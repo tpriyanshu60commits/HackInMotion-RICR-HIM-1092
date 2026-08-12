@@ -33,7 +33,7 @@ export const Register = () => {
         const { token, ...userData } = res.data.data;
         localStorage.setItem('auth_token', token);
         setUser(userData);
-        navigate('/dashboard', { replace: true });
+        navigate('/landing', { replace: true });
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');

@@ -24,20 +24,20 @@ import AiAssistant from './pages/AiAssistant';
 // Public Route Wrapper (Redirects to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isInitializing } = useStore();
-  
+
   if (isInitializing) return <div className="flex min-h-screen items-center justify-center"><WaterDropLoader message="Initializing Environment..." /></div>;
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
-  
+
   return children;
 };
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isInitializing } = useStore();
-  
+
   if (isInitializing) return <div className="flex min-h-screen items-center justify-center"><WaterDropLoader message="Verifying access..." /></div>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  
+
   return children;
 };
 
@@ -70,10 +70,11 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-          
+
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/locations" element={<Locations />} />
@@ -86,7 +87,7 @@ function App() {
             <Route path="/education" element={<Education />} />
             <Route path="/ai" element={<AiAssistant />} />
           </Route>
-          
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
