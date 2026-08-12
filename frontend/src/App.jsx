@@ -1,33 +1,43 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
-import useStore from './store/useStore';
-import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { MainLayout } from './layouts/MainLayout';
+
+// Mock Pages for now
+import { LandingPage } from './pages/LandingPage';
+import { Dashboard } from './pages/Dashboard';
+import { Locations } from './pages/Locations';
+import { Alerts } from './pages/Alerts';
+import { Profile } from './pages/Profile';
+import { Compare } from './pages/Compare';
+import { RouteRisk } from './pages/RouteRisk';
+import { HistoricalTrends } from './pages/HistoricalTrends';
+import { CommunityReports } from './pages/CommunityReports';
 import AiAssistant from './pages/AiAssistant';
-import CityComparison from './pages/CityComparison';
-import RoutePlanner from './pages/RoutePlanner';
-import CommunityReports from './pages/CommunityReports';
 
 function App() {
-  const theme = useStore((state) => state.theme);
-
-  useEffect(() => {
-    // Apply theme class to document body
-    document.body.className = `theme-${theme}`;
-  }, [theme]);
-
   return (
-    <BrowserRouter>
-      <Layout>
+    <ThemeProvider>
+      <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/ai" element={<AiAssistant />} />
-          <Route path="/compare" element={<CityComparison />} />
-          <Route path="/route" element={<RoutePlanner />} />
-          <Route path="/reports" element={<CommunityReports />} />
+          <Route path="/" element={<LandingPage />} />
+          
+          <Route element={<MainLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/locations" element={<Locations />} />
+            <Route path="/history" element={<HistoricalTrends />} />
+            <Route path="/community" element={<CommunityReports />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/route" element={<RouteRisk />} />
+            <Route path="/ai" element={<AiAssistant />} />
+          </Route>
+          
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Layout>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

@@ -1,188 +1,89 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { AlertTriangle, MapPin, Plus, Flame, Wind, Factory, Droplets, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { GlassCard } from '../components/common/GlassCard';
+import { RiskBadge } from '../components/common/RiskBadge';
+import { Flame, CloudFog, Factory, Trash2, ShieldAlert, Plus, MapPin } from 'lucide-react';
 
-const TYPE_ICONS = {
-  'Smoke': Flame,
-  'Waste burning': Flame,
-  'Dust': Wind,
-  'Industrial emissions': Factory,
-  'Other': Info
-};
+const REPORTS = [
+  { id: 1, type: 'Waste Burning', desc: 'Large waste fire near bypass road.', location: 'Bypass Road, Rewa', time: '10 mins ago', icon: Flame, color: 'text-red-500', bg: 'bg-red-500/10' },
+  { id: 2, type: 'Heavy Dust', desc: 'Construction site generating extreme dust without covers.', location: 'Civil Lines', time: '2 hours ago', icon: CloudFog, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+  { id: 3, type: 'Industrial Emission', desc: 'Unusual black smoke from factory.', location: 'Industrial Area', time: '5 hours ago', icon: Factory, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+];
 
-const SEVERITY_COLORS = {
-  'Low': 'text-success bg-success/10 border-success/20',
-  'Moderate': 'text-warning bg-warning/10 border-warning/20',
-  'High': 'text-destructive bg-destructive/10 border-destructive/20'
-};
-
-export default function CommunityReports() {
-  const [reports, setReports] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  
-  const [type, setType] = useState('Smoke');
-  const [severity, setSeverity] = useState('Moderate');
-  const [description, setDescription] = useState('');
-  
-  useEffect(() => {
-    fetchReports();
-  }, []);
-
-  const fetchReports = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/reports');
-      setReports(res.data);
-    } catch (err) {
-      console.error('Failed to load reports');
-    }
-  };
-
-  const submitReport = async (e) => {
-    e.preventDefault();
-    try {
-      // Mock coordinates near central city
-      const lat = 28.6139 + (Math.random() - 0.5) * 0.1;
-      const lng = 77.2090 + (Math.random() - 0.5) * 0.1;
-      
-      await axios.post('http://localhost:5000/api/reports', {
-        type, severity, description, lat, lng
-      });
-      
-      setShowForm(false);
-      setDescription('');
-      fetchReports();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
+export const CommunityReports = () => {
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
-            <AlertTriangle className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Community Reports</h1>
-            <p className="text-muted-foreground text-sm">Local environmental hazards reported by the community</p>
-          </div>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex justify-between items-end mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Community Reports</h1>
+          <p className="text-text-muted">Crowdsourced local environmental hazards.</p>
         </div>
-        <button 
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-all font-medium shadow-md"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Report Hazard</span>
+        <button className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl text-sm font-semibold hover:bg-primary-600 transition-colors shadow-lg shadow-primary-500/20">
+          <Plus size={18} /> Submit Report
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 order-2 lg:order-1 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {reports.map((report) => {
-              const Icon = TYPE_ICONS[report.type] || Info;
-              return (
-                <div key={report._id} className="glass p-5 rounded-2xl border border-border hover:border-primary/50 transition-colors cursor-default">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-muted rounded-lg text-foreground">
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <span className="font-semibold">{report.type}</span>
-                    </div>
-                    <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${SEVERITY_COLORS[report.severity]}`}>
-                      {report.severity}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2 min-h-[2.5rem]">
-                    {report.description || 'No description provided.'}
-                  </p>
-                  <div className="flex justify-between items-center text-xs text-muted-foreground/70 border-t border-border pt-3">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      <span>{Math.abs(report.lat).toFixed(2)}°, {Math.abs(report.lng).toFixed(2)}°</span>
-                    </div>
-                    <span>{new Date(report.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              );
-            })}
-            
-            {reports.length === 0 && (
-              <div className="col-span-full text-center py-20 border-2 border-dashed border-border rounded-2xl text-muted-foreground">
-                <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No community reports found.</p>
+        {/* Report List */}
+        <div className="col-span-1 lg:col-span-2 space-y-4">
+          {REPORTS.map(report => (
+            <GlassCard key={report.id} hover className="flex gap-4 items-start p-5">
+              <div className={`shrink-0 w-12 h-12 rounded-2xl ${report.bg} ${report.color} flex items-center justify-center`}>
+                <report.icon size={24} />
               </div>
-            )}
-          </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-bold text-lg">{report.type}</h3>
+                  <span className="text-xs font-semibold text-text-muted bg-surface px-2 py-1 rounded-md border border-border">
+                    {report.time}
+                  </span>
+                </div>
+                <p className="text-text-muted text-sm mb-3">{report.desc}</p>
+                <div className="flex items-center gap-1 text-xs font-semibold text-primary-600 dark:text-primary-400">
+                  <MapPin size={14} />
+                  {report.location}
+                </div>
+              </div>
+            </GlassCard>
+          ))}
         </div>
 
-        <div className="lg:col-span-1 order-1 lg:order-2">
-          {showForm ? (
-            <form onSubmit={submitReport} className="glass p-6 rounded-3xl space-y-4 border border-primary/20 sticky top-24">
-              <h3 className="font-bold text-lg mb-2">New Report</h3>
+        {/* Submit Form Placeholder */}
+        <div className="col-span-1">
+          <GlassCard className="sticky top-6">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 border-b border-border pb-4">
+              <ShieldAlert size={20} className="text-primary-500" />
+              File a New Report
+            </h3>
+            <form className="space-y-4" onSubmit={e => e.preventDefault()}>
               <div>
-                <label className="block text-sm font-medium mb-1.5 text-muted-foreground">Hazard Type</label>
-                <select 
-                  value={type} 
-                  onChange={(e) => setType(e.target.value)}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option>Smoke</option>
-                  <option>Waste burning</option>
-                  <option>Dust</option>
-                  <option>Industrial emissions</option>
-                  <option>Other</option>
+                <label className="text-xs font-semibold text-text-muted uppercase mb-1 block">Issue Type</label>
+                <select className="w-full bg-surface/50 border border-border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary-500 font-medium text-sm">
+                  <option>Waste Burning</option>
+                  <option>Heavy Smoke</option>
+                  <option>Construction Dust</option>
+                  <option>Industrial Emission</option>
+                  <option>Unusual Odor</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1.5 text-muted-foreground">Severity</label>
-                <select 
-                  value={severity} 
-                  onChange={(e) => setSeverity(e.target.value)}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                >
-                  <option>Low</option>
-                  <option>Moderate</option>
-                  <option>High</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1.5 text-muted-foreground">Description</label>
+                <label className="text-xs font-semibold text-text-muted uppercase mb-1 block">Description</label>
                 <textarea 
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Provide more details..."
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 h-24 resize-none"
+                  rows={3}
+                  className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-primary-500 font-medium text-sm resize-none"
+                  placeholder="Describe what you see..."
                 ></textarea>
               </div>
-              <button 
-                type="submit" 
-                className="w-full bg-primary text-primary-foreground py-2.5 rounded-xl font-medium shadow-md hover:bg-primary/90 transition-all"
-              >
-                Submit to Community
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-surface border border-border hover:bg-surface-hover rounded-xl text-sm font-semibold transition-colors text-text-main">
+                <MapPin size={16} className="text-primary-500"/>
+                Use Current Location
               </button>
-              <button 
-                type="button" 
-                onClick={() => setShowForm(false)}
-                className="w-full bg-transparent text-muted-foreground py-2.5 rounded-xl font-medium hover:bg-muted transition-all"
-              >
-                Cancel
+              <button className="w-full mt-2 flex items-center justify-center gap-2 px-6 py-3 bg-primary-500 text-white rounded-xl font-bold hover:bg-primary-600 transition-colors shadow-lg shadow-primary-500/20">
+                Submit Report
               </button>
             </form>
-          ) : (
-            <div className="glass rounded-3xl overflow-hidden h-[400px] border border-border flex items-center justify-center bg-muted/20 relative sticky top-24">
-              <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'}}></div>
-              <div className="text-center z-10 bg-card p-6 rounded-2xl shadow-xl border border-border mx-4">
-                <MapPin className="w-10 h-10 text-primary mx-auto mb-3 opacity-80" />
-                <h3 className="font-semibold mb-1">Live Map View</h3>
-                <p className="text-sm text-muted-foreground">Reports are visualized here when map services are active.</p>
-              </div>
-            </div>
-          )}
+          </GlassCard>
         </div>
       </div>
     </div>
   );
-}
+};
