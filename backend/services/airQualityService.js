@@ -1,91 +1,82 @@
 import axios from 'axios';
 import { calculateBaseRisk, getPersonalizedRisk } from './riskEngine.js';
 import AirQualitySnapshot from '../models/AirQualitySnapshot.js';
+import { geocodeCity, reverseGeocode } from './geocodingService.js';
 
-/**
- * Normalizes WAQI data into our standardized format
- */
-const normalizeWaqiData = (data, healthProfile = null) => {
-  const iaqi = data.iaqi || {};
-  const aqi = data.aqi;
+const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null) => {
+  const currentAirQuality = data.airQuality.current;
+  const currentWeather = data.weather.current;
+  const dailyWeather = data.weather.daily;
+  
+  // Map Open-Meteo European AQI (0-100+) to a standard 0-500 US AQI scale roughly
+  // Open-Meteo returns US AQI in the hourly array, but for current we can use pm2.5 to estimate AQI,
+  // Or better, OpenMeteo provides US AQI in current if requested.
+  // I requested it in the URL below.
+  const aqi = currentAirQuality.us_aqi || 50; 
   
   const baseRisk = calculateBaseRisk(aqi);
   const personalizedRisk = getPersonalizedRisk(baseRisk, healthProfile);
 
   return {
     aqi: aqi,
-    pm25: iaqi.pm25 ? iaqi.pm25.v : null,
-    pm10: iaqi.pm10 ? iaqi.pm10.v : null,
-    co: iaqi.co ? iaqi.co.v : null,
-    no2: iaqi.no2 ? iaqi.no2.v : null,
-    so2: iaqi.so2 ? iaqi.so2.v : null,
-    o3: iaqi.o3 ? iaqi.o3.v : null,
-    temperature: iaqi.t ? iaqi.t.v : null,
-    humidity: iaqi.h ? iaqi.h.v : null,
-    wind: iaqi.w ? iaqi.w.v : null,
+    pm25: currentAirQuality.pm2_5,
+    pm10: currentAirQuality.pm10,
+    co: currentAirQuality.carbon_monoxide,
+    no2: currentAirQuality.nitrogen_dioxide,
+    so2: currentAirQuality.sulphur_dioxide,
+    o3: currentAirQuality.ozone,
+    temperature: currentWeather.temperature_2m,
+    feelsLike: currentWeather.apparent_temperature,
+    humidity: currentWeather.relative_humidity_2m,
+    wind: currentWeather.wind_speed_10m,
+    pressure: currentWeather.surface_pressure,
+    precipitation: currentWeather.precipitation,
+    weatherCode: currentWeather.weather_code,
+    uvIndex: dailyWeather?.uv_index_max?.[0] || 0,
+    sunrise: dailyWeather?.sunrise?.[0] || null,
+    sunset: dailyWeather?.sunset?.[0] || null,
     risk: personalizedRisk,
-    city: data.city.name,
-    latitude: data.city.geo[0],
-    longitude: data.city.geo[1],
-    timestamp: data.time ? new Date(data.time.iso) : new Date(),
+    city: locationInfo.city,
+    country: locationInfo.country,
+    latitude: data.weather.latitude,
+    longitude: data.weather.longitude,
+    timestamp: new Date(),
   };
 };
 
-/**
- * Get current air quality by coordinates
- */
 export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null) => {
   try {
-    const token = process.env.ENVIRONMENT_API_KEY;
-    const baseUrl = process.env.ENVIRONMENT_API_BASE_URL || 'https://api.waqi.info/';
-    
-    // WAQI endpoint: /feed/geo:lat;lng/?token=
-    const response = await axios.get(`${baseUrl}feed/geo:${lat};${lng}/?token=${token}`);
-    
-    if (response.data.status !== 'ok') {
-      throw new Error(response.data.data || 'Failed to fetch environmental data');
-    }
+    const locationInfo = await reverseGeocode(lat, lng);
 
-    const normalizedData = normalizeWaqiData(response.data.data, healthProfile);
-    
-    // Optionally save snapshot in background
+    const [airQualityResponse, weatherResponse] = await Promise.all([
+      axios.get(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`),
+      axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`)
+    ]);
+
+    const data = {
+      airQuality: airQualityResponse.data,
+      weather: weatherResponse.data
+    };
+
+    const normalizedData = normalizeOpenMeteoData(data, locationInfo, healthProfile);
     saveSnapshot(normalizedData).catch(console.error);
-
     return normalizedData;
   } catch (error) {
-    console.error('Air Quality API Error:', error.message);
+    console.error('Open-Meteo API Error:', error.message);
     throw new Error('Environmental data currently unavailable for this location.');
   }
 };
 
-/**
- * Get current air quality by city name
- */
 export const getAirQualityByCity = async (city, healthProfile = null) => {
   try {
-    const token = process.env.ENVIRONMENT_API_KEY;
-    const baseUrl = process.env.ENVIRONMENT_API_BASE_URL || 'https://api.waqi.info/';
-    
-    const response = await axios.get(`${baseUrl}feed/${encodeURIComponent(city)}/?token=${token}`);
-    
-    if (response.data.status !== 'ok') {
-      throw new Error(response.data.data || 'Failed to fetch environmental data');
-    }
-
-    const normalizedData = normalizeWaqiData(response.data.data, healthProfile);
-    
-    saveSnapshot(normalizedData).catch(console.error);
-
-    return normalizedData;
+    const geo = await geocodeCity(city);
+    return await getAirQualityByCoordinates(geo.lat, geo.lng, healthProfile);
   } catch (error) {
-    console.error('Air Quality API Error:', error.message);
+    console.error('City lookup error:', error.message);
     throw new Error('Environmental data currently unavailable for this city.');
   }
 };
 
-/**
- * Save snapshot to database
- */
 const saveSnapshot = async (data, locationId = null) => {
   try {
     await AirQualitySnapshot.create({
@@ -111,12 +102,7 @@ const saveSnapshot = async (data, locationId = null) => {
   }
 };
 
-/**
- * Get Historical Data (Dummy for now, normally queries AirQualitySnapshot)
- * In a real scenario with AQICN, historical data requires an enterprise plan or we rely on our own collected snapshots.
- */
 export const getHistoricalData = async (lat, lng, days = 7) => {
-  // Since we might not have enough snapshots initially, return what we have
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
 

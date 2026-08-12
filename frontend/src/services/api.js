@@ -21,10 +21,11 @@ export const locationService = {
   save: (data) => api.post('/locations/saved', data),
 };
 
-export const airQualityService = {
-  getCurrent: (lat, lng) => api.get(`/air-quality/current?lat=${lat}&lng=${lng}`),
-  getForecast: (lat, lng) => api.get(`/air-quality/forecast?lat=${lat}&lng=${lng}`),
-  getHistory: (lat, lng, range) => api.get(`/air-quality/history?lat=${lat}&lng=${lng}&range=${range}`),
+export const environmentService = {
+  getCurrentByCoords: (lat, lng) => api.get(`/environment/current?lat=${lat}&lng=${lng}`),
+  getCurrentByCity: (city) => api.get(`/environment/city?city=${city}`),
+  getHistory: (lat, lng, days) => api.get(`/environment/history?lat=${lat}&lng=${lng}&days=${days}`),
+  compareCities: (cities) => api.get(`/environment/compare?cities=${cities}`),
 };
 
 export const profileService = {

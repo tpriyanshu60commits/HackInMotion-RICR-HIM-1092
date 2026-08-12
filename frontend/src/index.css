@@ -152,7 +152,7 @@
 
 .animate-ripple {
   animation: ripple 1s ease-out infinite;
-  animation-delay: 0.5s; /* Align with drop landing */
+  animation-delay: 0.5s;
 }
 
 @keyframes fadeIn {
@@ -171,4 +171,9 @@
 
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes rain {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(30px); }
 }
