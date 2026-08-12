@@ -2,13 +2,10 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import app from './app.js';
 
-// Load env vars
 dotenv.config();
 
-// Connect to database
 connectDB();
 
-// Initialize scheduled tasks
 import { initCronJobs } from './services/alertService.js';
 initCronJobs();
 
