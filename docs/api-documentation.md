@@ -1,178 +1,99 @@
-# API Documentation
+# VerdantX API Documentation
 
-## Base URL
-`http://localhost:5000/api`
-
-## Authentication
-
-All protected routes require a JWT token. The token is sent in an `HttpOnly` cookie by default when logging in. Alternatively, you can pass it in the `Authorization` header as a Bearer token.
-
-### 1. Register User
-- **URL**: `/auth/register`
-- **Method**: `POST`
-- **Body**:
-  ```json
-  {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "password123"
-  }
-  ```
-- **Response**: `201 Created`
-  ```json
-  {
-    "success": true,
-    "data": { "_id": "...", "name": "John Doe", "email": "john@example.com", "token": "..." }
-  }
-  ```
-
-### 2. Login User
-- **URL**: `/auth/login`
-- **Method**: `POST`
-- **Body**:
-  ```json
-  {
-    "email": "john@example.com",
-    "password": "password123"
-  }
-  ```
-- **Response**: `200 OK`
-
-### 3. Get/Update Profile
-- **URL**: `/auth/profile`
-- **Method**: `GET` / `PUT`
-- **Protected**: Yes
-- **PUT Body (optional fields)**:
-  ```json
-  {
-    "name": "John Updated",
-    "healthProfile": {
-      "respiratoryCondition": true,
-      "asthma": false
-    },
-    "alertPreferences": {
-      "highRisk": true
-    }
-  }
-  ```
+## Authentication & Users (MOCK)
+*Currently using mock user ID `60d0fe4f5311236168a109ca` for device 3 demo integration.*
 
 ---
 
-## Locations
+## AI Assistant (`/api/ai`)
 
-### 1. Get Saved Locations
-- **URL**: `/locations`
-- **Method**: `GET`
-- **Protected**: Yes
+### `POST /api/ai/ask`
+Submits a prompt to the Groq AI Environmental Agent.
 
-### 2. Save a Location
-- **URL**: `/locations`
-- **Method**: `POST`
-- **Protected**: Yes
-- **Body**:
-  ```json
-  {
-    "name": "Home",
-    "city": "London",
-    "latitude": 51.5074,
-    "longitude": -0.1278,
-    "locationType": "home"
-  }
-  ```
-
-### 3. Delete Location
-- **URL**: `/locations/:id`
-- **Method**: `DELETE`
-- **Protected**: Yes
-
----
-
-## Environment & Risk Engine
-
-The risk engine automatically incorporates the authenticated user's `healthProfile` to adjust the `risk` severity.
-
-### 1. Current Air Quality (by Coordinates)
-- **URL**: `/environment/current?lat=51.5&lng=-0.1`
-- **Method**: `GET`
-- **Protected**: Yes
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "data": {
-      "aqi": 120,
-      "pm25": 45,
-      "city": "London",
-      "risk": {
-        "riskLevel": "UNHEALTHY_SENSITIVE",
-        "severity": 3,
-        "personalRisk": "HIGHER",
-        "explanation": "Respiratory conditions increase susceptibility.",
-        "recommendations": ["Keep windows closed"]
-      }
-    }
-  }
-  ```
-
-### 2. Historical Data
-- **URL**: `/environment/history?lat=51.5&lng=-0.1&days=7`
-- **Method**: `GET`
-- **Protected**: Yes
-
-### 3. Compare Cities
-- **URL**: `/environment/compare?cities=London,Paris,Berlin`
-- **Method**: `GET`
-- **Protected**: Yes
-
----
-
-## Alerts
-
-### 1. Get User Alerts
-- **URL**: `/alerts`
-- **Method**: `GET`
-- **Protected**: Yes
-
-### 2. Mark Alert Read
-- **URL**: `/alerts/:id/read`
-- **Method**: `PUT`
-- **Protected**: Yes
-
----
-
-## Community Reports
-
-### 1. Get Reports
-- **URL**: `/community?lat=51.5&lng=-0.1&radius=10`
-- **Method**: `GET`
-- **Protected**: No
-
-### 2. Create Report
-- **URL**: `/community`
-- **Method**: `POST`
-- **Protected**: Yes
-- **Body**:
-  ```json
-  {
-    "category": "smoke",
-    "description": "Thick black smoke from a factory",
-    "latitude": 51.5,
-    "longitude": -0.1,
-    "city": "London"
-  }
-  ```
-
-### 3. Upvote Report
-- **URL**: `/community/:id/upvote`
-- **Method**: `PUT`
-- **Protected**: Yes
-
-## Standard Error Response
+**Request Body:**
 ```json
 {
-  "success": false,
-  "message": "Error description",
-  "code": "400",
-  "details": null
+  "message": "What is the air quality in my city?",
+  "contextData": {
+    "aqi": 85,
+    "pm2_5": 12.5,
+    "temperature": 28,
+    "humidity": 45
+  }
 }
+```
+
+**Response:**
+```json
+{
+  "response": "The air quality in your city is currently Moderate with an AQI of 85..."
+}
+```
+
+---
+
+## Environmental Data (`/api/data`)
+*Proxies requests to Open-Meteo free API.*
+
+### `GET /api/data/current`
+Fetches current AQI, PM2.5, PM10, and Weather.
+
+**Query Parameters:**
+- `lat` (required): Latitude
+- `lng` (required): Longitude
+
+**Response:**
+```json
+{
+  "aqi": 110,
+  "pm2_5": 45.2,
+  "pm10": 80.1,
+  "temperature": 29.5,
+  "humidity": 55,
+  "windSpeed": 12.4,
+  "timestamp": "2026-08-12T12:00:00Z"
+}
+```
+
+### `GET /api/data/forecast`
+Fetches 48-hour forecast for AQI and PM2.5.
+
+**Query Parameters:**
+- `lat` (required): Latitude
+- `lng` (required): Longitude
+
+---
+
+## Community Reports (`/api/reports`)
+
+### `POST /api/reports`
+Submit a new environmental hazard report.
+
+**Request Body:**
+```json
+{
+  "type": "Smoke",
+  "severity": "High",
+  "description": "Thick black smoke from factory.",
+  "lat": 28.6139,
+  "lng": 77.2090
+}
+```
+
+### `GET /api/reports`
+Fetch recent community reports.
+
+**Response:**
+```json
+[
+  {
+    "_id": "report_id",
+    "type": "Smoke",
+    "severity": "High",
+    "description": "Thick black smoke from factory.",
+    "lat": 28.6139,
+    "lng": 77.2090,
+    "createdAt": "2026-08-12T12:00:00Z"
+  }
+]
 ```

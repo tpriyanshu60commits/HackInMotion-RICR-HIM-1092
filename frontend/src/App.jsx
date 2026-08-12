@@ -13,6 +13,7 @@ import { Compare } from './pages/Compare';
 import { RouteRisk } from './pages/RouteRisk';
 import { HistoricalTrends } from './pages/HistoricalTrends';
 import { CommunityReports } from './pages/CommunityReports';
+import AiAssistant from './pages/AiAssistant';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/compare" element={<Compare />} />
             <Route path="/route" element={<RouteRisk />} />
+            <Route path="/ai" element={<AiAssistant />} />
           </Route>
           
           <Route path="*" element={<Navigate to="/" replace />} />

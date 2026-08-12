@@ -24,6 +24,8 @@ const userSchema = new mongoose.Schema(
       children: { type: Boolean, default: false },
       elderlyHouseholdMember: { type: Boolean, default: false },
       outdoorWorker: { type: Boolean, default: false },
+      respiratorySensitivity: { type: String, enum: ['Low', 'Moderate', 'High'], default: 'Low' },
+      outdoorActivityFrequency: { type: String, enum: ['Rarely', 'Sometimes', 'Often'], default: 'Sometimes' }
     },
     alertPreferences: {
       highRisk: { type: Boolean, default: true },

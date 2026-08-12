@@ -12,6 +12,10 @@ import locationRoutes from './routes/locationRoutes.js';
 import environmentRoutes from './routes/environmentRoutes.js';
 import alertRoutes from './routes/alertRoutes.js';
 import communityRoutes from './routes/communityRoutes.js';
+import aiRoutes from './routes/ai.js';
+import dataRoutes from './routes/data.js';
+import reportRoutes from './routes/reports.js';
+import myLocationRoutes from './routes/locations.js'; // My simple mocked ones if needed, but DEVICE 1 has auth so I should probably use theirs if frontend was updated, but frontend still uses `/api/locations` and `/api/reports` and `/api/data`.
 
 const app = express();
 
@@ -19,7 +23,7 @@ const app = express();
 app.use(helmet()); // Set security HTTP headers
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true, // Allow cookies
   })
 );
@@ -48,11 +52,18 @@ app.get('/', (req, res) => {
   res.send('Environmental API is running...');
 });
 
+// Device 1 routes
 app.use('/api/auth', authRoutes);
-app.use('/api/locations', locationRoutes);
+app.use('/api/locations', locationRoutes); // Device 1
 app.use('/api/environment', environmentRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/community', communityRoutes);
+
+// Device 3 routes (Ensuring frontend doesn't break if it relies on these specific paths)
+app.use('/api/ai', aiRoutes);
+app.use('/api/data', dataRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/my-locations', myLocationRoutes);
 
 // Error Handling Middleware
 app.use(notFound);
