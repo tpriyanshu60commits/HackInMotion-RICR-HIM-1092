@@ -6,6 +6,22 @@ const useStore = create(
     (set) => ({
       theme: 'light',
       setTheme: (theme) => set({ theme }),
+
+      user: null,
+      isAuthenticated: false,
+      isInitializing: true,
+      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setInitializing: (isInitializing) => set({ isInitializing }),
+      logout: () => {
+        localStorage.removeItem('auth_token');
+        set({ user: null, isAuthenticated: false });
+      },
+
+      sidebarWidth: 'default', // 'compact', 'default', 'wide', 'minimized'
+      setSidebarWidth: (width) => set({ sidebarWidth: width }),
+
+      weatherCondition: 'clear',
+      setWeatherCondition: (condition) => set({ weatherCondition: condition }),
       
       location: null,
       setLocation: (location) => set({ location }),

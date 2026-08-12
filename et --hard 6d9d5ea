@@ -1,0 +1,16 @@
+[33m6d9d5ea[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m7e6e978[m HEAD@{1}: commit: light and dark theme is selected and properly working
+[33m6d9d5ea[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2}: pull: Fast-forward
+[33m62e11c0[m[33m ([m[1;32mfeature/AG01[m[33m)[m HEAD@{3}: reset: moving to HEAD
+[33m62e11c0[m[33m ([m[1;32mfeature/AG01[m[33m)[m HEAD@{4}: checkout: moving from feature/AG01 to master
+[33m62e11c0[m[33m ([m[1;32mfeature/AG01[m[33m)[m HEAD@{5}: merge master: Fast-forward
+[33m5cc65a0[m HEAD@{6}: checkout: moving from master to feature/AG01
+[33m62e11c0[m[33m ([m[1;32mfeature/AG01[m[33m)[m HEAD@{7}: pull: Fast-forward
+[33m5cc65a0[m HEAD@{8}: checkout: moving from feature/AG01 to master
+[33m5cc65a0[m HEAD@{9}: merge master: Fast-forward
+[33mb6c3d32[m[33m ([m[1;31morigin/feature/AG01[m[33m)[m HEAD@{10}: checkout: moving from master to feature/AG01
+[33m5cc65a0[m HEAD@{11}: pull: Fast-forward
+[33me6d357a[m HEAD@{12}: checkout: moving from feature/AG01 to master
+[33mb6c3d32[m[33m ([m[1;31morigin/feature/AG01[m[33m)[m HEAD@{13}: commit: Backend, Database, Authentication & Risk Engine's working started
+[33me6d357a[m HEAD@{14}: checkout: moving from master to feature/AG01
+[33me6d357a[m HEAD@{15}: clone: from https://github.com/tpriyanshu60commits/HackInMotion-RICR-HIM-1092.git
