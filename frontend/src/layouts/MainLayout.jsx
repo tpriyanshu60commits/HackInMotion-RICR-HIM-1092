@@ -9,6 +9,7 @@ import {
 import useStore from '../store/useStore';
 import { cn } from '../components/common/GlassCard';
 import { WeatherBackground } from '../components/common/WeatherBackground';
+import { ChatbotButton } from '../components/chat/ChatbotButton';
 import api from '../services/api';
 
 const THEMES = [
@@ -67,11 +68,10 @@ export const MainLayout = () => {
 
   return (
     <WeatherBackground>
-      <div className="min-h-screen flex text-text-main w-full pb-16 md:pb-0"> {/* Padding bottom for mobile nav */}
-        
+      <div className="h-screen w-full flex text-text-main overflow-hidden bg-background">
         {/* Desktop Sidebar */}
         <nav className={cn(
-          "hidden md:flex glass border-r border-border flex-col transition-all duration-300 ease-in-out z-40 sticky top-0 h-screen",
+          "hidden md:flex glass border-r border-border flex-col transition-all duration-300 ease-in-out z-40 h-full flex-shrink-0",
           sidebarWidth === 'default' ? 'w-64' : sidebarWidth === 'compact' ? 'w-48' : 'w-20'
         )}>
           {/* Logo Area */}
@@ -232,11 +232,14 @@ export const MainLayout = () => {
         </nav>
 
         {/* Main Canvas */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 w-full relative mt-16 md:mt-0 h-full">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden p-4 pt-20 pb-20 md:p-8 md:pb-8 relative scroll-smooth w-full">
           <div className="max-w-7xl mx-auto h-full">
             <Outlet />
           </div>
         </main>
+        
+        {/* Floating Chatbot */}
+        <ChatbotButton />
       </div>
     </WeatherBackground>
   );
