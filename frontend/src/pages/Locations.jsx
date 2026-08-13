@@ -34,7 +34,7 @@ const LocationCard = ({ loc }) => {
         show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
       }}
       whileHover={{ scale: 1.02, y: -3 }}
-      className="group relative w-full rounded-[20px] bg-white/[0.04] backdrop-blur-[16px] border border-white/[0.08] hover:border-white/[0.16] hover:bg-white/[0.08] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden flex flex-col md:flex-row items-start md:items-center p-5 md:p-6 gap-4 md:gap-6"
+      className="group relative w-full rounded-[20px] bg-white/[0.04] backdrop-blur-[14px] border border-white/[0.08] hover:border-white/[0.16] hover:bg-white/[0.08] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 ease-in-out cursor-pointer overflow-hidden flex flex-col md:flex-row items-start md:items-center p-5 md:p-6 gap-4 md:gap-6"
     >
       {/* Subtle internal gradient/glow */}
       <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-[20px] ${aqiStyle.glow}`}></div>

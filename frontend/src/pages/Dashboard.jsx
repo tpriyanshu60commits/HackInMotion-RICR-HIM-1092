@@ -5,9 +5,10 @@ import { WaterDropLoader } from '../components/common/WaterDropLoader';
 import { LocationSearch } from '../components/common/LocationSearch';
 import {
   MapPin, Wind, Droplets, Thermometer, CloudRain, Activity,
-  Info, CheckCircle2, Sunrise, Gauge, Sun, Search, Bell,
+  Info, CheckCircle2, Sunrise, Gauge, Sun, Search,
   AlertTriangle, AlertCircle, AlertOctagon
 } from 'lucide-react';
+import { NotificationDropdown } from '../components/common/NotificationDropdown';
 import { environmentService } from '../services/api';
 import useStore from '../store/useStore';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -124,18 +125,18 @@ export const Dashboard = () => {
   return (
     <div
       className="space-y-6 animate-fade-in pb-10 px-2 lg:px-4 min-h-full relative"
-    style={{
-  backgroundImage: `
+      style={{
+        backgroundImage: `
     linear-gradient(
       rgba(1, 11, 7, 0.4),
       rgba(0, 0, 0, 0.4)
     ),
     url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
   `,
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundAttachment: "fixed",
-}}
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
     >
       {/* Top Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -153,10 +154,7 @@ export const Dashboard = () => {
               <LocationSearch onLocationSelect={handleLocationSelect} />
             </div>
           </div>
-          <button className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.1] backdrop-blur-xl transition-colors shrink-0 relative">
-            <Bell size={18} />
-            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-          </button>
+          <NotificationDropdown />
         </div>
       </div>
 

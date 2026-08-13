@@ -31,6 +31,9 @@ const useStore = create(
       userName: '',
       setUserName: (name) => set({ userName: name }),
       
+      userAge: '',
+      setUserAge: (age) => set({ userAge: age }),
+      
       diagnosedConditions: [],
       setDiagnosedConditions: (conditions) => set({ diagnosedConditions: conditions }),
       
@@ -52,6 +55,9 @@ const useStore = create(
       language: 'en',
       setLanguage: (lang) => set({ language: lang }),
       
+      temperatureUnit: 'celsius',
+      setTemperatureUnit: (unit) => set({ temperatureUnit: unit }),
+      
       location: null,
       setLocation: (location) => set({ location }),
       
@@ -60,10 +66,16 @@ const useStore = create(
       removeSavedLocation: (id) => set((state) => ({ savedLocations: state.savedLocations.filter(l => l.id !== id) })),
       
       alerts: [],
-      addAlert: (alert) => set((state) => ({ alerts: [alert, ...state.alerts] })),
+      addAlert: (alert) => set((state) => ({ 
+        alerts: [{ ...alert, read: false, id: Date.now().toString() }, ...state.alerts] 
+      })),
       markAlertRead: (id) => set((state) => ({
         alerts: state.alerts.map(a => a.id === id ? { ...a, read: true } : a)
       })),
+      markAllAlertsRead: () => set((state) => ({
+        alerts: state.alerts.map(a => ({ ...a, read: true }))
+      })),
+      clearAllAlerts: () => set({ alerts: [] }),
     }),
     {
       name: 'env-storage',

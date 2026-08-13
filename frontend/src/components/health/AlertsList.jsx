@@ -5,7 +5,7 @@ import { useHealthAlerts } from '../../hooks/useHealthAlerts';
 import { cn } from '../common/GlassCard';
 
 export const AlertsList = () => {
-  const { alerts } = useHealthAlerts();
+  const { alerts, summary } = useHealthAlerts();
 
   const severityConfig = {
     red: { icon: ShieldAlert, classes: 'border-red-500/30 bg-red-500/10 text-red-300', iconColor: 'text-red-400' },
@@ -23,18 +23,40 @@ export const AlertsList = () => {
       </h2>
 
       <div className="flex-1 flex flex-col gap-3">
+        {summary && (
+          <div className="mb-2 p-4 bg-white/5 border border-white/10 rounded-xl backdrop-blur-md relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+            <p className="text-sm text-gray-300 leading-relaxed font-medium">
+              {summary}
+            </p>
+          </div>
+        )}
+        
         <AnimatePresence mode="popLayout">
           {alerts.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/10 rounded-xl"
-            >
-              <ShieldCheck size={32} className="text-gray-500 mb-3 opacity-50" />
-              <p className="text-sm text-gray-400 font-medium">Monitoring conditions...</p>
-              <p className="text-xs text-gray-500 mt-1">Please enter your name and select conditions to see personalized alerts.</p>
-            </motion.div>
+            summary ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex-1 flex flex-col items-center justify-center text-center p-6 border border-green-500/20 bg-green-500/5 rounded-xl"
+              >
+                <ShieldCheck size={32} className="text-green-500 mb-3" />
+                <p className="text-sm text-green-400 font-medium">All Clear!</p>
+                <p className="text-xs text-green-500/70 mt-1">No specific alerts triggered for your conditions right now.</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex-1 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/10 rounded-xl"
+              >
+                <ShieldCheck size={32} className="text-gray-500 mb-3 opacity-50" />
+                <p className="text-sm text-gray-400 font-medium">Monitoring conditions...</p>
+                <p className="text-xs text-gray-500 mt-1">Please enter your name and select conditions to see personalized alerts.</p>
+              </motion.div>
+            )
           ) : (
             alerts.map((alert, idx) => {
               const config = severityConfig[alert.severity] || severityConfig.amber;

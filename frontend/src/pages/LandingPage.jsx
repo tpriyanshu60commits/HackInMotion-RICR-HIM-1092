@@ -44,11 +44,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0F0D] text-white font-sans selection:bg-green-500/30 overflow-x-hidden">
-      
+
       {/* Global Fixed Background */}
-      <div 
+      <div
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
+        style={{
           backgroundColor: '#142018',
           backgroundImage: `url("/hero-bg.png"), linear-gradient(135deg, #1a2e22, #0A0F0D)`
         }}
@@ -67,7 +67,7 @@ export default function LandingPage() {
               <span className="text-[10px] text-gray-400 mt-1">Breathe Better. Live Better.</span>
             </div>
           </div>
-          
+
           <div className="hidden lg:flex items-center gap-8">
             {['Home', 'Features', 'Solutions', 'Community', 'Blog', 'About'].map(link => (
               <a key={link} href={`#${link.toLowerCase()}`} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">{link}</a>
@@ -91,9 +91,9 @@ export default function LandingPage() {
           {/* Left Column */}
           <div className="flex flex-col justify-center max-w-2xl">
             <div className="self-start">
-              <Eyebrow 
-                text="AI Powered. Data Driven." 
-                icon={<svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="8" r="4"/></svg>} 
+              <Eyebrow
+                text="AI Powered. Data Driven."
+                icon={<svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="8" r="4" /></svg>}
               />
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
@@ -133,7 +133,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-xs text-gray-400 mb-6">Updated 5 min ago</p>
-              
+
               <div className="flex gap-2 mb-6">
                 <span className="px-3 py-1.5 bg-white/5 rounded-full text-xs text-gray-300 border border-white/10">📍 New Delhi, India</span>
                 <span className="px-3 py-1.5 bg-white/5 rounded-full text-xs text-gray-300 border border-white/10">🗺 View on Map</span>
@@ -176,7 +176,7 @@ export default function LandingPage() {
                   Good
                 </div>
               </GlassCard>
-              
+
               <GlassCard className="p-4">
                 <div className="flex justify-between mb-2">
                   <span className="text-xs font-medium text-gray-400">PM10</span>
@@ -263,7 +263,7 @@ export default function LandingPage() {
             <p className="text-gray-300 text-lg mb-8 leading-relaxed">
               Our environment is changing rapidly. VerdantX helps you stay informed, take action and contribute towards a healthier, greener and safer world.
             </p>
-            
+
             <ul className="space-y-6">
               {[
                 "Air pollution is linked to 7 million+ deaths annually.",
@@ -282,14 +282,14 @@ export default function LandingPage() {
 
           <div className="relative group">
             <GlassCard className="overflow-hidden p-1">
-              <div 
+              <div
                 className="relative rounded-xl overflow-hidden aspect-video"
-                style={{ 
+                style={{
                   backgroundColor: '#142018',
                   backgroundImage: `linear-gradient(135deg, #1a2e22, #0A0F0D)`
                 }}
               >
-                <video 
+                <video
                   ref={videoRef}
                   className="w-full h-full object-cover"
                   // poster="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2000&auto=format&fit=crop"
@@ -301,7 +301,7 @@ export default function LandingPage() {
                 />
                 {!isPlaying && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity group-hover:bg-black/50">
-                    <button 
+                    <button
                       onClick={handlePlayVideo}
                       className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 hover:scale-110 hover:bg-white/30 transition-all cursor-pointer z-10"
                     >
@@ -311,7 +311,7 @@ export default function LandingPage() {
                 )}
               </div>
             </GlassCard>
-            
+
             <div className="mt-6 flex items-center gap-3 px-4">
               <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M17 8C8 10 5 16 5 16s1.5-2.5 4-4l-3-3c2 0 4.5.5 6 1.5l1.5-1.5c1.5-1.5 4.5-2 4.5-2s-.5 3-2 4.5L17 14c1 1.5 1.5 4 1.5 6 0 0-6-3-4-12z" /></svg>
@@ -336,7 +336,7 @@ export default function LandingPage() {
               </h2>
             </div>
             <Link to="/dashboard" className="text-green-500 hover:text-green-400 font-medium inline-flex items-center gap-2 transition-colors">
-              Explore All Features 
+              Explore All Features
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </Link>
           </div>
@@ -403,7 +403,7 @@ export default function LandingPage() {
                   <h4 className="text-xl font-bold text-white whitespace-nowrap">{item.title}</h4>
                 </div>
                 <p className="text-gray-400 text-sm">{item.desc}</p>
-                
+
                 {/* Mobile Connector */}
                 {idx < 3 && <div className="lg:hidden h-12 border-l-2 border-dashed border-white/10 my-6"></div>}
               </div>
@@ -418,7 +418,7 @@ export default function LandingPage() {
           <GlassCard className="p-10 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-10 relative overflow-hidden">
             {/* Background Glow */}
             <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-green-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-            
+
             <div className="max-w-2xl relative z-10 text-center lg:text-left">
               <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Be Part of the Change</h2>
               <p className="text-gray-300 text-lg">
@@ -462,7 +462,7 @@ export default function LandingPage() {
                   "M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
                 ].map((path, idx) => (
                   <a key={idx} href="#" className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-green-500 hover:bg-white/10 transition-colors">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d={path}/></svg>
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d={path} /></svg>
                   </a>
                 ))}
               </div>
