@@ -55,6 +55,9 @@ const useStore = create(
       language: 'en',
       setLanguage: (lang) => set({ language: lang }),
       
+      temperatureUnit: 'celsius',
+      setTemperatureUnit: (unit) => set({ temperatureUnit: unit }),
+      
       location: null,
       setLocation: (location) => set({ location }),
       
