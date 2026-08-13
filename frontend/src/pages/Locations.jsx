@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSavedLocations } from '../hooks/useSavedLocations';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Plus, MapPin, ChevronRight, X, 
   CloudRain, Cloud, Sun, CloudFog 
 } from 'lucide-react';
 
-const INITIAL_LOCATIONS = [
-  { id: 1, name: "New Delhi", country: "India", aqi: 2, status: "Good", temperature: 28, condition: "Light Rain", icon: 'CloudRain' },
-  { id: 2, name: "Mumbai", country: "India", aqi: 68, status: "Moderate", temperature: 27, condition: "Cloudy", icon: 'Cloud' },
-  { id: 3, name: "Bengaluru", country: "India", aqi: 35, status: "Good", temperature: 25, condition: "Sunny", icon: 'Sun' },
-  { id: 4, name: "Kolkata", country: "India", aqi: 85, status: "Moderate", temperature: 29, condition: "Haze", icon: 'CloudFog' }
-];
 
 const WeatherIcon = ({ type, size = 20, className }) => {
   switch (type) {
@@ -86,7 +81,60 @@ const LocationCard = ({ loc }) => {
   );
 };
 
-const AddLocationModal = ({ isOpen, onClose }) => {
+const AddLocationModal = ({ isOpen, onClose, onAdd }) => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setQuery('');
+      setResults([]);
+      setSelectedResult(null);
+      return;
+    }
+    const delayDebounceFn = setTimeout(async () => {
+      if (query.length > 2 && !selectedResult) {
+        setIsSearching(true);
+        try {
+          const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5`);
+          const data = await res.json();
+          setResults(data.results || []);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setResults([]);
+      }
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [query, isOpen, selectedResult]);
+
+  const handleSelect = (res) => {
+    setSelectedResult(res);
+    setQuery(`${res.name}, ${res.admin1 ? res.admin1 + ', ' : ''}${res.country}`);
+    setResults([]);
+  };
+
+  const handleSave = async () => {
+    if (!selectedResult) return;
+    setIsSaving(true);
+    await onAdd({
+      name: selectedResult.name,
+      city: selectedResult.name,
+      country: selectedResult.country,
+      latitude: selectedResult.latitude,
+      longitude: selectedResult.longitude,
+      locationType: 'other'
+    });
+    setIsSaving(false);
+    onClose();
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -116,23 +164,41 @@ const AddLocationModal = ({ isOpen, onClose }) => {
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 relative">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">City / Location</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Tokyo" 
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all"
-                  />
+                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Search City</label>
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Tokyo, Japan" 
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        setSelectedResult(null);
+                      }}
+                      className="w-full bg-white/[0.05] border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all"
+                    />
+                  </div>
+                  {isSearching && <p className="text-xs text-gray-400 mt-2 ml-1">Searching...</p>}
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Country</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Japan" 
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 transition-all"
-                  />
-                </div>
+                
+                {results.length > 0 && (
+                  <div className="absolute top-[80px] left-0 w-full bg-[#121A16] border border-white/10 rounded-xl shadow-xl overflow-hidden z-[102] max-h-48 overflow-y-auto">
+                    {results.map((res) => (
+                      <button
+                        key={res.id}
+                        onClick={() => handleSelect(res)}
+                        className="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/[0.05] transition-colors border-b border-white/[0.05] last:border-0"
+                      >
+                        <span className="font-bold">{res.name}</span>
+                        <span className="text-gray-400 ml-2">
+                          {res.admin1 ? `${res.admin1}, ` : ''}{res.country}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 mt-8">
@@ -143,10 +209,11 @@ const AddLocationModal = ({ isOpen, onClose }) => {
                   Cancel
                 </button>
                 <button 
-                  onClick={onClose}
-                  className="flex-1 py-3 px-4 rounded-xl bg-green-500 hover:bg-green-400 text-black font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]"
+                  onClick={handleSave}
+                  disabled={!selectedResult || isSaving}
+                  className="flex-1 py-3 px-4 rounded-xl bg-green-500 hover:bg-green-400 disabled:opacity-50 disabled:hover:bg-green-500 text-black font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(34,197,94,0.3)] disabled:shadow-none disabled:hover:scale-100"
                 >
-                  Add Location
+                  {isSaving ? 'Saving...' : 'Add Location'}
                 </button>
               </div>
             </motion.div>
@@ -160,10 +227,15 @@ const AddLocationModal = ({ isOpen, onClose }) => {
 export const Locations = () => {
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { locations, fetchLocations, addLocation, loading } = useSavedLocations();
 
-  const filteredLocations = INITIAL_LOCATIONS.filter(loc => 
+  useEffect(() => {
+    fetchLocations();
+  }, [fetchLocations]);
+
+  const filteredLocations = locations.filter(loc => 
     loc.name.toLowerCase().includes(search.toLowerCase()) || 
-    loc.country.toLowerCase().includes(search.toLowerCase())
+    (loc.country && loc.country.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -182,7 +254,6 @@ export const Locations = () => {
   backgroundAttachment: "fixed",
 }}
     >
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pt-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-2 text-white drop-shadow-md">Locations</h1>
@@ -190,7 +261,6 @@ export const Locations = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-          {/* Search Bar */}
           <div className="relative w-full sm:w-64 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-400 transition-colors" size={18} />
             <input 
@@ -202,7 +272,6 @@ export const Locations = () => {
             />
           </div>
 
-          {/* Add Button */}
           <button 
             onClick={() => setIsModalOpen(true)}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 hover:border-green-500/40 rounded-full font-bold transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]"
@@ -213,43 +282,57 @@ export const Locations = () => {
         </div>
       </div>
 
-      {/* Location Cards */}
-      {filteredLocations.length > 0 ? (
-        <motion.div 
-          className="flex flex-col gap-4"
-          variants={{
-            hidden: { opacity: 0 },
-            show: {
-              opacity: 1,
-              transition: { staggerChildren: 0.1 }
-            }
-          }}
-          initial="hidden"
-          animate="show"
-        >
-          {filteredLocations.map(loc => (
-            <LocationCard key={loc.id} loc={loc} />
-          ))}
-        </motion.div>
+      {loading && locations.length === 0 ? (
+        <div className="w-full py-20 flex flex-col items-center justify-center text-center">
+           <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+           <p className="text-gray-400 font-medium">Fetching live location data...</p>
+        </div>
       ) : (
-        /* Empty State */
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full py-20 flex flex-col items-center justify-center text-center bg-white/[0.02] border border-white/[0.05] rounded-[24px] backdrop-blur-md"
-        >
-          <div className="w-16 h-16 bg-white/[0.05] rounded-full flex items-center justify-center mb-4">
-            <Search size={28} className="text-gray-500" />
-          </div>
-          <h3 className="text-xl font-bold text-white mb-2">No locations found</h3>
-          <p className="text-gray-400 font-medium max-w-sm">
-            We couldn't find any locations matching "{search}". Try searching for another city.
-          </p>
-        </motion.div>
+        <>
+          {filteredLocations.length > 0 ? (
+            <motion.div 
+              className="flex flex-col gap-4"
+              variants={{
+                hidden: { opacity: 0 },
+                show: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.1 }
+                }
+              }}
+              initial="hidden"
+              animate="show"
+            >
+              {filteredLocations.map(loc => (
+                <LocationCard key={loc.id} loc={loc} />
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full py-20 flex flex-col items-center justify-center text-center bg-white/[0.02] border border-white/[0.05] rounded-[24px] backdrop-blur-md"
+            >
+              <div className="w-16 h-16 bg-white/[0.05] rounded-full flex items-center justify-center mb-4">
+                <Search size={28} className="text-gray-500" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {search ? "No locations found" : "No saved locations yet"}
+              </h3>
+              <p className="text-gray-400 font-medium max-w-sm">
+                {search 
+                  ? `We couldn't find any locations matching "${search}". Try searching for another city.` 
+                  : "Add a location to get started and monitor its live environmental conditions!"}
+              </p>
+            </motion.div>
+          )}
+        </>
       )}
 
-      {/* Modal */}
-      <AddLocationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddLocationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onAdd={addLocation} 
+      />
     </div>
   );
 };

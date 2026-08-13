@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const locationSchema = new mongoose.Schema(
     {
-        userId: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: 'User',
@@ -21,11 +21,11 @@ const locationSchema = new mongoose.Schema(
         country: {
             type: String,
         },
-        lat: {
+        latitude: {
             type: Number,
             required: true,
         },
-        lng: {
+        longitude: {
             type: Number,
             required: true,
         },
@@ -45,7 +45,7 @@ const locationSchema = new mongoose.Schema(
 );
 
 // Prevent duplicate names for the same user
-locationSchema.index({ userId: 1, name: 1 }, { unique: true });
+locationSchema.index({ user: 1, name: 1 }, { unique: true });
 
 const Location = mongoose.model('Location', locationSchema);
 

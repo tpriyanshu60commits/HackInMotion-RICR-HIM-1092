@@ -75,120 +75,136 @@ export const ReportPage = () => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      
-      {/* Header & Navigation */}
-      {!selectedReportId && (
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-heading font-bold text-white flex items-center gap-2">
-              <AlertCircle className="text-green-500" />
-              Community Reports
-            </h1>
-            <p className="text-text-muted mt-1">
-              Report and track local environmental issues.
-            </p>
+    <div 
+      className="min-h-screen w-full pt-8 pb-12 px-4 lg:px-8"
+      style={{
+        backgroundImage: `
+          linear-gradient(
+            rgba(1, 11, 7, 0.4),
+            rgba(0, 0, 0, 0.4)
+          ),
+          url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
+        `,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="max-w-5xl mx-auto space-y-8">
+        
+        {/* Header & Navigation */}
+        {!selectedReportId && (
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-heading font-bold text-white flex items-center gap-2">
+                <AlertCircle className="text-green-500" />
+                Community Reports
+              </h1>
+              <p className="text-text-muted mt-1">
+                Report and track local environmental issues.
+              </p>
+            </div>
+
+            <GlassCard className="p-1.5 flex bg-[#0A0F0D]/80 backdrop-blur-xl border border-white/20">
+              {TABS.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
+                    activeTab === tab.id
+                      ? "bg-green-500/20 text-green-400 shadow-sm"
+                      : "text-text-muted hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  <tab.icon size={16} />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              ))}
+            </GlassCard>
           </div>
+        )}
 
-          <GlassCard className="p-1.5 flex bg-surface/30">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
-                  activeTab === tab.id
-                    ? "bg-green-500/20 text-green-400 shadow-sm"
-                    : "text-text-muted hover:text-white hover:bg-white/5"
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium animate-fade-in">
+            {error}
+          </div>
+        )}
+
+        {showAcceptedMessage && (
+          <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm font-medium animate-fade-in flex items-center gap-2">
+            <AlertCircle size={18} />
+            Report has been successfully marked as CM Accepted!
+          </div>
+        )}
+
+        {/* Main Content Area */}
+        {selectedReportId && selectedReport ? (
+          <ReportDetail 
+            report={selectedReport}
+            onBack={() => setSelectedReportId(null)}
+            onUpvote={(id) => upvoteReport(id, user?._id)}
+            onEscalate={(id) => escalateToCMHelp(id, user?._id)}
+            currentUserId={user?._id}
+          />
+        ) : (
+          <div className="animate-fade-in">
+            {activeTab === 'new' && (
+              <div className="max-w-2xl mx-auto">
+                <ReportForm onSubmit={handleSubmitReport} loading={loading} />
+              </div>
+            )}
+
+            {activeTab === 'nearby' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {reports.length === 0 && !loading && (
+                  <div className="col-span-full py-12 text-center text-text-muted">
+                    No reports found in your area.
+                  </div>
                 )}
-              >
-                <tab.icon size={16} />
-                <span className="hidden sm:inline">{tab.label}</span>
-              </button>
-            ))}
-          </GlassCard>
-        </div>
-      )}
+                {reports.map(report => (
+                  <ReportCard 
+                    key={report._id} 
+                    report={report} 
+                    onUpvote={(id) => upvoteReport(id, user?._id)}
+                    currentUserId={user?._id}
+                    onClick={() => setSelectedReportId(report._id)}
+                  />
+                ))}
+              </div>
+            )}
 
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium animate-fade-in">
-          {error}
-        </div>
-      )}
+            {activeTab === 'mine' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {!user && (
+                  <div className="col-span-full py-12 text-center text-text-muted">
+                    Please log in to view your reports.
+                  </div>
+                )}
+                {user && myReports.length === 0 && !loading && (
+                  <div className="col-span-full py-12 text-center text-text-muted">
+                    You haven't submitted any reports yet.
+                  </div>
+                )}
+                {user && myReports.map(report => (
+                  <ReportCard 
+                    key={report._id} 
+                    report={report} 
+                    currentUserId={user?._id}
+                    onClick={() => setSelectedReportId(report._id)}
+                  />
+                ))}
+              </div>
+            )}
 
-      {showAcceptedMessage && (
-        <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-sm font-medium animate-fade-in flex items-center gap-2">
-          <AlertCircle size={18} />
-          Report has been successfully marked as CM Accepted!
-        </div>
-      )}
-
-      {/* Main Content Area */}
-      {selectedReportId && selectedReport ? (
-        <ReportDetail 
-          report={selectedReport}
-          onBack={() => setSelectedReportId(null)}
-          onUpvote={(id) => upvoteReport(id, user?._id)}
-          onEscalate={(id) => escalateToCMHelp(id, user?._id)}
-          currentUserId={user?._id}
-        />
-      ) : (
-        <div className="animate-fade-in">
-          {activeTab === 'new' && (
-            <div className="max-w-2xl mx-auto">
-              <ReportForm onSubmit={handleSubmitReport} loading={loading} />
-            </div>
-          )}
-
-          {activeTab === 'nearby' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {reports.length === 0 && !loading && (
-                <div className="col-span-full py-12 text-center text-text-muted">
-                  No reports found in your area.
-                </div>
-              )}
-              {reports.map(report => (
-                <ReportCard 
-                  key={report._id} 
-                  report={report} 
-                  onUpvote={(id) => upvoteReport(id, user?._id)}
-                  currentUserId={user?._id}
-                  onClick={() => setSelectedReportId(report._id)}
-                />
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'mine' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {!user && (
-                <div className="col-span-full py-12 text-center text-text-muted">
-                  Please log in to view your reports.
-                </div>
-              )}
-              {user && myReports.length === 0 && !loading && (
-                <div className="col-span-full py-12 text-center text-text-muted">
-                  You haven't submitted any reports yet.
-                </div>
-              )}
-              {user && myReports.map(report => (
-                <ReportCard 
-                  key={report._id} 
-                  report={report} 
-                  currentUserId={user?._id}
-                  onClick={() => setSelectedReportId(report._id)}
-                />
-              ))}
-            </div>
-          )}
-
-          {loading && reports.length === 0 && (
-            <div className="flex justify-center py-12">
-              <span className="w-8 h-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin" />
-            </div>
-          )}
-        </div>
-      )}
+            {loading && reports.length === 0 && (
+              <div className="flex justify-center py-12">
+                <span className="w-8 h-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin" />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

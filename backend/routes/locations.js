@@ -8,8 +8,8 @@ const MOCK_USER_ID = "60d0fe4f5311236168a109ca";
 
 router.post('/', async (req, res) => {
     try {
-        const { name, lat, lng } = req.body;
-        const newLocation = new Location({ userId: MOCK_USER_ID, name, lat, lng });
+        const { name, latitude, longitude } = req.body;
+        const newLocation = new Location({ userId: MOCK_USER_ID, name, latitude, longitude });
         await newLocation.save();
         res.status(201).json(newLocation);
     } catch (error) {

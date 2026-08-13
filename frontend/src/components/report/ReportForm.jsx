@@ -92,7 +92,7 @@ export const ReportForm = ({ onSubmit, loading }) => {
   };
 
   return (
-    <GlassCard className="p-6">
+    <GlassCard className="p-6 bg-[#0A0F0D]/80 backdrop-blur-2xl border border-white/20">
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Category Selection */}
@@ -107,7 +107,7 @@ export const ReportForm = ({ onSubmit, loading }) => {
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
                   formData.category === cat.id 
                     ? 'bg-green-500/20 text-green-400 border-green-500/50' 
-                    : 'bg-surface border-border text-text-muted hover:bg-surface-hover hover:text-white'
+                    : 'bg-[#0A0F0D]/80 border-white/20 text-text-muted hover:bg-black hover:text-white backdrop-blur-md'
                 }`}
               >
                 {cat.label}
@@ -125,7 +125,7 @@ export const ReportForm = ({ onSubmit, loading }) => {
             value={formData.title}
             onChange={handleInputChange}
             placeholder="E.g., Large garbage pile on Main St"
-            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:border-green-500/50 transition-colors"
+            className="w-full bg-[#0A0F0D]/80 border border-white/20 backdrop-blur-md rounded-xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:border-green-500/50 transition-colors"
             required
           />
         </div>
@@ -139,7 +139,7 @@ export const ReportForm = ({ onSubmit, loading }) => {
             onChange={handleInputChange}
             placeholder="Provide more details about the issue..."
             rows={4}
-            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:border-green-500/50 transition-colors resize-none"
+            className="w-full bg-[#0A0F0D]/80 border border-white/20 backdrop-blur-md rounded-xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:border-green-500/50 transition-colors resize-none"
             required
           />
         </div>
@@ -162,7 +162,7 @@ export const ReportForm = ({ onSubmit, loading }) => {
             value={formData.address}
             onChange={handleInputChange}
             placeholder="Enter address or tap detect..."
-            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:border-green-500/50 transition-colors"
+            className="w-full bg-[#0A0F0D]/80 border border-white/20 backdrop-blur-md rounded-xl px-4 py-3 text-white placeholder:text-text-muted focus:outline-none focus:border-green-500/50 transition-colors"
             required
           />
         </div>
@@ -184,7 +184,7 @@ export const ReportForm = ({ onSubmit, loading }) => {
               </div>
             </div>
           ) : (
-            <label className="w-full h-32 border-2 border-dashed border-border hover:border-green-500/50 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors bg-surface/30 hover:bg-surface/50">
+            <label className="w-full h-32 border-2 border-dashed border-white/20 hover:border-green-500/50 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors bg-[#0A0F0D]/80 hover:bg-black backdrop-blur-md">
               <Camera className="text-text-muted" size={28} />
               <span className="text-sm text-text-muted font-medium">Click to upload photo</span>
               <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" required />
