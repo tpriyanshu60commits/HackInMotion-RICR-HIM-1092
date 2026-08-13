@@ -7,7 +7,7 @@ export const AlertToastContainer = () => {
   const { activeToast, dismissToast } = useLiveAlerts();
 
   return (
-    <div className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-[100] pointer-events-none flex flex-col gap-4">
+    <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-6 left-4 md:left-6 z-[100] pointer-events-none flex flex-col gap-4">
       <AnimatePresence mode="popLayout">
         {activeToast && (
           <AlertToast 

@@ -25,6 +25,7 @@ import { WeatherBackground } from '../components/common/WeatherBackground';
 import { ChatbotButton } from '../components/chat/ChatbotButton';
 import { AlertToastContainer } from '../components/alerts/AlertToastContainer';
 import api from '../services/api';
+import { BottomNavMobile } from './BottomNavMobile';
 
 const NAV_ITEMS = [
   { to: '/locations', icon: MapPin, label: 'Locations' },
@@ -65,7 +66,7 @@ export const MainLayout = () => {
         {/* =====================================================
             TOP NAVBAR
         ====================================================== */}
-        <header className="glass border-b border-border fixed  top-2  z-50 w-full h-16 flex items-center justify-between px-4 md:px-8 rounded-2xl">
+        <header className="glass border-b border-border fixed top-2 z-50 w-full h-16 hidden md:flex items-center justify-between px-4 md:px-8 rounded-2xl">
 
           {/* Logo Section */}
           <Link to="/dashboard" className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity">
@@ -128,7 +129,7 @@ export const MainLayout = () => {
             MOBILE/TABLET FULL-SCREEN MENU
         ====================================================== */}
         {mobileMenuOpen && (
-          <div className="fixed  inset-0 z-50 xl:hidden">
+          <div className="fixed inset-0 z-[100] xl:hidden">
             <div
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setMobileMenuOpen(false)}
@@ -190,7 +191,7 @@ export const MainLayout = () => {
         {/* =====================================================
             MAIN CONTENT
         ====================================================== */}
-        <main className="flex-1 w-full relative mt-10 scroll-smooth p-4 md:p-8 overflow-x-hidden">
+        <main className="flex-1 w-full relative mt-0 md:mt-10 scroll-smooth p-0 md:p-8 overflow-x-hidden">
           <Outlet />
         </main>
 
@@ -203,6 +204,11 @@ export const MainLayout = () => {
             CHATBOT
         ====================================================== */}
         <ChatbotButton />
+
+        {/* =====================================================
+            MOBILE BOTTOM NAV
+        ====================================================== */}
+        <BottomNavMobile setMobileMenuOpen={setMobileMenuOpen} />
       </div>
     </WeatherBackground>
   );

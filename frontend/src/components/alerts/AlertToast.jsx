@@ -35,35 +35,35 @@ export const AlertToast = ({ toast, onDismiss }) => {
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex gap-4 p-4 rounded-2xl border-y border-r border-border glass shadow-2xl backdrop-blur-xl border-l-4 overflow-hidden",
+        "relative flex gap-3 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl border-y border-r border-border glass shadow-2xl backdrop-blur-xl border-l-4 overflow-hidden",
         severityStyles[toast.severity] || severityStyles.amber,
-        "w-full sm:w-[400px] pointer-events-auto"
+        "w-[300px] md:w-[400px] pointer-events-auto"
       )}
     >
       {/* Icon Area */}
-      <div className="shrink-0 mt-1">
-        <Icon size={24} className="opacity-90" />
+      <div className="shrink-0 mt-0.5 md:mt-1">
+        <Icon className="opacity-90 w-5 h-5 md:w-6 md:h-6" />
       </div>
 
       {/* Content */}
-      <div className="flex-1 pr-6 space-y-1">
-        <div className="flex items-center gap-1.5 text-xs font-medium opacity-75">
-          <MapPin size={12} />
+      <div className="flex-1 pr-4 md:pr-6 space-y-1">
+        <div className="flex items-center gap-1.5 text-[10px] md:text-xs font-medium opacity-75">
+          <MapPin className="w-3 h-3" />
           <span className="truncate">{toast.locationName}</span>
         </div>
         
-        <p className="text-sm font-semibold leading-snug drop-shadow-sm">
+        <p className="text-xs md:text-sm font-semibold leading-snug drop-shadow-sm">
           {toast.message}
         </p>
         
-        <div className="flex items-center gap-4 pt-1 text-xs opacity-60 font-medium">
+        <div className="flex items-center gap-4 pt-1 text-[10px] md:text-xs opacity-60 font-medium">
           <span>{timeAgo}</span>
           <button 
             onClick={() => speak(toast.message, true)}
             className="flex items-center gap-1 hover:text-white transition-colors"
             title="Read aloud"
           >
-            <Volume2 size={12} />
+            <Volume2 className="w-3 h-3 md:w-4 md:h-4" />
             <span>Read</span>
           </button>
         </div>
