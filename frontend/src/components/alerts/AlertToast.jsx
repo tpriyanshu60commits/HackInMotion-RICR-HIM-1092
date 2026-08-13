@@ -52,7 +52,7 @@ export const AlertToast = ({ toast, onDismiss }) => {
           <span className="truncate">{toast.locationName}</span>
         </div>
         
-        <p className="text-xs md:text-sm font-semibold leading-snug drop-shadow-sm">
+        <p className="text-xs md:text-sm font-semibold leading-snug drop-shadow-sm break-words line-clamp-3">
           {toast.message}
         </p>
         

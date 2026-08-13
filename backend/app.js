@@ -15,7 +15,8 @@ import communityRoutes from './routes/communityRoutes.js';
 import aiRoutes from './routes/ai.js';
 import dataRoutes from './routes/data.js';
 import reportRoutes from './routes/reports.js';
-import myLocationRoutes from './routes/locations.js'; // My simple mocked ones if needed, but DEVICE 1 has auth so I should probably use theirs if frontend was updated, but frontend still uses `/api/locations` and `/api/reports` and `/api/data`.
+import myLocationRoutes from './routes/locations.js';
+import routeRoutes from './routes/routeRoutes.js';
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/data', dataRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/my-locations', myLocationRoutes);
+app.use('/api/route', routeRoutes);
 
 // Error Handling Middleware
 app.use(notFound);

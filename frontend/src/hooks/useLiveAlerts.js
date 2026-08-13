@@ -54,30 +54,29 @@ export const useLiveAlerts = () => {
       }
     };
 
-    // Run immediately on mount, then every 60s
+    // Run immediately on mount, then every 2 mins (120000 ms)
     evaluateRules();
-    const interval = setInterval(evaluateRules, 60000);
+    const interval = setInterval(evaluateRules, 120000);
 
-    // DEMO: Send a sample alert 2 seconds after mount to test Notification Bell
+    // TEMPORARY: Send 1 single demo alert
     const demoTimeout = setTimeout(() => {
       const sampleAlert = {
-        id: 'demo-alert-' + Date.now(),
+        id: `demo-alert-${Date.now()}`,
         category: 'health',
         icon: alertRules[1].icon,
-        severity: 'red',
+        severity: 'amber',
         messages: {
-          en: "Demo Alert: Hazardous air detected nearby — stay indoors.",
-          hi: "डेमो अलर्ट: पास में खतरनाक हवा — घर के अंदर रहें।"
+          en: `Demo Alert: This should hide automatically in 2 seconds.`,
+          hi: `डेमो अलर्ट: यह 2 सेकंड में छिप जाना चाहिए।`
         }
       };
       
       setQueue(prev => [...prev, sampleAlert]);
       
-      // Also add it directly to the persistent notification dropdown store
       useStore.getState().addAlert({
-        title: 'Emergency Alert',
-        message: sampleAlert.messages[language] || sampleAlert.messages.en,
-        type: 'danger',
+        title: `Test Alert`,
+        message: sampleAlert.messages.en,
+        type: 'warning',
         timestamp: new Date()
       });
     }, 2000);
@@ -112,15 +111,18 @@ export const useLiveAlerts = () => {
       // Fire effects
       playSound();
       speak(toastData.message);
-
-      // Auto-dismiss after 7 seconds
-      const timeout = setTimeout(() => {
-        setActiveToast(null);
-      }, 7000);
-
-      return () => clearTimeout(timeout);
     }
   }, [queue, activeToast, language, location, playSound, speak]);
+
+  // Handle auto-dismiss separately so it doesn't get cancelled by the queue effect re-running
+  useEffect(() => {
+    if (activeToast) {
+      const timeout = setTimeout(() => {
+        setActiveToast(null);
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [activeToast]);
 
   const dismissToast = useCallback(() => {
     setActiveToast(null);
