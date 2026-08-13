@@ -1,5 +1,8 @@
-
+import { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
+import { environmentService } from '../services/api';
+import useStore from '../store/useStore';
+import { LocationSearch } from '../components/common/LocationSearch';
 
 const COMPARE_DATA = [
   {
@@ -70,8 +73,48 @@ const getAqiStyle = (aqi) => {
 };
 
 export const Compare = () => {
-  // Keep the existing two-city comparison behavior
-  const comparisonCities = COMPARE_DATA.slice(0, 2);
+  const globalLocation = useStore((state) => state.location);
+  const initialCity1 = globalLocation?.name?.split(',')[0].trim() || "Rewa";
+
+  const [selectedCity1, setSelectedCity1] = useState(initialCity1);
+  const [selectedCity2, setSelectedCity2] = useState("");
+  const [comparisonData, setComparisonData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchComparisonData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (selectedCity1 && selectedCity2) {
+        const cities = `${selectedCity1},${selectedCity2}`;
+        const res = await environmentService.compareCities(cities);
+        setComparisonData({ data: res.data.data });
+      } else if (selectedCity1) {
+        const res = await environmentService.getCurrentByCity(selectedCity1);
+        setComparisonData({ data: [res.data.data] });
+      } else if (selectedCity2) {
+        const res = await environmentService.getCurrentByCity(selectedCity2);
+        setComparisonData({ data: [res.data.data] });
+      } else {
+        setComparisonData({ data: [] });
+      }
+    } catch (err) {
+      console.error("Failed to fetch comparison data:", err);
+      setError("Failed to fetch comparison data. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComparisonData();
+  }, [selectedCity1, selectedCity2]);
+
+  console.log("Current comparisonData state:", comparisonData);
+
+  // Use actual fetched data or fallback to empty array
+  const comparisonCities = comparisonData?.data || [];
 
   return (
     <div
@@ -93,52 +136,20 @@ export const Compare = () => {
             </p>
           </div>
 
-          <button
-            className="
-              text-xs md:text-sm
-              font-semibold
-              text-green-400
-              hover:text-green-300
-              transition-colors
-            "
-          >
-            + Add Location
-          </button>
         </div>
 
         {/* City Selectors */}
-        <div className="flex items-center justify-between gap-5 md:gap-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-5 md:gap-8 z-50">
 
           {/* Selector 1 */}
-          <div
-            className="
-              flex-1
-              bg-black/40
-              border border-white/10
-              rounded-lg
-              px-4 md:px-5
-              py-3
-              flex items-center justify-between
-              hover:border-white/20
-              hover:bg-white/[0.04]
-              transition-all
-              cursor-pointer
-              group
-            "
-          >
-            <span className="
-              text-sm md:text-base
-              font-medium
-              text-white
-              group-hover:text-green-400
-              transition-colors
-            ">
-              {comparisonCities[0].city}, India
-            </span>
-
-            <span className="text-gray-500 text-[10px]">
-              ▼
-            </span>
+          <div className="flex-1 w-full relative z-50">
+            <div className="[&>div>input]:bg-black/40 [&>div>input]:border [&>div>input]:border-white/10 [&>div>input]:rounded-lg [&>div>input]:px-10 [&>div>input]:py-3 [&>div>input]:text-white [&>div>input]:placeholder:text-gray-600 focus-within:[&>div>input]:border-white/30 hover:[&>div>input]:bg-white/[0.04]">
+              <LocationSearch 
+                initialQuery={initialCity1}
+                retainSelection={true}
+                onLocationSelect={(loc) => setSelectedCity1(loc.name.split(',')[0].trim())} 
+              />
+            </div>
           </div>
 
           {/* VS */}
@@ -157,35 +168,14 @@ export const Compare = () => {
           </div>
 
           {/* Selector 2 */}
-          <div
-            className="
-              flex-1
-              bg-black/40
-              border border-white/10
-              rounded-lg
-              px-4 md:px-5
-              py-3
-              flex items-center justify-between
-              hover:border-white/20
-              hover:bg-white/[0.04]
-              transition-all
-              cursor-pointer
-              group
-            "
-          >
-            <span className="
-              text-sm md:text-base
-              font-medium
-              text-white
-              group-hover:text-green-400
-              transition-colors
-            ">
-              {comparisonCities[1].city}, India
-            </span>
-
-            <span className="text-gray-500 text-[10px]">
-              ▼
-            </span>
+          <div className="flex-1 w-full relative z-50">
+            <div className="[&>div>input]:bg-black/40 [&>div>input]:border [&>div>input]:border-white/10 [&>div>input]:rounded-lg [&>div>input]:px-10 [&>div>input]:py-3 [&>div>input]:text-white [&>div>input]:placeholder:text-gray-600 focus-within:[&>div>input]:border-white/30 hover:[&>div>input]:bg-white/[0.04]">
+              <LocationSearch 
+                initialQuery=""
+                retainSelection={true}
+                onLocationSelect={(loc) => setSelectedCity2(loc.name.split(',')[0].trim())} 
+              />
+            </div>
           </div>
         </div>
 
@@ -201,310 +191,332 @@ export const Compare = () => {
           relative
         ">
 
-          {comparisonCities.map((data, idx) => {
-            const aqiStyle = getAqiStyle(data.aqi);
+          {isLoading && !comparisonData ? (
+             <div className="text-center text-gray-400 py-10 w-full">Loading comparison...</div>
+          ) : error ? (
+             <div className="text-center text-red-400 py-10 w-full">{error}</div>
+          ) : (
+            comparisonCities.map((data, idx) => {
+              if (data.error) {
+                return (
+                  <div key={idx} className="flex-1 bg-white/[0.025] backdrop-blur-sm border border-red-500/20 rounded-xl p-7 md:p-8 flex flex-col items-center justify-center">
+                    <p className="text-red-400 font-semibold mb-2">Unavailable</p>
+                    <p className="text-gray-400 text-sm">{data.city}: {data.error}</p>
+                  </div>
+                );
+              }
 
-            return (
-              <div
-                key={idx}
-                className="
-                  flex-1
-                  min-w-0
+              const aqiStyle = getAqiStyle(data.aqi);
 
-                  bg-white/[0.025]
-                  backdrop-blur-sm
+              return (
+                <div
+                  key={idx}
+                  className="
+                    flex-1
+                    min-w-0
 
-                  border
-                  border-white/[0.07]
+                    bg-white/[0.025]
+                    backdrop-blur-sm
 
-                  hover:border-white/[0.16]
-                  hover:bg-white/[0.045]
-
-                  rounded-xl
-
-                  p-7
-                  md:p-8
-
-                  hover:scale-[1.015]
-                  hover:-translate-y-[2px]
-
-                  transition-all
-                  duration-300
-                  ease-out
-
-                  hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-
-                  flex
-                  flex-col
-
-                  cursor-default
-                  group
-                "
-              >
-
-                {/* City Header */}
-                <div className="
-                  flex
-                  items-center
-                  gap-3
-                  mb-7
-                  pb-5
-                  border-b
-                  border-white/[0.06]
-                ">
-                  <div className="
-                    w-9
-                    h-9
-                    rounded-full
-                    bg-white/[0.04]
                     border
                     border-white/[0.07]
-                    flex
-                    items-center
-                    justify-center
-                    shrink-0
-                    group-hover:bg-green-400/10
-                    group-hover:border-green-400/20
+
+                    hover:border-white/[0.16]
+                    hover:bg-white/[0.045]
+
+                    rounded-xl
+
+                    p-7
+                    md:p-8
+
+                    hover:scale-[1.015]
+                    hover:-translate-y-[2px]
+
                     transition-all
-                  ">
-                    <MapPin
-                      size={19}
-                      className="
-                        text-gray-400
-                        group-hover:text-green-400
-                        transition-colors
-                      "
-                    />
-                  </div>
+                    duration-300
+                    ease-out
 
-                  <span className="
-                    text-base
-                    md:text-lg
-                    font-semibold
-                    text-white
-                    tracking-wide
-                  ">
-                    {data.city}, India
-                  </span>
-                </div>
+                    hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
 
-                {/* AQI Block */}
-                <div className="
-                  mb-9
-                  flex
-                  flex-col
-                ">
-                  <span className="
-                    text-xs
-                    font-semibold
-                    text-gray-400
-                    uppercase
-                    tracking-widest
-                    mb-2
-                  ">
-                    AQI
-                  </span>
+                    flex
+                    flex-col
 
+                    cursor-default
+                    group
+                  "
+                >
+
+                  {/* City Header */}
                   <div className="
                     flex
-                    items-end
-                    gap-4
+                    items-center
+                    gap-3
+                    mb-7
+                    pb-5
+                    border-b
+                    border-white/[0.06]
+                  ">
+                    <div className="
+                      w-9
+                      h-9
+                      rounded-full
+                      bg-white/[0.04]
+                      border
+                      border-white/[0.07]
+                      flex
+                      items-center
+                      justify-center
+                      shrink-0
+                      group-hover:bg-green-400/10
+                      group-hover:border-green-400/20
+                      transition-all
+                    ">
+                      <MapPin
+                        size={19}
+                        className="
+                          text-gray-400
+                          group-hover:text-green-400
+                          transition-colors
+                        "
+                      />
+                    </div>
+
+                    <span className="
+                      text-base
+                      md:text-lg
+                      font-semibold
+                      text-white
+                      tracking-wide
+                    ">
+                      {data.city && data.city !== 'Unknown Location' ? data.city : (idx === 0 ? selectedCity1 : selectedCity2)}
+                      {data.country ? `, ${data.country}` : ''}
+                    </span>
+                  </div>
+
+                  {/* AQI Block */}
+                  <div className="
+                    mb-9
+                    flex
+                    flex-col
                   ">
                     <span className="
-                      text-5xl
-                      md:text-6xl
-                      font-black
-                      text-white
-                      leading-none
-                      tracking-tighter
+                      text-xs
+                      font-semibold
+                      text-gray-400
+                      uppercase
+                      tracking-widest
+                      mb-2
                     ">
-                      {data.aqi}
+                      AQI
                     </span>
 
                     <div className="
                       flex
-                      items-center
-                      gap-2
-                      mb-1.5
+                      items-end
+                      gap-4
                     ">
-                      <span
-                        className={`
-                          w-2
-                          h-2
-                          rounded-full
-                          ${aqiStyle.dot}
-                          ${aqiStyle.shadow}
-                        `}
-                      />
-
-                      <span
-                        className={`
-                          text-xs
-                          font-bold
-                          uppercase
-                          tracking-wider
-                          ${aqiStyle.color}
-                        `}
-                      >
-                        {data.risk}
+                      <span className="
+                        text-5xl
+                        md:text-6xl
+                        font-black
+                        text-white
+                        leading-none
+                        tracking-tighter
+                      ">
+                        {data.aqi}
                       </span>
+
+                      <div className="
+                        flex
+                        items-center
+                        gap-2
+                        mb-1.5
+                      ">
+                        <span
+                          className={`
+                            w-2
+                            h-2
+                            rounded-full
+                            ${aqiStyle.dot}
+                            ${aqiStyle.shadow}
+                          `}
+                        />
+
+                        <span
+                          className={`
+                            text-xs
+                            font-bold
+                            uppercase
+                            tracking-wider
+                            ${aqiStyle.color}
+                          `}
+                        >
+                          {data.risk?.label || data.riskLevel?.label || 'UNKNOWN'}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Metric Rows */}
-                <div className="
-                  space-y-1
-                  flex-1
-                  flex
-                  flex-col
-                ">
-
-                  {/* PM2.5 */}
+                  {/* Metric Rows */}
                   <div className="
+                    space-y-1
+                    flex-1
                     flex
-                    items-center
-                    justify-between
-                    py-3
-                    border-b
-                    border-white/[0.05]
-                    group-hover:bg-white/[0.02]
-                    -mx-2
-                    px-3
-                    rounded
-                    transition-colors
+                    flex-col
                   ">
-                    <span className="
-                      text-sm
-                      font-medium
-                      text-gray-300
-                      uppercase
-                    ">
-                      PM2.5
-                    </span>
 
-                    <span className="
-                      text-base
-                      font-semibold
-                      text-gray-100
+                    {/* PM2.5 */}
+                    <div className="
+                      flex
+                      items-center
+                      justify-between
+                      py-3
+                      border-b
+                      border-white/[0.05]
+                      group-hover:bg-white/[0.02]
+                      -mx-2
+                      px-3
+                      rounded
+                      transition-colors
                     ">
-                      {data.pm25}{' '}
                       <span className="
-                        text-xs
-                        text-gray-500
+                        text-sm
                         font-medium
+                        text-gray-300
+                        uppercase
                       ">
-                        µg/m³
+                        PM2.5
                       </span>
-                    </span>
-                  </div>
 
-                  {/* PM10 */}
-                  <div className="
-                    flex
-                    items-center
-                    justify-between
-                    py-3
-                    border-b
-                    border-white/[0.05]
-                    group-hover:bg-white/[0.02]
-                    -mx-2
-                    px-3
-                    rounded
-                    transition-colors
-                  ">
-                    <span className="
-                      text-sm
-                      font-medium
-                      text-gray-300
-                      uppercase
-                    ">
-                      PM10
-                    </span>
-
-                    <span className="
-                      text-base
-                      font-semibold
-                      text-gray-100
-                    ">
-                      {data.pm10}{' '}
                       <span className="
-                        text-xs
-                        text-gray-500
-                        font-medium
+                        text-base
+                        font-semibold
+                        text-gray-100
                       ">
-                        µg/m³
+                        {data.pm25}{' '}
+                        <span className="
+                          text-xs
+                          text-gray-500
+                          font-medium
+                        ">
+                          µg/m³
+                        </span>
                       </span>
-                    </span>
-                  </div>
+                    </div>
 
-                  {/* Temperature */}
-                  <div className="
-                    flex
-                    items-center
-                    justify-between
-                    py-3
-                    border-b
-                    border-white/[0.05]
-                    group-hover:bg-white/[0.02]
-                    -mx-2
-                    px-3
-                    rounded
-                    transition-colors
-                  ">
-                    <span className="
-                      text-sm
-                      font-medium
-                      text-gray-300
+                    {/* PM10 */}
+                    <div className="
+                      flex
+                      items-center
+                      justify-between
+                      py-3
+                      border-b
+                      border-white/[0.05]
+                      group-hover:bg-white/[0.02]
+                      -mx-2
+                      px-3
+                      rounded
+                      transition-colors
                     ">
-                      Temperature
-                    </span>
+                      <span className="
+                        text-sm
+                        font-medium
+                        text-gray-300
+                        uppercase
+                      ">
+                        PM10
+                      </span>
 
-                    <span className="
-                      text-base
-                      font-semibold
-                      text-gray-100
-                    ">
-                      {data.temp}°C
-                    </span>
-                  </div>
+                      <span className="
+                        text-base
+                        font-semibold
+                        text-gray-100
+                      ">
+                        {data.pm10}{' '}
+                        <span className="
+                          text-xs
+                          text-gray-500
+                          font-medium
+                        ">
+                          µg/m³
+                        </span>
+                      </span>
+                    </div>
 
-                  {/* Humidity */}
-                  <div className="
-                    flex
-                    items-center
-                    justify-between
-                    py-3
-                    border-b
-                    border-transparent
-                    group-hover:bg-white/[0.02]
-                    -mx-2
-                    px-3
-                    rounded
-                    transition-colors
-                  ">
-                    <span className="
-                      text-sm
-                      font-medium
-                      text-gray-300
+                    {/* Temperature */}
+                    <div className="
+                      flex
+                      items-center
+                      justify-between
+                      py-3
+                      border-b
+                      border-white/[0.05]
+                      group-hover:bg-white/[0.02]
+                      -mx-2
+                      px-3
+                      rounded
+                      transition-colors
                     ">
-                      Humidity
-                    </span>
+                      <span className="
+                        text-sm
+                        font-medium
+                        text-gray-300
+                      ">
+                        Temperature
+                      </span>
 
-                    <span className="
-                      text-base
-                      font-semibold
-                      text-gray-100
+                      <span className="
+                        text-base
+                        font-semibold
+                        text-gray-100
+                      ">
+                        {data.temperature}°C
+                      </span>
+                    </div>
+
+                    {/* Humidity */}
+                    <div className="
+                      flex
+                      items-center
+                      justify-between
+                      py-3
+                      border-b
+                      border-transparent
+                      group-hover:bg-white/[0.02]
+                      -mx-2
+                      px-3
+                      rounded
+                      transition-colors
                     ">
-                      {data.hum}%
-                    </span>
+                      <span className="
+                        text-sm
+                        font-medium
+                        text-gray-300
+                      ">
+                        Humidity
+                      </span>
+
+                      <span className="
+                        text-base
+                        font-semibold
+                        text-gray-100
+                      ">
+                        {data.humidity}%
+                      </span>
+                    </div>
+
                   </div>
 
                 </div>
+              );
+            })
+          )}
 
-              </div>
-            );
-          })}
+          {!isLoading && comparisonCities.length === 1 && (
+            <div className="flex-1 bg-white/[0.015] backdrop-blur-sm border border-white/[0.07] border-dashed rounded-xl p-7 md:p-8 flex items-center justify-center min-h-[400px]">
+              <p className="text-gray-500 font-medium tracking-wide">Search a city to compare</p>
+            </div>
+          )}
 
           {/* Center VS Indicator */}
           <div className="
