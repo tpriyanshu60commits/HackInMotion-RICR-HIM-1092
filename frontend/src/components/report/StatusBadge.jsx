@@ -1,5 +1,5 @@
-import React from 'react';
-import { cn } from '../common/GlassCard';
+
+import { cn } from '../../utils/utils';
 
 export const StatusBadge = ({ status }) => {
   const getStatusConfig = () => {

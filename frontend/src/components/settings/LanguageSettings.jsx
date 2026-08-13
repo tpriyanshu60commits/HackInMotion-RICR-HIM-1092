@@ -1,7 +1,7 @@
-import React from 'react';
+
 import { Globe, Check } from 'lucide-react';
 import useStore from '../../store/useStore';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const LanguageSettings = () => {
   const language = useStore(state => state.language);

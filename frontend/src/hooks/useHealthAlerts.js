@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import useStore from '../store/useStore';
 import { healthAlertRules } from '../data/healthAlertRules';
 import { useSimulatedWearable } from './useSimulatedWearable';
 
 export const useHealthAlerts = () => {
-  const [alerts, setAlerts] = useState([]);
   
   // Profile
   const userName = useStore(state => state.userName);
@@ -18,7 +17,7 @@ export const useHealthAlerts = () => {
   // Wearable Stats
   const wearableStats = useSimulatedWearable(currentAQI);
 
-  useEffect(() => {
+  const alerts = useMemo(() => {
     const profile = {
       userName,
       diagnosedConditions,
@@ -54,7 +53,7 @@ export const useHealthAlerts = () => {
       }
     }
 
-    setAlerts(generatedAlerts);
+    return generatedAlerts;
   }, [userName, diagnosedConditions, prescribedMedication, wearableConnected, currentAQI, wearableStats]);
 
   // Generate a comprehensive summary paragraph

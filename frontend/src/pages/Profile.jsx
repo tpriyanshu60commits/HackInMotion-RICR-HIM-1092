@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { User, HeartPulse, Bell, Globe, Thermometer, Shield, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import useStore from '../store/useStore';
-import { cn } from '../components/common/GlassCard';
+import { cn } from '../utils/utils';
 
 // Setting panels
 import { BasicProfile } from '../components/settings/BasicProfile';
@@ -30,7 +30,9 @@ export const Profile = () => {
   const handleLogout = async () => {
     try {
       await api.post('/auth/logout');
-    } catch (error) {}
+    } catch (e) {
+      console.error('Logout failed:', e);
+    }
     logout();
     navigate('/login');
   };

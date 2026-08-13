@@ -1,33 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/common/GlassCard';
-import { RiskBadge } from '../components/common/RiskBadge';
+
 import { WaterDropLoader } from '../components/common/WaterDropLoader';
 import { LocationSearch } from '../components/common/LocationSearch';
 import {
   MapPin, Wind, Droplets, Thermometer, CloudRain, Activity,
-  Info, CheckCircle2, Sunrise, Gauge, Sun, Search,
+  CheckCircle2, Sunrise, Gauge, Sun, Search,
   AlertTriangle, AlertCircle, AlertOctagon
 } from 'lucide-react';
 import { NotificationDropdown } from '../components/common/NotificationDropdown';
 import { environmentService } from '../services/api';
 import useStore from '../store/useStore';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+
 import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
-
-const ChangeMapView = ({ coords }) => {
-  const map = useMap();
-  map.setView(coords, map.getZoom());
-  return null;
-};
 
 const getAqiStatus = (aqi) => {
   if (aqi <= 50) return { label: 'Good', color: 'text-green-500', icon: CheckCircle2, desc: 'Air quality is satisfactory and poses little or no risk.' };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Leaf, User, Mail, Lock, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { GlassCard } from '../components/common/GlassCard';

@@ -1,8 +1,8 @@
-import React from 'react';
+
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Menu as MenuIcon, Settings } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { cn } from '../components/common/GlassCard';
+import { cn } from '../utils/utils';
 
 export const BottomNavMobile = ({ setMobileMenuOpen }) => {
   const location = useLocation();

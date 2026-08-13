@@ -1,5 +1,5 @@
-import React from 'react';
-import { cn } from './GlassCard';
+
+import { cn } from '../../utils/utils';
 
 const getColor = (value, thresholds) => {
   if (value <= thresholds[0]) return 'text-risk-good';

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { GlassCard } from '../components/common/GlassCard';
 import { Leaf, Wind, Sun, BatteryCharging, Droplets, BookOpen, ShieldCheck } from 'lucide-react';
 

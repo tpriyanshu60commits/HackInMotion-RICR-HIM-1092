@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useReports } from '../hooks/useReports';
 import useStore from '../store/useStore';
 import { ReportForm } from '../components/report/ReportForm';
 import { ReportCard } from '../components/report/ReportCard';
 import { ReportDetail } from '../components/report/ReportDetail';
-import { GlassCard, cn } from '../components/common/GlassCard';
+import { GlassCard } from '../components/common/GlassCard';
+import { cn } from '../utils/utils';
 import { AlertCircle, FileText, Globe2, PlusCircle } from 'lucide-react';
 
 export const ReportPage = () => {
@@ -31,15 +32,18 @@ export const ReportPage = () => {
     const acceptedId = searchParams.get('id');
     const isAccepted = searchParams.get('accepted');
     if (isAccepted === 'true' && acceptedId) {
-      setSelectedReportId(acceptedId);
-      setShowAcceptedMessage(true);
-      // Clean up URL
-      searchParams.delete('accepted');
-      searchParams.delete('id');
-      setSearchParams(searchParams);
-      
-      // Hide message after 5 seconds
-      setTimeout(() => setShowAcceptedMessage(false), 5000);
+      setTimeout(() => {
+        setSelectedReportId(acceptedId);
+        setShowAcceptedMessage(true);
+        // Clean up URL
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('accepted');
+        newParams.delete('id');
+        setSearchParams(newParams);
+        
+        // Hide message after 5 seconds
+        setTimeout(() => setShowAcceptedMessage(false), 5000);
+      }, 0);
     }
   }, [searchParams, setSearchParams]);
 

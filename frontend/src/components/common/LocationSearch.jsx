@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, MapPin, X, Loader2 } from 'lucide-react';
-import useStore from '../../store/useStore';
-import { cn } from './GlassCard';
+
+import { cn } from '../../utils/utils';
 
 export const LocationSearch = ({ onLocationSelect, className }) => {
   const [query, setQuery] = useState('');

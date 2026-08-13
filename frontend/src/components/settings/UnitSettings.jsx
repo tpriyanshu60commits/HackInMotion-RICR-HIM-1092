@@ -1,5 +1,5 @@
-import React from 'react';
-import { Thermometer, Ruler } from 'lucide-react';
+
+import { Thermometer } from 'lucide-react';
 import useStore from '../../store/useStore';
 
 export const UnitSettings = () => {

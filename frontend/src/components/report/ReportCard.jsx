@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { MapPin, ThumbsUp, Calendar, Clock } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { StatusBadge } from './StatusBadge';

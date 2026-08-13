@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Droplets } from 'lucide-react';
 
 export const WaterDropLoader = ({ message = 'Loading environmental data...' }) => {

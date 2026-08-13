@@ -1,7 +1,7 @@
-import React from 'react';
+
 import { Bell, Volume2, VolumeX, Mic } from 'lucide-react';
 import useStore from '../../store/useStore';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const NotificationSettings = () => {
   const isMuted = useStore(state => state.isMuted);

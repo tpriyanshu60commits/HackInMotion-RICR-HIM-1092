@@ -1,6 +1,6 @@
-import React from 'react';
 import { ArrowLeft, MapPin, Calendar, Clock, ThumbsUp } from 'lucide-react';
-import { GlassCard, cn } from '../common/GlassCard';
+import { GlassCard } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 import { StatusBadge } from './StatusBadge';
 import { EscalationBanner } from './EscalationBanner';
 
@@ -112,7 +112,7 @@ export const ReportDetail = ({ report, onBack, onUpvote, onEscalate, currentUser
       <div className="pl-2">
         <h3 className="text-lg font-bold text-white mb-6">Status Timeline</h3>
         <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
-          {STEPS.map((step, index) => {
+          {STEPS.map((step) => {
             const status = getStepStatus(step.id);
             if (status === 'upcoming' && step.id === 'Resolved' && (report.status === 'Escalated' || report.status === 'CM Accepted')) return null;
             if (status === 'upcoming' && (step.id === 'Escalated' || step.id === 'CM Accepted') && report.status === 'Resolved') return null;

@@ -1,8 +1,8 @@
-import React from 'react';
+
 import { Watch, Heart, Activity } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { useSimulatedWearable } from '../../hooks/useSimulatedWearable';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const ConnectedDeviceCard = () => {
   const wearableConnected = useStore(state => state.wearableConnected);

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { HeartPulse, Activity, Info, FileText, Upload, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { HeartPulse, Activity, FileText, Upload, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const ProfileCard = () => {
   const diagnosedConditions = useStore(state => state.diagnosedConditions);

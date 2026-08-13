@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Volume2, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '../../components/common/GlassCard';
+import { cn } from '../../utils/utils';
 import { useVoiceAlert } from '../../hooks/useVoiceAlert';
 
 export const AlertToast = ({ toast, onDismiss }) => {
