@@ -21,10 +21,14 @@ import { Education } from './pages/Education';
 import { ReportPage } from './pages/ReportPage';
 // Public Route Wrapper (Redirects to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
-  const { isAuthenticated, isInitializing } = useStore();
+  const { isAuthenticated, isInitializing, user } = useStore();
 
   if (isInitializing) return <div className="flex min-h-screen items-center justify-center"><WaterDropLoader message="Initializing Environment..." /></div>;
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  
+  if (isAuthenticated) {
+    const dashboardRoute = user?.role === 'admin' || user?.userType === 'admin' ? '/admin' : '/dashboard';
+    return <Navigate to={dashboardRoute} replace />;
+  }
 
   return children;
 };
@@ -68,7 +72,7 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 

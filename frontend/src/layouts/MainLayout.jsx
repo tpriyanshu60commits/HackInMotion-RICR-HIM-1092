@@ -27,7 +27,6 @@ import { AlertToastContainer } from '../components/alerts/AlertToastContainer';
 import api from '../services/api';
 
 const NAV_ITEMS = [
-  { to: '/dashboard', icon: BarChart3, label: 'Dashboard' },
   { to: '/locations', icon: MapPin, label: 'Locations' },
   { to: '/history', icon: Activity, label: 'History' },
   { to: '/compare', icon: Wind, label: 'Compare' },
@@ -62,88 +61,58 @@ export const MainLayout = () => {
   return (
     <WeatherBackground>
       <div className="min-h-screen w-full  flex flex-col text-text-main overflow-x-hidden bg-background">
-        
+
         {/* =====================================================
             TOP NAVBAR
         ====================================================== */}
         <header className="glass border-b border-border fixed  top-2  z-50 w-full h-16 flex items-center justify-between px-4 md:px-8 rounded-2xl">
-          
+
           {/* Logo Section */}
-          <div className="flex items-center gap-3 text-white font-heading font-bold text-xl">
+          <Link to="/dashboard" className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity">
             <Leaf className="text-green-500 shrink-0" size={28} />
-            <Link to="/">VerdantX</Link>
-          </div>
+            <span>VerdantX</span>
+          </Link>
 
           {/* Desktop Navigation */}
-         <div className='flex gap-2'>
-           <nav className="hidden xl:flex items-center gap-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 group border border-transparent',
-                    isActive
-                      ? 'bg-green-500/10 text-green-400 border-green-500/20'
-                      : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
-                  )
-                }
-              >
-                <item.icon size={18} className="transition-transform group-hover:scale-110 shrink-0" />
-                <span className="text-xs">{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
+          <div className='flex gap-2'>
+            <nav className="hidden xl:flex items-center gap-1">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 group border border-transparent',
+                      isActive
+                        ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                    )
+                  }
+                >
+                  <item.icon size={18} className="transition-transform group-hover:scale-110 shrink-0" />
+                  <span className="text-xs">{item.label}</span>
+                </NavLink>
+              ))}
+            </nav>
 
-          {/* User Profile / Logout (Desktop) */}
-          <div className="hidden xl:flex items-center gap-4">
-            {/* Quick Settings */}
-            <div className="flex items-center gap-2 border-r border-white/10 pr-4 mr-2">
-              <button
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-2 text-gray-400 hover:text-white transition-colors"
-                title={isMuted ? "Unmute Alerts" : "Mute Alerts"}
+            {/* User Profile / Logout (Desktop) */}
+            <div className="hidden xl:flex items-center gap-4">
+              <Link
+                to="/report"
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-sm shadow-lg shadow-green-500/20 mr-2"
               >
-                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </button>
-              <button
-                onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-                className="flex items-center gap-1 p-2 text-gray-400 hover:text-white transition-colors font-medium text-xs"
-                title="Toggle Language"
+                <AlertCircle size={16} />
+                <span>Report Issue</span>
+              </Link>
+              <Link
+                to="/profile"
+                className="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400 font-bold hover:bg-green-500/30 transition-colors"
+                title="Account Settings"
               >
-                <Languages size={18} />
-                <span className="uppercase">{language}</span>
-              </button>
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
+              </Link>
             </div>
-            
-            <Link 
-              to="/report" 
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-sm shadow-lg shadow-green-500/20"
-            >
-              <AlertCircle size={16} />
-              <span>Report Issue</span>
-            </Link>
-            <NavLink
-              to="/profile"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200',
-                  isActive ? 'text-green-400' : 'text-gray-400 hover:text-white'
-                )
-              }
-            >
-              <User size={18} />
-              <span className="text-sm">Profile</span>
-            </NavLink>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-all duration-200 font-medium text-sm border border-red-500/20"
-            >
-              <span className="hidden sm:inline">Logout</span>
-            </button>
           </div>
-         </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -160,7 +129,7 @@ export const MainLayout = () => {
         ====================================================== */}
         {mobileMenuOpen && (
           <div className="fixed  inset-0 z-50 xl:hidden">
-            <div 
+            <div
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setMobileMenuOpen(false)}
             />
@@ -194,21 +163,6 @@ export const MainLayout = () => {
                     <span>{item.label}</span>
                   </NavLink>
                 ))}
-                <NavLink
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 mt-4',
-                      isActive
-                        ? 'bg-green-500/10 text-green-400 border border-green-500/20'
-                        : 'text-text-muted hover:bg-surface-hover hover:text-text-main'
-                    )
-                  }
-                >
-                  <User size={20} />
-                  <span>Profile</span>
-                </NavLink>
               </div>
 
               <div className="p-4 border-t border-border flex flex-col gap-3">
@@ -220,12 +174,14 @@ export const MainLayout = () => {
                   <AlertCircle size={20} />
                   Report Issue
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-xl font-medium transition-colors"
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10"
                 >
-                  Logout
-                </button>
+                  <User size={20} />
+                  Account Settings
+                </Link>
               </div>
             </div>
           </div>
