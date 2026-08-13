@@ -55,6 +55,12 @@ export const ReportPage = () => {
     const res = await createReport(formData, user?._id);
     if (res.success) {
       setActiveTab('mine');
+      useStore.getState().addAlert({
+        title: 'Report Submitted',
+        message: 'Your environmental report has been successfully submitted and is pending review.',
+        type: 'success',
+        timestamp: new Date()
+      });
     }
   };
 

@@ -33,7 +33,6 @@ const NAV_ITEMS = [
   { to: '/compare', icon: Wind, label: 'Compare' },
   { to: '/route', icon: NavIcon, label: 'Route Risk' },
   { to: '/education', icon: BookOpen, label: 'Education' },
-  { to: '/alerts', icon: Bell, label: 'Alerts' },
 ];
 
 export const MainLayout = () => {

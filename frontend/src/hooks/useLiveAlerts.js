@@ -41,6 +41,16 @@ export const useLiveAlerts = () => {
       if (newAlerts.length > 0) {
         localStorage.setItem('shown_live_alerts', JSON.stringify(shownAlerts));
         setQueue(prev => [...prev, ...newAlerts]);
+        
+        // Also add them to the persistent notification dropdown store
+        newAlerts.forEach(alert => {
+          useStore.getState().addAlert({
+            title: 'Live Alert',
+            message: alert.messages[language] || alert.messages.en,
+            type: alert.severity === 'red' || alert.severity === 'orange' ? 'danger' : alert.severity === 'amber' ? 'warning' : 'info',
+            timestamp: new Date()
+          });
+        });
       }
     };
 
@@ -48,7 +58,34 @@ export const useLiveAlerts = () => {
     evaluateRules();
     const interval = setInterval(evaluateRules, 60000);
 
-    return () => clearInterval(interval);
+    // DEMO: Send a sample alert 2 seconds after mount to test Notification Bell
+    const demoTimeout = setTimeout(() => {
+      const sampleAlert = {
+        id: 'demo-alert-' + Date.now(),
+        category: 'health',
+        icon: alertRules[1].icon,
+        severity: 'red',
+        messages: {
+          en: "Demo Alert: Hazardous air detected nearby — stay indoors.",
+          hi: "डेमो अलर्ट: पास में खतरनाक हवा — घर के अंदर रहें।"
+        }
+      };
+      
+      setQueue(prev => [...prev, sampleAlert]);
+      
+      // Also add it directly to the persistent notification dropdown store
+      useStore.getState().addAlert({
+        title: 'Emergency Alert',
+        message: sampleAlert.messages[language] || sampleAlert.messages.en,
+        type: 'danger',
+        timestamp: new Date()
+      });
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(demoTimeout);
+    };
   }, [weatherCondition, currentAQI, currentTemp]);
 
   // Process the queue

@@ -57,5 +57,28 @@ export const useHealthAlerts = () => {
     setAlerts(generatedAlerts);
   }, [userName, diagnosedConditions, prescribedMedication, wearableConnected, currentAQI, wearableStats]);
 
-  return { alerts, wearableStats };
+  // Generate a comprehensive summary paragraph
+  const userAge = useStore(state => state.userAge);
+  const getSummary = () => {
+    if (!userName || diagnosedConditions.length === 0) return null;
+    
+    let summary = `Hi ${userName}`;
+    if (userAge) summary += ` (Age: ${userAge})`;
+    
+    summary += `. Based on your active health profile including ${diagnosedConditions.join(', ')}`;
+    
+    if (currentAQI <= 50) {
+      summary += `, today's air quality is excellent. Your conditions are at minimal risk, making it a great day for outdoor activities.`;
+    } else if (currentAQI <= 100) {
+      summary += `, today's moderate air quality might pose a slight risk. If you feel any discomfort, consider reducing prolonged outdoor exertion.`;
+    } else if (currentAQI <= 150) {
+      summary += `, today's air quality is unhealthy for sensitive groups. It is highly recommended that you limit outdoor activities and ensure you have your medications accessible.`;
+    } else {
+      summary += `, today's air quality is hazardous. You are at significant risk of exacerbating your conditions. Please stay indoors, keep windows closed, and run an air purifier if available.`;
+    }
+    
+    return summary;
+  };
+
+  return { alerts, wearableStats, summary: getSummary() };
 };

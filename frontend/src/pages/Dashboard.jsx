@@ -5,9 +5,10 @@ import { WaterDropLoader } from '../components/common/WaterDropLoader';
 import { LocationSearch } from '../components/common/LocationSearch';
 import {
   MapPin, Wind, Droplets, Thermometer, CloudRain, Activity,
-  Info, CheckCircle2, Sunrise, Gauge, Sun, Search, Bell,
+  Info, CheckCircle2, Sunrise, Gauge, Sun, Search,
   AlertTriangle, AlertCircle, AlertOctagon
 } from 'lucide-react';
+import { NotificationDropdown } from '../components/common/NotificationDropdown';
 import { environmentService } from '../services/api';
 import useStore from '../store/useStore';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -153,10 +154,7 @@ export const Dashboard = () => {
               <LocationSearch onLocationSelect={handleLocationSelect} />
             </div>
           </div>
-          <button className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.1] backdrop-blur-xl transition-colors shrink-0 relative">
-            <Bell size={18} />
-            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-          </button>
+          <NotificationDropdown />
         </div>
       </div>
 
