@@ -17,8 +17,6 @@ const useStore = create(
         set({ user: null, isAuthenticated: false });
       },
 
-      sidebarWidth: 'default', // 'compact', 'default', 'wide', 'minimized'
-      setSidebarWidth: (width) => set({ sidebarWidth: width }),
 
       weatherCondition: 'clear',
       setWeatherCondition: (condition) => set({ weatherCondition: condition }),

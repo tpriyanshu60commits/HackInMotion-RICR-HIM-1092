@@ -78,15 +78,15 @@ export const Compare = () => {
       className="min-h-full relative px-2 lg:px-4 py-8 animate-fade-in flex flex-col items-center justify-start"
       style={{
         backgroundImage: `
-          linear-gradient(
-            rgba(10,15,13,0.94),
-            rgba(10,15,13,0.94)
-          ),
-          url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
-        `,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+    linear-gradient(
+      rgba(1, 11, 7, 0.4),
+      rgba(0, 0, 0, 0.4)
+    ),
+    url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
+  `,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
       }}
     >
       {/* Main Comparison Module */}

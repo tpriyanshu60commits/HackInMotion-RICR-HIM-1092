@@ -122,14 +122,20 @@ export const Dashboard = () => {
   );
 
   return (
-    <div 
+    <div
       className="space-y-6 animate-fade-in pb-10 px-2 lg:px-4 min-h-full relative"
-      style={{
-        backgroundImage: `linear-gradient(rgba(10,15,13,0.92), rgba(10,15,13,0.92)), url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
+    style={{
+  backgroundImage: `
+    linear-gradient(
+      rgba(1, 11, 7, 0.4),
+      rgba(0, 0, 0, 0.4)
+    ),
+    url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
+  `,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundAttachment: "fixed",
+}}
     >
       {/* Top Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -139,7 +145,7 @@ export const Dashboard = () => {
           </h1>
           <p className="text-sm text-gray-400 font-medium">Here's your environment summary</p>
         </div>
-        
+
         <div className="flex items-center gap-4 relative z-50">
           <div className="w-full md:w-64 relative group z-50">
             <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 z-10" />
@@ -150,9 +156,6 @@ export const Dashboard = () => {
           <button className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.1] backdrop-blur-xl transition-colors shrink-0 relative">
             <Bell size={18} />
             <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-          </button>
-          <button className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.1] backdrop-blur-xl transition-colors shrink-0">
-            <Sun size={18} />
           </button>
         </div>
       </div>
@@ -175,14 +178,14 @@ export const Dashboard = () => {
                 Live
               </span>
             </div>
-            
+
             {data && (
               <div className="flex items-center gap-1.5 text-gray-400 text-sm font-medium mb-4">
                 <MapPin size={14} className="text-gray-500" />
                 {data.city && data.city !== 'Unknown Location' ? `${data.city}${data.country ? `, ${data.country}` : ''}` : (location?.name || 'Unknown Location')}
               </div>
             )}
-            
+
             <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
               <div className="text-7xl md:text-8xl font-black text-white leading-none tracking-tighter drop-shadow-lg">
                 {data.aqi || '--'}
@@ -205,7 +208,7 @@ export const Dashboard = () => {
 
           {/* 4-Column Grid for Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            
+
             {/* PM2.5 */}
             <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
@@ -334,7 +337,7 @@ export const Dashboard = () => {
                 })()}
               </div>
             </GlassCard>
-            
+
             {/* Sunrise */}
             <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
@@ -353,7 +356,7 @@ export const Dashboard = () => {
 
           {/* Bottom Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            
+
             {/* Trend Chart */}
             <GlassCard className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">AQI Trend (24h)</h3>
@@ -366,16 +369,16 @@ export const Dashboard = () => {
                         <stop offset="95%" stopColor="#22C55E" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis 
-                      dataKey="time" 
-                      tick={{ fontSize: 10, fill: '#6B7280' }} 
-                      tickFormatter={(val, i) => i % 6 === 0 ? val : ''} 
-                      axisLine={false} 
-                      tickLine={false} 
+                    <XAxis
+                      dataKey="time"
+                      tick={{ fontSize: 10, fill: '#6B7280' }}
+                      tickFormatter={(val, i) => i % 6 === 0 ? val : ''}
+                      axisLine={false}
+                      tickLine={false}
                       dy={10}
                     />
-                    <Tooltip 
-                      contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(10,15,13,0.9)', backdropFilter: 'blur(8px)' }} 
+                    <Tooltip
+                      contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(10,15,13,0.9)', backdropFilter: 'blur(8px)' }}
                       itemStyle={{ color: '#22C55E' }}
                     />
                     <Area type="monotone" dataKey="aqi" stroke="#22C55E" strokeWidth={2} fillOpacity={1} fill="url(#colorAqi)" activeDot={{ r: 4, fill: '#22C55E' }} />
@@ -387,7 +390,7 @@ export const Dashboard = () => {
             {/* Breakdown Chart */}
             <GlassCard className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">Air Quality Breakdown</h3>
-              <div className="flex-1 flex flex-row items-center justify-between px-2">
+              <div className="flex-1 flex flex-col sm:flex-row items-center justify-between px-2 gap-6">
                 <div className="h-40 w-40 relative shrink-0">
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-2xl font-bold text-white">{data.aqi || '--'}</span>
@@ -425,8 +428,8 @@ export const Dashboard = () => {
                     </ResponsiveContainer>
                   </div>
                 </div>
-                
-                <div className="flex flex-col gap-3 ml-4 w-full max-w-[200px]">
+
+                <div className="flex flex-col gap-3 w-full sm:ml-4 max-w-[200px]">
                   {[
                     { label: 'Good (0-50)', pct: '70%', color: 'bg-green-500' },
                     { label: 'Moderate (51-100)', pct: '20%', color: 'bg-yellow-500' },
@@ -444,9 +447,9 @@ export const Dashboard = () => {
                 </div>
               </div>
             </GlassCard>
-            
+
           </div>
-          
+
         </div>
       )}
     </div>
