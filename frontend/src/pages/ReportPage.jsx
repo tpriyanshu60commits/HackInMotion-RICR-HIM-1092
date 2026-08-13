@@ -77,18 +77,7 @@ export const ReportPage = () => {
   return (
     <div 
       className="min-h-screen w-full pt-8 pb-12 px-4 lg:px-8"
-      style={{
-        backgroundImage: `
-          linear-gradient(
-            rgba(1, 11, 7, 0.4),
-            rgba(0, 0, 0, 0.4)
-          ),
-          url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
-        `,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
+      
     >
       <div className="max-w-5xl mx-auto space-y-8">
         
