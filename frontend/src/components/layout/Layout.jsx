@@ -3,7 +3,7 @@ import Header from './Header';
 
 export default function Layout({ children }) {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-[#0c1614] to-[#050908] text-white">
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />

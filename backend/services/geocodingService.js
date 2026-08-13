@@ -7,6 +7,7 @@ export const geocodeCity = async (city) => {
         q: city,
         format: 'json',
         limit: 1,
+        'accept-language': 'en',
       },
       headers: {
         // Nominatim requires a valid User-Agent
@@ -35,6 +36,7 @@ export const reverseGeocode = async (lat, lng) => {
         lat,
         lon: lng,
         format: 'json',
+        'accept-language': 'en',
       },
       headers: {
         'User-Agent': 'VerdantX-Environment-App/1.0',

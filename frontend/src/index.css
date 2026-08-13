@@ -24,14 +24,14 @@
 
 @layer base {
   :root {
-    --background: #f8fafc;
-    --surface: rgba(255, 255, 255, 0.7);
-    --surface-hover: rgba(255, 255, 255, 0.9);
-    --border-color: rgba(226, 232, 240, 0.6);
-    --text-main: #0f172a;
-    --text-muted: #64748b;
+    --background: #0A0F0D;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hover: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
 
-    /* Greenish for default Light/Good Air */
+    /* Green accent */
     --primary-50: #f0fdf4;
     --primary-100: #dcfce7;
     --primary-200: #bbf7d0;
@@ -42,77 +42,8 @@
     --primary-700: #15803d;
     --primary-800: #166534;
     --primary-900: #14532d;
-    
-    --bg-image: linear-gradient(135deg, #e0f2fe 0%, #dcfce7 100%);
-  }
 
-  .theme-dark {
-    --background: #0f172a;
-    --surface: rgba(30, 41, 59, 0.6);
-    --surface-hover: rgba(30, 41, 59, 0.8);
-    --border-color: rgba(51, 65, 85, 0.6);
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-
-    /* Slate/Indigo vibe */
-    --primary-50: #eef2ff;
-    --primary-100: #e0e7ff;
-    --primary-200: #c7d2fe;
-    --primary-300: #a5b4fc;
-    --primary-400: #818cf8;
-    --primary-500: #6366f1;
-    --primary-600: #4f46e5;
-    --primary-700: #4338ca;
-    --primary-800: #3730a3;
-    --primary-900: #312e81;
-
-    --bg-image: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-  }
-
-  .theme-nature {
-    --background: #fbfdf9;
-    --surface: rgba(244, 250, 241, 0.75);
-    --surface-hover: rgba(255, 255, 255, 0.95);
-    --border-color: rgba(190, 227, 185, 0.6);
-    --text-main: #143118;
-    --text-muted: #4b6e51;
-
-    /* Earthy Green */
-    --primary-50: #f2fbf4;
-    --primary-100: #e0f6e5;
-    --primary-200: #c2ecd0;
-    --primary-300: #93dca9;
-    --primary-400: #5dc37c;
-    --primary-500: #37a75a;
-    --primary-600: #268543;
-    --primary-700: #216937;
-    --primary-800: #1d542e;
-    --primary-900: #194427;
-
-    --bg-image: linear-gradient(135deg, #e6f4ea 0%, #c8e6c9 100%);
-  }
-
-  .theme-ocean {
-    --background: #f0f9ff;
-    --surface: rgba(224, 242, 254, 0.6);
-    --surface-hover: rgba(240, 249, 255, 0.9);
-    --border-color: rgba(186, 230, 253, 0.6);
-    --text-main: #082f49;
-    --text-muted: #0284c7;
-
-    /* CleanTech Blue */
-    --primary-50: #f0f9ff;
-    --primary-100: #e0f2fe;
-    --primary-200: #bae6fd;
-    --primary-300: #7dd3fc;
-    --primary-400: #38bdf8;
-    --primary-500: #0ea5e9;
-    --primary-600: #0284c7;
-    --primary-700: #0369a1;
-    --primary-800: #075985;
-    --primary-900: #0c4a6e;
-
-    --bg-image: linear-gradient(135deg, #bae6fd 0%, #38bdf8 100%);
+    --bg-image: none;
   }
 
   body {
