@@ -7,6 +7,9 @@ export const ProfileCard = () => {
   const userName = useStore(state => state.userName);
   const setUserName = useStore(state => state.setUserName);
   
+  const userAge = useStore(state => state.userAge);
+  const setUserAge = useStore(state => state.setUserAge);
+  
   const diagnosedConditions = useStore(state => state.diagnosedConditions);
   const setDiagnosedConditions = useStore(state => state.setDiagnosedConditions);
   
@@ -55,16 +58,30 @@ export const ProfileCard = () => {
       </div>
 
       <div className="space-y-6 flex-1">
-        {/* Name Input */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Your Name</label>
-          <input 
-            type="text" 
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            placeholder="e.g. Rahul"
-            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 focus:bg-white/[0.04] text-white font-medium text-sm transition-all"
-          />
+        {/* Basic Info (Name & Age) */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Your Name</label>
+            <input 
+              type="text" 
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              placeholder="e.g. Rahul"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 focus:bg-white/[0.04] text-white font-medium text-sm transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Age</label>
+            <input 
+              type="number" 
+              value={userAge}
+              onChange={(e) => setUserAge(e.target.value)}
+              placeholder="e.g. 35"
+              min="1"
+              max="120"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 focus:bg-white/[0.04] text-white font-medium text-sm transition-all"
+            />
+          </div>
         </div>
 
         {/* Doctor's Report (Simulated Upload) */}
