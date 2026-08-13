@@ -32,6 +32,7 @@ const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null) => {
     pressure: currentWeather.surface_pressure,
     precipitation: currentWeather.precipitation,
     weatherCode: currentWeather.weather_code,
+    isDay: currentWeather.is_day === 1,
     uvIndex: dailyWeather?.uv_index_max?.[0] || 0,
     sunrise: dailyWeather?.sunrise?.[0] || null,
     sunset: dailyWeather?.sunset?.[0] || null,
@@ -50,7 +51,7 @@ export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null)
 
     const [airQualityResponse, weatherResponse] = await Promise.all([
       axios.get(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`),
-      axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`)
+      axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,is_day&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`)
     ]);
 
     const data = {
