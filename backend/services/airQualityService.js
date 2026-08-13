@@ -7,13 +7,13 @@ const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null) => {
   const currentAirQuality = data.airQuality.current;
   const currentWeather = data.weather.current;
   const dailyWeather = data.weather.daily;
-  
+
   // Map Open-Meteo European AQI (0-100+) to a standard 0-500 US AQI scale roughly
   // Open-Meteo returns US AQI in the hourly array, but for current we can use pm2.5 to estimate AQI,
   // Or better, OpenMeteo provides US AQI in current if requested.
   // I requested it in the URL below.
-  const aqi = currentAirQuality.us_aqi || 50; 
-  
+  const aqi = currentAirQuality.us_aqi || 50;
+
   const baseRisk = calculateBaseRisk(aqi);
   const personalizedRisk = getPersonalizedRisk(baseRisk, healthProfile);
 
@@ -103,14 +103,55 @@ const saveSnapshot = async (data, locationId = null) => {
 };
 
 export const getHistoricalData = async (lat, lng, days = 7) => {
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - days);
+  try {
+    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=us_aqi,pm10,pm2_5&past_days=${days}`;
+    const response = await axios.get(url);
+    const hourly = response.data.hourly;
 
-  const history = await AirQualitySnapshot.find({
-    latitude: { $gte: lat - 0.1, $lte: lat + 0.1 },
-    longitude: { $gte: lng - 0.1, $lte: lng + 0.1 },
-    timestamp: { $gte: cutoffDate },
-  }).sort({ timestamp: 1 });
+    const dailyData = {};
 
-  return history;
+    hourly.time.forEach((timeStr, i) => {
+      const dateOnly = timeStr.split('T')[0];
+
+      if (!dailyData[dateOnly]) {
+        dailyData[dateOnly] = {
+          aqiSum: 0, aqiCount: 0,
+          pm25Sum: 0, pm25Count: 0,
+          pm10Sum: 0, pm10Count: 0
+        };
+      }
+
+      if (hourly.us_aqi[i] != null) {
+        dailyData[dateOnly].aqiSum += hourly.us_aqi[i];
+        dailyData[dateOnly].aqiCount++;
+      }
+      if (hourly.pm2_5[i] != null) {
+        dailyData[dateOnly].pm25Sum += hourly.pm2_5[i];
+        dailyData[dateOnly].pm25Count++;
+      }
+      if (hourly.pm10[i] != null) {
+        dailyData[dateOnly].pm10Sum += hourly.pm10[i];
+        dailyData[dateOnly].pm10Count++;
+      }
+    });
+
+    const result = Object.keys(dailyData).map(dateStr => {
+      const data = dailyData[dateStr];
+      const dateObj = new Date(dateStr + "T12:00:00Z"); // Safe mid-day UTC parsing
+      const name = dateObj.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+
+      return {
+        name,
+        date: dateStr,
+        aqi: data.aqiCount > 0 ? Math.round(data.aqiSum / data.aqiCount) : 0,
+        pm25: data.pm25Count > 0 ? Math.round(data.pm25Sum / data.pm25Count) : 0,
+        pm10: data.pm10Count > 0 ? Math.round(data.pm10Sum / data.pm10Count) : 0,
+      };
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Failed to fetch historical air quality data:', error.message);
+    throw new Error("Failed to fetch historical air quality data");
+  }
 };

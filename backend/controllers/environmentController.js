@@ -53,14 +53,15 @@ export const getCurrentEnvironmentByCity = async (req, res, next) => {
 // @access  Private
 export const getHistoricalEnvironment = async (req, res, next) => {
   try {
-    const { lat, lng, days = 7 } = req.query;
+    const { lat, lng, days } = req.query;
 
     if (!lat || !lng) {
       res.status(400);
       throw new Error('Latitude and longitude are required');
     }
 
-    const data = await getHistoricalData(parseFloat(lat), parseFloat(lng), parseInt(days));
+    const parsedDays = parseInt(days) || 7;
+    const data = await getHistoricalData(parseFloat(lat), parseFloat(lng), parsedDays);
 
     if (data.length === 0) {
       return res.json({

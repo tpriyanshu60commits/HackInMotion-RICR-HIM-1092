@@ -17,14 +17,28 @@ api.interceptors.request.use((config) => {
 
 export const locationService = {
   search: (query) => api.get(`/locations/search?q=${query}`),
-  getSaved: () => api.get('/locations/saved'),
-  save: (data) => api.post('/locations/saved', data),
+  getSaved: () => api.get('/locations'),
+  save: (data) => api.post('/locations', {
+    name: data.name,
+    city: data.city,
+    area: data.area,
+    country: data.country,
+    latitude: data.latitude,
+    longitude: data.longitude,
+    locationType: data.locationType || 'other',
+  }),
+  delete: (id) => api.delete(`/locations/${id}`),
 };
 
 export const environmentService = {
   getCurrentByCoords: (lat, lng) => api.get(`/environment/current?lat=${lat}&lng=${lng}`),
   getCurrentByCity: (city) => api.get(`/environment/city?city=${city}`),
-  getHistory: (lat, lng, days) => api.get(`/environment/history?lat=${lat}&lng=${lng}&days=${days}`),
+  getHistory: async (lat, lng, days) => {
+    const response = await api.get('/environment/history', {
+      params: { lat, lng, days }
+    });
+    return response.data;
+  },
   compareCities: (cities) => api.get(`/environment/compare?cities=${cities}`),
 };
 

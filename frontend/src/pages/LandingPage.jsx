@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 // Common Glass Card Component (Internal)
@@ -20,6 +20,20 @@ export default function LandingPage() {
   // Video state
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const pathRef = useRef(null);
+  const [pathLength, setPathLength] = useState(0);
+  const [isDrawn, setIsDrawn] = useState(false);
+
+  useEffect(() => {
+    if (pathRef.current) {
+      const length = pathRef.current.getTotalLength();
+      setPathLength(length);
+      setTimeout(() => {
+        setIsDrawn(true);
+      }, 50);
+    }
+  }, []);
 
   const handlePlayVideo = () => {
     if (videoRef.current) {
@@ -129,13 +143,18 @@ export default function LandingPage() {
               <div className="h-10 w-full relative">
                 <svg className="w-full h-full" viewBox="0 0 100 20" preserveAspectRatio="none">
                   <path 
-                    d="M0 15 Q 10 5, 20 15 T 40 10 T 60 12 T 80 5 T 100 15" 
+                    ref={pathRef}
+                    d="M0 15 C 10 5, 15 5, 25 12 C 35 19, 40 19, 50 10 C 60 3, 65 3, 75 12 C 82 17, 90 17, 100 15" 
                     fill="none" 
                     stroke="#22C55E" 
                     strokeWidth="1.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
-                    className="path-anim"
+                    style={{
+                      strokeDasharray: pathLength,
+                      strokeDashoffset: isDrawn ? 0 : pathLength,
+                      transition: pathLength > 0 ? 'stroke-dashoffset 2.5s ease-out' : 'none'
+                    }}
                   />
                 </svg>
               </div>
@@ -273,8 +292,9 @@ export default function LandingPage() {
                 <video 
                   ref={videoRef}
                   className="w-full h-full object-cover"
-                  poster="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2000&auto=format&fit=crop"
-                  src="https://cdn.coverr.co/videos/coverr-flying-over-a-foggy-forest-2292/1080p.mp4"
+                  // poster="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2000&auto=format&fit=crop"
+                  src="https://videos.pexels.com/video-files/30859401/13196588_2560_1440_60fps.mp4"
+                  preload="metadata"
                   controls={isPlaying}
                   onPause={() => setIsPlaying(false)}
                   onEnded={() => setIsPlaying(false)}
@@ -498,17 +518,7 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* Global CSS for Animations */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes draw {
-          from { stroke-dashoffset: 200; }
-          to { stroke-dashoffset: 0; }
-        }
-        .path-anim {
-          stroke-dasharray: 200;
-          animation: draw 3s ease-out forwards;
-        }
-      `}} />
+
     </div>
   );
 }
