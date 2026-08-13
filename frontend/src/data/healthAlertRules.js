@@ -25,7 +25,7 @@ export const healthAlertRules = [
     appliesIf: (profile) => profile.diagnosedConditions.includes('Hypertension') || profile.diagnosedConditions.includes('Heart condition'),
     triggersIf: (envData) => envData.aqi >= 151, // Unhealthy
     severity: 'red',
-    buildMessage: (profile, envData) => {
+    buildMessage: (profile) => {
       const name = profile.userName || 'Friend';
       return `${name}, poor air quality can add strain on blood pressure. Avoid strenuous outdoor activity today.`;
     }
@@ -35,7 +35,7 @@ export const healthAlertRules = [
     appliesIf: (profile) => profile.diagnosedConditions.includes('Elderly in household') || profile.diagnosedConditions.includes('Children in household'),
     triggersIf: (envData) => envData.aqi >= 51 && envData.aqi <= 100, // Moderate
     severity: 'amber',
-    buildMessage: (profile, envData) => {
+    buildMessage: (profile) => {
       const name = profile.userName || 'Friend';
       return `${name}, air quality is a bit elevated. A light mask outdoors is a good idea today for sensitive groups.`;
     }
@@ -45,7 +45,7 @@ export const healthAlertRules = [
     appliesIf: (profile) => profile.diagnosedConditions.length === 0,
     triggersIf: (envData) => envData.aqi <= 50, // Good
     severity: 'green',
-    buildMessage: (profile, envData) => {
+    buildMessage: (profile) => {
       const name = profile.userName || 'Friend';
       return `${name}, air's clean today — nothing to worry about. Great day to be outside!`;
     }

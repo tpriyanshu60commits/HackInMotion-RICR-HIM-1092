@@ -1,10 +1,4 @@
-import React from 'react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-export function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
+import { cn } from '../../utils/utils';
 
 export const GlassCard = ({ children, className, hover = false, ...props }) => {
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ShieldAlert, ArrowUpRight, ArrowDownRight, Settings, MapPin } from 'lucide-react';
 
 const ALERTS = [

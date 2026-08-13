@@ -86,39 +86,45 @@ export const useLiveAlerts = () => {
       clearInterval(interval);
       clearTimeout(demoTimeout);
     };
-  }, [weatherCondition, currentAQI, currentTemp]);
+  }, [weatherCondition, currentAQI, currentTemp, language]);
 
   // Process the queue
   useEffect(() => {
     if (!activeToast && queue.length > 0) {
-      // Pull next alert from queue
       const nextAlert = queue[0];
-      setQueue(prev => prev.slice(1));
       
-      // Construct the toast object
-      const toastData = {
-        id: nextAlert.id + Date.now(),
-        ruleId: nextAlert.id,
-        category: nextAlert.category,
-        icon: nextAlert.icon,
-        severity: nextAlert.severity,
-        message: nextAlert.messages[language] || nextAlert.messages.en,
-        locationName: location?.name || 'Current Location',
-        timestamp: new Date()
-      };
+      // Defer state updates to avoid synchronous cascading renders
+      const processTimeout = setTimeout(() => {
+        setQueue(prev => prev.slice(1));
+        
+        // Construct the toast object
+        const toastData = {
+          id: nextAlert.id + Date.now(),
+          ruleId: nextAlert.id,
+          category: nextAlert.category,
+          icon: nextAlert.icon,
+          severity: nextAlert.severity,
+          message: nextAlert.messages[language] || nextAlert.messages.en,
+          locationName: location?.name || 'Current Location',
+          timestamp: new Date()
+        };
 
-      setActiveToast(toastData);
-      
-      // Fire effects
-      playSound();
-      speak(toastData.message);
+        setActiveToast(toastData);
+        
+        // Fire effects
+        playSound();
+        speak(toastData.message);
+      }, 0);
 
       // Auto-dismiss after 7 seconds
       const timeout = setTimeout(() => {
         setActiveToast(null);
       }, 7000);
 
-      return () => clearTimeout(timeout);
+      return () => {
+        clearTimeout(processTimeout);
+        clearTimeout(timeout);
+      };
     }
   }, [queue, activeToast, language, location, playSound, speak]);
 

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from './contexts/ThemeContext';
+
 import { MainLayout } from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
@@ -58,7 +58,7 @@ function App() {
         } else {
           setUser(null);
         }
-      } catch (err) {
+      } catch {
         setUser(null);
       } finally {
         setInitializing(false);
@@ -69,29 +69,27 @@ function App() {
   }, [setUser, setInitializing]);
 
   return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
-          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
-          <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/locations" element={<Locations />} />
-            <Route path="/history" element={<HistoricalTrends />} />
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/compare" element={<Compare />} />
-            <Route path="/route" element={<RouteRisk />} />
-            <Route path="/education" element={<Education />} />
-            <Route path="/report" element={<ReportPage />} />
-          </Route>
+        <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/locations" element={<Locations />} />
+          <Route path="/history" element={<HistoricalTrends />} />
+          <Route path="/alerts" element={<Alerts />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/compare" element={<Compare />} />
+          <Route path="/route" element={<RouteRisk />} />
+          <Route path="/education" element={<Education />} />
+          <Route path="/report" element={<ReportPage />} />
+        </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

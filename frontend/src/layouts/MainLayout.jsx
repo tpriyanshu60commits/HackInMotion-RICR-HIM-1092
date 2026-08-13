@@ -1,30 +1,24 @@
-import React, { useState } from 'react';
-import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, Outlet, Link } from 'react-router-dom';
 import {
   Leaf,
   MapPin,
-  BarChart3,
-  Bell,
   User,
   Menu,
   X,
   Wind,
   Navigation as NavIcon,
   Activity,
-  Users,
   BookOpen,
-  AlertCircle,
-  Volume2,
-  VolumeX,
-  Languages
+  AlertCircle
 } from 'lucide-react';
 
 import useStore from '../store/useStore';
-import { cn } from '../components/common/GlassCard';
+import { cn } from '../utils/utils';
 import { WeatherBackground } from '../components/common/WeatherBackground';
 import { ChatbotButton } from '../components/chat/ChatbotButton';
 import { AlertToastContainer } from '../components/alerts/AlertToastContainer';
-import api from '../services/api';
+
 import { BottomNavMobile } from './BottomNavMobile';
 
 const NAV_ITEMS = [
@@ -38,22 +32,7 @@ const NAV_ITEMS = [
 export const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const user = useStore((state) => state.user);
-  const logout = useStore((state) => state.logout);
-  const isMuted = useStore((state) => state.isMuted);
-  const setIsMuted = useStore((state) => state.setIsMuted);
-  const language = useStore((state) => state.language);
-  const setLanguage = useStore((state) => state.setLanguage);
-  const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/auth/logout');
-    } catch (error) {
-      // Logout should continue even if API fails
-    }
-    logout();
-    navigate('/login');
-  };
 
   const navItems = user?.role === 'admin'
     ? [...NAV_ITEMS, { to: '/admin', icon: User, label: 'Admin Panel' }]

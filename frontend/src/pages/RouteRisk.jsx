@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Navigation as NavIcon, MapPin, Play, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { useState } from 'react';
+import { Navigation as NavIcon, MapPin, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 
 export const RouteRisk = () => {
   const [analyzing, setAnalyzing] = useState(false);
