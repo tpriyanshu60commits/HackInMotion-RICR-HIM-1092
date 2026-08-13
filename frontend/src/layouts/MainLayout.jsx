@@ -13,12 +13,17 @@ import {
   Activity,
   Users,
   BookOpen,
+  AlertCircle,
+  Volume2,
+  VolumeX,
+  Languages
 } from 'lucide-react';
 
 import useStore from '../store/useStore';
 import { cn } from '../components/common/GlassCard';
 import { WeatherBackground } from '../components/common/WeatherBackground';
 import { ChatbotButton } from '../components/chat/ChatbotButton';
+import { AlertToastContainer } from '../components/alerts/AlertToastContainer';
 import api from '../services/api';
 
 const NAV_ITEMS = [
@@ -28,7 +33,6 @@ const NAV_ITEMS = [
   { to: '/compare', icon: Wind, label: 'Compare' },
   { to: '/route', icon: NavIcon, label: 'Route Risk' },
   { to: '/education', icon: BookOpen, label: 'Education' },
-  { to: '/community', icon: Users, label: 'Community' },
   { to: '/alerts', icon: Bell, label: 'Alerts' },
 ];
 
@@ -36,6 +40,10 @@ export const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const user = useStore((state) => state.user);
   const logout = useStore((state) => state.logout);
+  const isMuted = useStore((state) => state.isMuted);
+  const setIsMuted = useStore((state) => state.setIsMuted);
+  const language = useStore((state) => state.language);
+  const setLanguage = useStore((state) => state.setLanguage);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -59,7 +67,7 @@ export const MainLayout = () => {
         {/* =====================================================
             TOP NAVBAR
         ====================================================== */}
-        <header className="glass border-b border-border fixed  top-0 z-50 w-full h-16 flex items-center justify-between px-4 md:px-8">
+        <header className="glass border-b border-border fixed  top-2  z-50 w-full h-16 flex items-center justify-between px-4 md:px-8 rounded-2xl">
           
           {/* Logo Section */}
           <div className="flex items-center gap-3 text-white font-heading font-bold text-xl">
@@ -91,6 +99,32 @@ export const MainLayout = () => {
 
           {/* User Profile / Logout (Desktop) */}
           <div className="hidden xl:flex items-center gap-4">
+            {/* Quick Settings */}
+            <div className="flex items-center gap-2 border-r border-white/10 pr-4 mr-2">
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                className="p-2 text-gray-400 hover:text-white transition-colors"
+                title={isMuted ? "Unmute Alerts" : "Mute Alerts"}
+              >
+                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </button>
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+                className="flex items-center gap-1 p-2 text-gray-400 hover:text-white transition-colors font-medium text-xs"
+                title="Toggle Language"
+              >
+                <Languages size={18} />
+                <span className="uppercase">{language}</span>
+              </button>
+            </div>
+            
+            <Link 
+              to="/report" 
+              className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-sm shadow-lg shadow-green-500/20"
+            >
+              <AlertCircle size={16} />
+              <span>Report Issue</span>
+            </Link>
             <NavLink
               to="/profile"
               className={({ isActive }) =>
@@ -178,7 +212,15 @@ export const MainLayout = () => {
                 </NavLink>
               </div>
 
-              <div className="p-4 border-t border-border">
+              <div className="p-4 border-t border-border flex flex-col gap-3">
+                <Link
+                  to="/report"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors shadow-lg shadow-green-500/20"
+                >
+                  <AlertCircle size={20} />
+                  Report Issue
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-xl font-medium transition-colors"
@@ -196,6 +238,11 @@ export const MainLayout = () => {
         <main className="flex-1 w-full relative mt-10 scroll-smooth p-4 md:p-8 overflow-x-hidden">
           <Outlet />
         </main>
+
+        {/* =====================================================
+            LIVE ALERTS TOAST
+        ====================================================== */}
+        <AlertToastContainer />
 
         {/* =====================================================
             CHATBOT

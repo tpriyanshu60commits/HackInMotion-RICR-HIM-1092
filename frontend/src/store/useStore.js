@@ -21,6 +21,37 @@ const useStore = create(
       weatherCondition: 'clear',
       setWeatherCondition: (condition) => set({ weatherCondition: condition }),
       
+      currentAQI: 50, // mock value
+      setCurrentAQI: (aqi) => set({ currentAQI: aqi }),
+      
+      currentTemp: 25, // mock value
+      setCurrentTemp: (temp) => set({ currentTemp: temp }),
+      
+      // Health Profile State
+      userName: '',
+      setUserName: (name) => set({ userName: name }),
+      
+      diagnosedConditions: [],
+      setDiagnosedConditions: (conditions) => set({ diagnosedConditions: conditions }),
+      
+      prescribedMedication: [],
+      setPrescribedMedication: (meds) => set({ prescribedMedication: meds }),
+      
+      lastCheckupDate: '',
+      setLastCheckupDate: (date) => set({ lastCheckupDate: date }),
+      
+      wearableConnected: false,
+      setWearableConnected: (connected) => set({ wearableConnected: connected }),
+      
+      isMuted: false,
+      setIsMuted: (isMuted) => set({ isMuted }),
+      
+      voiceAlertsEnabled: false,
+      setVoiceAlertsEnabled: (enabled) => set({ voiceAlertsEnabled: enabled }),
+      
+      language: 'en',
+      setLanguage: (lang) => set({ language: lang }),
+      
       location: null,
       setLocation: (location) => set({ location }),
       

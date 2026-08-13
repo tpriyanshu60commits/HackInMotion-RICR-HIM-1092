@@ -17,8 +17,8 @@ import { Profile } from './pages/Profile';
 import { Compare } from './pages/Compare';
 import { RouteRisk } from './pages/RouteRisk';
 import { HistoricalTrends } from './pages/HistoricalTrends';
-import { CommunityReports } from './pages/CommunityReports';
 import { Education } from './pages/Education';
+import { ReportPage } from './pages/ReportPage';
 // Public Route Wrapper (Redirects to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isInitializing } = useStore();
@@ -76,12 +76,12 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/locations" element={<Locations />} />
             <Route path="/history" element={<HistoricalTrends />} />
-            <Route path="/community" element={<CommunityReports />} />
             <Route path="/alerts" element={<Alerts />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/compare" element={<Compare />} />
             <Route path="/route" element={<RouteRisk />} />
             <Route path="/education" element={<Education />} />
+            <Route path="/report" element={<ReportPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
