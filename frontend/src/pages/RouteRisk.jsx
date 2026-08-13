@@ -38,18 +38,7 @@ export const RouteRisk = () => {
   return (
     <div 
       className="min-h-full relative px-4 lg:px-8 py-8 animate-fade-in flex flex-col"
-     style={{
-  backgroundImage: `
-    linear-gradient(
-      rgba(1, 11, 7, 0.4),
-      rgba(0, 0, 0, 0.4)
-    ),
-    url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
-  `,
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundAttachment: "fixed",
-}}
+     
     >
       <div className="max-w-[1600px] w-full mx-auto flex flex-col h-full gap-8">
         

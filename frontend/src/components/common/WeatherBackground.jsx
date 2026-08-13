@@ -4,63 +4,61 @@ import { cn } from '../../utils/utils';
 
 export const WeatherBackground = ({ children }) => {
   const weatherCondition = useStore((state) => state.weatherCondition);
-  const theme = useStore((state) => state.theme);
+  const currentAQI = useStore((state) => state.currentAQI);
   
-  const backgrounds = {
-    clear: {
-      light: 'from-sky-300 via-blue-200 to-indigo-100',
-      dark: 'from-slate-900 via-indigo-950 to-blue-900',
-      nature: 'from-sky-300 via-green-200 to-emerald-100',
-      ocean: 'from-blue-300 via-cyan-200 to-sky-100',
-    },
-    cloudy: {
-      light: 'from-slate-300 via-gray-200 to-slate-100',
-      dark: 'from-gray-900 via-slate-800 to-gray-700',
-      nature: 'from-slate-300 via-green-100 to-gray-100',
-      ocean: 'from-slate-300 via-cyan-100 to-gray-100',
-    },
-    rain: {
-      light: 'from-indigo-300 via-slate-400 to-gray-300',
-      dark: 'from-slate-900 via-indigo-900 to-blue-950',
-      nature: 'from-indigo-200 via-green-400 to-emerald-800',
-      ocean: 'from-indigo-300 via-cyan-600 to-blue-900',
-    },
-    storm: {
-      light: 'from-slate-500 via-gray-600 to-slate-400',
-      dark: 'from-gray-950 via-slate-900 to-indigo-950',
-      nature: 'from-slate-700 via-green-900 to-emerald-950',
-      ocean: 'from-slate-700 via-cyan-900 to-blue-950',
-    },
-    snow: {
-      light: 'from-blue-100 via-white to-slate-100',
-      dark: 'from-slate-800 via-blue-900 to-gray-800',
-      nature: 'from-blue-100 via-white to-green-100',
-      ocean: 'from-blue-100 via-white to-cyan-100',
-    }
-  };
+  const allBackgrounds = [
+    'clear-day', 'clear-night',
+    'cloudy-day', 'cloudy-night',
+    'rainy-day', 'rainy-night',
+    'stormy-day', 'stormy-night',
+    'foggy-day', 'foggy-night',
+    'snowy-day', 'snowy-night'
+  ];
 
-  const getGradient = () => {
-    const style = backgrounds[weatherCondition] || backgrounds.clear;
-    return style[theme] || style.light;
-  };
+  // Fallback to clear-day if somehow an invalid condition gets in
+  const activeBg = allBackgrounds.includes(weatherCondition) ? weatherCondition : 'clear-day';
 
   return (
     <div className="relative min-h-screen w-full transition-colors duration-1000 overflow-hidden">
-      {/* Dynamic Gradient Background */}
+      {/* Dynamic Image Backgrounds with Cross-fade */}
+      {allBackgrounds.map((bgName) => {
+        const isActive = activeBg === bgName;
+        return (
+          <div 
+            key={bgName}
+            className={cn(
+              "absolute inset-0 -z-30 transition-opacity duration-1000 bg-cover bg-center bg-fixed",
+              isActive ? "opacity-90" : "opacity-0"
+            )}
+            style={{ backgroundImage: `url('/images/weather/${bgName}.jpg')` }}
+          />
+        );
+      })}
+
+      {/* AQI Dust/Smog Overlay (Layered below the scrim) */}
+      {currentAQI >= 150 && (
+        <div 
+          className="absolute inset-0 -z-25 pointer-events-none transition-opacity duration-1000 opacity-60 mix-blend-multiply"
+          style={{ 
+            backgroundColor: '#8b6f4e', // brownish tint for pollution
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+          }}
+        />
+      )}
+
+      {/* Persistent Scrim Layer for Readability */}
       <div 
-        className={cn(
-          "absolute inset-0 bg-gradient-to-br -z-20 transition-all duration-1000",
-          getGradient()
-        )}
+        className="absolute inset-0 -z-20 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.65) 100%)' }}
       />
       
       {/* Weather overlay effects (e.g., subtle rain, clouds) */}
-      {weatherCondition === 'rain' && (
+      {activeBg.startsWith('rainy') && (
         <div className="absolute inset-0 -z-10 opacity-30 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjIwIj48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==')] bg-repeat" 
              style={{ backgroundSize: '4px 30px', animation: 'rain 0.5s linear infinite' }} />
       )}
       
-      {weatherCondition === 'cloudy' && (
+      {activeBg.startsWith('cloudy') && (
         <div className="absolute top-0 left-0 right-0 h-64 -z-10 opacity-20 bg-gradient-to-b from-white to-transparent" />
       )}
 

@@ -11,7 +11,8 @@ import {
 import { NotificationDropdown } from '../components/common/NotificationDropdown';
 import { environmentService } from '../services/api';
 import useStore from '../store/useStore';
-
+import { resolveBackground } from '../utils/resolveBackground';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 
 const getAqiStatus = (aqi) => {
@@ -31,15 +32,6 @@ const getUvStatus = (uv) => {
   return { label: 'Extreme', color: 'text-purple-500', bg: 'bg-purple-500' };
 };
 
-const getWeatherConditionString = (code) => {
-  if (code === 0) return 'clear';
-  if ([1, 2, 3, 45, 48].includes(code)) return 'cloudy';
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'rain';
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
-  if ([95, 96, 99].includes(code)) return 'storm';
-  return 'clear';
-};
-
 export const Dashboard = () => {
   const [data, setData] = useState(null);
   const [forecast, setForecast] = useState([]);
@@ -49,6 +41,8 @@ export const Dashboard = () => {
   const setLocation = useStore((state) => state.setLocation);
   const location = useStore((state) => state.location);
   const setWeatherCondition = useStore((state) => state.setWeatherCondition);
+  const setIsDay = useStore((state) => state.setIsDay);
+  const setCurrentAQI = useStore((state) => state.setCurrentAQI);
   const user = useStore(state => state.user);
 
   useEffect(() => {
@@ -63,7 +57,12 @@ export const Dashboard = () => {
 
         const envData = currentRes.data.data;
         setData(envData);
-        setWeatherCondition(getWeatherConditionString(envData.weatherCode));
+        
+        // Update global derived states for backgrounds and overlays
+        const resolvedBg = resolveBackground(envData.weatherCode, envData.isDay);
+        setWeatherCondition(resolvedBg);
+        setIsDay(envData.isDay);
+        if (envData.aqi) setCurrentAQI(envData.aqi);
 
         if (forecastRes.hourly) {
           const chartData = forecastRes.hourly.time.map((time, idx) => ({
@@ -108,21 +107,7 @@ export const Dashboard = () => {
   );
 
   return (
-    <div
-      className="space-y-6 animate-fade-in pb-10 px-2 lg:px-4 min-h-full relative"
-      style={{
-        backgroundImage: `
-    linear-gradient(
-      rgba(1, 11, 7, 0.4),
-      rgba(0, 0, 0, 0.4)
-    ),
-    url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
-  `,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
+    <div className="space-y-6 animate-fade-in pb-10 px-2 lg:px-4 min-h-full relative">
       {/* Top Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pt-2 md:pt-0">
         <div className="order-2 md:order-1">
@@ -438,3 +423,4 @@ export const Dashboard = () => {
     </div>
   );
 };
+```

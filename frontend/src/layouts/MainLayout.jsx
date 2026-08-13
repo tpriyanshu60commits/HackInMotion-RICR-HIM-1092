@@ -40,7 +40,7 @@ export const MainLayout = () => {
 
   return (
     <WeatherBackground>
-      <div className="min-h-screen w-full  flex flex-col text-text-main overflow-x-hidden bg-background">
+      <div className="min-h-screen w-full flex flex-col text-text-main overflow-x-hidden">
 
         {/* =====================================================
             TOP NAVBAR

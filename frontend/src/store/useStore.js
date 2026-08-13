@@ -18,8 +18,11 @@ const useStore = create(
       },
 
 
-      weatherCondition: 'clear',
+      weatherCondition: 'clear-day',
       setWeatherCondition: (condition) => set({ weatherCondition: condition }),
+      
+      isDay: true,
+      setIsDay: (isDay) => set({ isDay }),
       
       currentAQI: 50, // mock value
       setCurrentAQI: (aqi) => set({ currentAQI: aqi }),

@@ -52,18 +52,7 @@ export const Profile = () => {
   return (
     <div 
       className="min-h-full relative px-2 md:px-4 py-8 animate-fade-in"
-      style={{
-        backgroundImage: `
-          linear-gradient(
-            rgba(1, 11, 7, 0.4),
-            rgba(0, 0, 0, 0.4)
-          ),
-          url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop")
-        `,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
+      
     >
       <div className="max-w-[1400px] mx-auto w-full">
         

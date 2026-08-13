@@ -25,9 +25,9 @@
 @layer base {
   :root {
     --background: #0A0F0D;
-    --surface: rgba(255, 255, 255, 0.04);
-    --surface-hover: rgba(255, 255, 255, 0.08);
-    --border-color: rgba(255, 255, 255, 0.1);
+    --surface: rgba(0, 0, 0, 0.4);
+    --surface-hover: rgba(0, 0, 0, 0.6);
+    --border-color: rgba(255, 255, 255, 0.08);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
 
