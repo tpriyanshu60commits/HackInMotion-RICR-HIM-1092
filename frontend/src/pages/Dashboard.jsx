@@ -139,15 +139,15 @@ export const Dashboard = () => {
       }}
     >
       {/* Top Header & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pt-2 md:pt-0">
+        <div className="order-2 md:order-1">
           <h1 className="text-2xl md:text-[28px] font-bold tracking-tight mb-1 text-white drop-shadow-sm flex items-center gap-2">
             Good Morning, {user?.name || 'Arpit'}! 👋
           </h1>
           <p className="text-sm text-gray-400 font-medium">Here's your environment summary</p>
         </div>
 
-        <div className="flex items-center gap-4 relative z-50">
+        <div className="flex items-center gap-4 relative z-50 order-1 md:order-2 w-full md:w-auto">
           <div className="w-full md:w-64 relative group z-50">
             <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 z-10" />
             <div className="[&>div>input]:pl-11 [&>div>input]:pr-4 [&>div>input]:py-2.5 [&>div>input]:bg-white/[0.05] [&>div>input]:backdrop-blur-xl [&>div>input]:border [&>div>input]:border-white/[0.1] [&>div>input]:rounded-full [&>div>input]:text-sm [&>div>input]:text-white focus-within:[&>div>input]:border-white/[0.2] transition-all [&>div>input]:w-full relative z-50">
