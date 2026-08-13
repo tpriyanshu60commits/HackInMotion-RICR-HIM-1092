@@ -10,7 +10,7 @@ export const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const setUser = useStore((state) => state.setUser);
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ export const Login = () => {
         const { token, ...userData } = res.data.data;
         localStorage.setItem('auth_token', token);
         setUser(userData);
-        navigate('/dashboard', { replace: true });
+        navigate('/landing', { replace: true });
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
@@ -37,7 +37,7 @@ export const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4 transition-colors">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-400/20 blur-[120px] pointer-events-none" />
-      
+
       <GlassCard className="w-full max-w-md p-8 z-10 animate-fade-in-up">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-2xl flex items-center justify-center mb-4 shadow-inner">

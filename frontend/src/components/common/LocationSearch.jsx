@@ -25,7 +25,7 @@ export const LocationSearch = ({ onLocationSelect, className }) => {
       if (query.length > 2) {
         setLoading(true);
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`);
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1&accept-language=en`);
           const data = await res.json();
           setResults(data);
           setIsOpen(true);
