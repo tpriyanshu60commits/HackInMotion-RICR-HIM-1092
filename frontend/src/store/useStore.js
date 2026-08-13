@@ -11,6 +11,19 @@ const useStore = create(
       isAuthenticated: false,
       isInitializing: true,
       setUser: (user) => set({ user, isAuthenticated: !!user }),
+      updateUserProfile: (profileData) => set((state) => ({
+        user: profileData,
+        userName: profileData.name || '',
+        userAge: profileData.healthProfile?.age || '',
+        diagnosedConditions: profileData.healthProfile?.diagnosedConditions || [],
+        prescribedMedication: profileData.healthProfile?.prescribedMedication || [],
+        lastCheckupDate: profileData.healthProfile?.lastCheckupDate || '',
+        wearableConnected: profileData.healthProfile?.wearableConnected || false,
+        isMuted: profileData.notificationSettings?.isMuted || false,
+        voiceAlertsEnabled: profileData.notificationSettings?.voiceAlertsEnabled || false,
+        language: profileData.preferences?.language || 'en',
+        temperatureUnit: profileData.preferences?.temperatureUnit || 'celsius',
+      })),
       setInitializing: (isInitializing) => set({ isInitializing }),
       logout: () => {
         localStorage.removeItem('auth_token');
