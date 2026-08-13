@@ -19,8 +19,6 @@ import { RouteRisk } from './pages/RouteRisk';
 import { HistoricalTrends } from './pages/HistoricalTrends';
 import { CommunityReports } from './pages/CommunityReports';
 import { Education } from './pages/Education';
-import AiAssistant from './pages/AiAssistant';
-
 // Public Route Wrapper (Redirects to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isInitializing } = useStore();
@@ -84,7 +82,6 @@ function App() {
             <Route path="/compare" element={<Compare />} />
             <Route path="/route" element={<RouteRisk />} />
             <Route path="/education" element={<Education />} />
-            <Route path="/ai" element={<AiAssistant />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

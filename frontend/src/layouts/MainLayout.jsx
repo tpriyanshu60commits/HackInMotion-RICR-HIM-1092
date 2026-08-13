@@ -22,6 +22,7 @@ import {
 import useStore from '../store/useStore';
 import { cn } from '../components/common/GlassCard';
 import { WeatherBackground } from '../components/common/WeatherBackground';
+import { ChatbotButton } from '../components/chat/ChatbotButton';
 import api from '../services/api';
 
 // IMPORTANT:
@@ -110,7 +111,6 @@ export const MainLayout = () => {
   return (
     <WeatherBackground>
       <div className="h-screen w-full flex text-text-main overflow-hidden bg-background">
-
         {/* =====================================================
             DESKTOP SIDEBAR
         ====================================================== */}
@@ -425,20 +425,7 @@ export const MainLayout = () => {
         {/* =====================================================
             CHATBOT
         ====================================================== */}
-
-        {/* 
-          If ChatbotButton component exists, import it above:
-
-          import { ChatbotButton } 
-            from '../components/common/ChatbotButton';
-
-          Then uncomment:
-
-          <ChatbotButton />
-
-          If it does NOT exist, keep this commented for now.
-        */}
-
+        <ChatbotButton />
       </div>
     </WeatherBackground>
   );

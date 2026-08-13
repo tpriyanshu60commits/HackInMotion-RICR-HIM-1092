@@ -33,4 +33,10 @@ export const profileService = {
   update: (data) => api.put('/profile', data),
 };
 
+export const aiService = {
+  ask: (data) => api.post('/ai/ask', data),
+  getHistory: () => api.get('/ai/history'),
+  clearHistory: () => api.delete('/ai/history'),
+};
+
 export default api;
