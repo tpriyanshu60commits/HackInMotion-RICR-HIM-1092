@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const EscalationBanner = ({ report, onEscalate, isOwner }) => {
   const [loading, setLoading] = useState(false);

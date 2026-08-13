@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Bell, X, CheckCircle2, AlertTriangle, AlertCircle, Trash2, Info } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Bell, CheckCircle2, AlertTriangle, AlertCircle, Trash2, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useStore from '../../store/useStore';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -97,9 +97,10 @@ export const NotificationDropdown = () => {
                   <div 
                     key={alert.id}
                     className={cn(
-                      "flex items-start gap-3 p-3 rounded-xl transition-all duration-300",
-                      alert.read ? "bg-transparent opacity-70" : "bg-white/[0.04] border border-white/[0.05]"
+                      "flex items-start gap-3 p-3 rounded-xl transition-all duration-300 cursor-pointer",
+                      alert.read ? "bg-transparent opacity-70" : "bg-white/[0.04] border border-white/[0.05] hover:bg-white/[0.08]"
                     )}
+                    onClick={() => markAlertRead(alert.id)}
                   >
                     <div className="shrink-0 mt-0.5">
                       {getIcon(alert.type || 'info')}

@@ -1,8 +1,8 @@
-import React from 'react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, ShieldAlert, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { useHealthAlerts } from '../../hooks/useHealthAlerts';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const AlertsList = () => {
   const { alerts, summary } = useHealthAlerts();

@@ -1,17 +1,44 @@
-import React, { useState } from 'react';
-import { HeartPulse, Activity, Info, FileText, Upload, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { HeartPulse, Activity, FileText, Upload, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
-import { cn } from '../common/GlassCard';
+import { profileAPI } from '../../services/api';
+import { cn } from '../../utils/utils';
 
 export const ProfileCard = () => {
-  const diagnosedConditions = useStore(state => state.diagnosedConditions);
-  const setDiagnosedConditions = useStore(state => state.setDiagnosedConditions);
+  const user = useStore(state => state.user);
+  const updateUserProfile = useStore(state => state.updateUserProfile);
   
-  const prescribedMedication = useStore(state => state.prescribedMedication);
-  const setPrescribedMedication = useStore(state => state.setPrescribedMedication);
+  const [diagnosedConditions, setDiagnosedConditions] = useState(user?.healthProfile?.diagnosedConditions || []);
+  const [prescribedMedication, setPrescribedMedication] = useState(user?.healthProfile?.prescribedMedication || []);
   
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    if (user && user.healthProfile) {
+      setDiagnosedConditions(user.healthProfile.diagnosedConditions || []);
+      setPrescribedMedication(user.healthProfile.prescribedMedication || []);
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await profileAPI.updateHealthProfile({ diagnosedConditions, prescribedMedication });
+      const fullProfile = await profileAPI.getProfile();
+      updateUserProfile(fullProfile.data.data);
+      
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Failed to save health profile', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const toggleCondition = (condition) => {
     if (diagnosedConditions.includes(condition)) {
@@ -125,6 +152,25 @@ export const ProfileCard = () => {
             </div>
           </div>
         )}
+      </div>
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className={cn(
+            "flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm",
+            saveSuccess ? "bg-green-500/20 text-green-400 border border-green-500/30" :
+            isSaving ? "bg-white/10 text-gray-400 border border-white/10" :
+            "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+          )}
+        >
+          {isSaving ? (
+            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+          ) : saveSuccess ? (
+            <CheckCircle2 size={18} />
+          ) : null}
+          {isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save Conditions"}
+        </button>
       </div>
 
     </div>

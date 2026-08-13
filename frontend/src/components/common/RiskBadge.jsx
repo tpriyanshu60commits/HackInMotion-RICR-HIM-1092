@@ -1,5 +1,5 @@
-import React from 'react';
-import { cn } from './GlassCard';
+
+import { cn } from '../../utils/utils';
 import { ShieldAlert, CheckCircle, AlertTriangle, AlertOctagon } from 'lucide-react';
 
 const RISK_LEVELS = {

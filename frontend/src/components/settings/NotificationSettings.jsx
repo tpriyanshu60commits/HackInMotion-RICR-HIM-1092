@@ -1,14 +1,41 @@
-import React from 'react';
-import { Bell, Volume2, VolumeX, Mic } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, Volume2, VolumeX, Mic, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
-import { cn } from '../common/GlassCard';
+import { profileAPI } from '../../services/api';
+import { cn } from '../../utils/utils';
 
 export const NotificationSettings = () => {
-  const isMuted = useStore(state => state.isMuted);
-  const setIsMuted = useStore(state => state.setIsMuted);
+  const user = useStore(state => state.user);
+  const updateUserProfile = useStore(state => state.updateUserProfile);
   
-  const voiceAlertsEnabled = useStore(state => state.voiceAlertsEnabled);
-  const setVoiceAlertsEnabled = useStore(state => state.setVoiceAlertsEnabled);
+  const [isMuted, setIsMuted] = useState(user?.notificationSettings?.isMuted || false);
+  const [voiceAlertsEnabled, setVoiceAlertsEnabled] = useState(user?.notificationSettings?.voiceAlertsEnabled || false);
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    if (user && user.notificationSettings) {
+      setIsMuted(user.notificationSettings.isMuted || false);
+      setVoiceAlertsEnabled(user.notificationSettings.voiceAlertsEnabled || false);
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await profileAPI.updateNotificationSettings({ isMuted, voiceAlertsEnabled });
+      const fullProfile = await profileAPI.getProfile();
+      updateUserProfile(fullProfile.data.data);
+      
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Failed to save notification settings', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="w-full bg-black/40 backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">
@@ -58,6 +85,25 @@ export const NotificationSettings = () => {
           </label>
         </div>
 
+      </div>
+      <div className="mt-8 flex justify-end">
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className={cn(
+            "flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm",
+            saveSuccess ? "bg-green-500/20 text-green-400 border border-green-500/30" :
+            isSaving ? "bg-white/10 text-gray-400 border border-white/10" :
+            "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+          )}
+        >
+          {isSaving ? (
+            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+          ) : saveSuccess ? (
+            <CheckCircle2 size={18} />
+          ) : null}
+          {isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save Changes"}
+        </button>
       </div>
     </div>
   );

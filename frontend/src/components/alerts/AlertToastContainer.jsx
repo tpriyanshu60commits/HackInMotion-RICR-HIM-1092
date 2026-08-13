@@ -1,4 +1,3 @@
-import React from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useLiveAlerts } from '../../hooks/useLiveAlerts';
 import { AlertToast } from './AlertToast';

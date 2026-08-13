@@ -1,14 +1,35 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Watch, Heart, Activity } from 'lucide-react';
 import useStore from '../../store/useStore';
+import { profileAPI } from '../../services/api';
 import { useSimulatedWearable } from '../../hooks/useSimulatedWearable';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const ConnectedDeviceCard = () => {
-  const wearableConnected = useStore(state => state.wearableConnected);
-  const setWearableConnected = useStore(state => state.setWearableConnected);
+  const user = useStore(state => state.user);
+  const updateUserProfile = useStore(state => state.updateUserProfile);
   const currentAQI = useStore(state => state.currentAQI);
   
+  const [wearableConnected, setWearableConnected] = useState(user?.healthProfile?.wearableConnected || false);
+
+  useEffect(() => {
+    if (user && user.healthProfile) {
+      setWearableConnected(user.healthProfile.wearableConnected || false);
+    }
+  }, [user]);
+
+  const handleToggle = async (e) => {
+    const checked = e.target.checked;
+    setWearableConnected(checked);
+    try {
+      await profileAPI.updateHealthProfile({ wearableConnected: checked });
+      const fullProfile = await profileAPI.getProfile();
+      updateUserProfile(fullProfile.data.data);
+    } catch (error) {
+      console.error('Failed to update wearable connected state', error);
+    }
+  };
+
   const stats = useSimulatedWearable(currentAQI);
 
   return (
@@ -38,7 +59,7 @@ export const ConnectedDeviceCard = () => {
             type="checkbox" 
             className="sr-only peer" 
             checked={wearableConnected}
-            onChange={(e) => setWearableConnected(e.target.checked)}
+            onChange={handleToggle}
           />
           <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
         </label>

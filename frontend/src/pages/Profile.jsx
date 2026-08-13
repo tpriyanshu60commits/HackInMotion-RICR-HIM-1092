@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, HeartPulse, Bell, Globe, Thermometer, Shield, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { profileAPI } from '../services/api';
 import useStore from '../store/useStore';
-import { cn } from '../components/common/GlassCard';
+import { cn } from '../utils/utils';
 
 // Setting panels
 import { BasicProfile } from '../components/settings/BasicProfile';
@@ -25,12 +25,32 @@ const TABS = [
 export const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const logout = useStore((state) => state.logout);
+  const updateUserProfile = useStore((state) => state.updateUserProfile);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await profileAPI.getProfile();
+        if (res.data.success) {
+          updateUserProfile(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch profile:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [updateUserProfile]);
 
   const handleLogout = async () => {
     try {
       await api.post('/auth/logout');
-    } catch (error) {}
+    } catch (e) {
+      console.error('Logout failed:', e);
+    }
     logout();
     navigate('/login');
   };
@@ -95,7 +115,13 @@ export const Profile = () => {
 
           {/* Main Content Area */}
           <div className="flex-1 min-w-0">
-            {renderActiveTab()}
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="w-8 h-8 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
+              </div>
+            ) : (
+              renderActiveTab()
+            )}
           </div>
 
         </div>

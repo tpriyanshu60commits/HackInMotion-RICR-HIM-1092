@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/common/GlassCard';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
-import { Activity, TrendingUp, TrendingDown, Calendar, Wind } from 'lucide-react';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { Activity, Calendar, Wind } from 'lucide-react';
 import useStore from '../store/useStore';
 import { environmentService } from '../services/api';
 import { LocationSearch } from '../components/common/LocationSearch';
 
 export const HistoricalTrends = () => {
   const [range, setRange] = useState('7 Days');
-  const [selectedLocation, setSelectedLocation] = useState(null);
-
-  useEffect(() => {
-    const initialLocation = useStore.getState().location;
-    if (initialLocation && initialLocation.lat && initialLocation.lng) {
-      setSelectedLocation(initialLocation);
-    }
-  }, []);
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    const loc = useStore.getState().location;
+    return (loc && loc.lat && loc.lng) ? loc : null;
+  });
 
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);

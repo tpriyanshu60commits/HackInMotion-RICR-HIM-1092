@@ -1,6 +1,6 @@
-import React from 'react';
+
 import useStore from '../../store/useStore';
-import { cn } from './GlassCard';
+import { cn } from '../../utils/utils';
 
 export const WeatherBackground = ({ children }) => {
   const weatherCondition = useStore((state) => state.weatherCondition);

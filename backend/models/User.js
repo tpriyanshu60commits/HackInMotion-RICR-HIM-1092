@@ -16,8 +16,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    phone: { type: String, default: '' },
+    avatar: { type: String, default: '' },
+    bio: { type: String, default: '' },
     healthProfile: {
       age: Number,
+      height: { type: Number, default: 0 },
+      weight: { type: Number, default: 0 },
+      gender: { type: String, default: '' },
+      activityLevel: { type: String, default: '' },
+      healthGoals: { type: String, default: '' },
+      diagnosedConditions: { type: [String], default: [] },
+      prescribedMedication: { type: [String], default: [] },
+      lastCheckupDate: { type: String, default: '' },
+      wearableConnected: { type: Boolean, default: false },
       respiratoryCondition: { type: Boolean, default: false },
       asthma: { type: Boolean, default: false },
       heartCondition: { type: Boolean, default: false },
@@ -26,6 +38,29 @@ const userSchema = new mongoose.Schema(
       outdoorWorker: { type: Boolean, default: false },
       respiratorySensitivity: { type: String, enum: ['Low', 'Moderate', 'High'], default: 'Low' },
       outdoorActivityFrequency: { type: String, enum: ['Rarely', 'Sometimes', 'Often'], default: 'Sometimes' }
+    },
+    preferences: {
+      language: { type: String, default: 'en' },
+      region: { type: String, default: '' },
+      timezone: { type: String, default: '' },
+      temperatureUnit: { type: String, enum: ['celsius', 'fahrenheit'], default: 'celsius' },
+      distanceUnit: { type: String, default: 'km' },
+      weightUnit: { type: String, default: 'kg' },
+      heightUnit: { type: String, default: 'cm' }
+    },
+    notificationSettings: {
+      emailNotifications: { type: Boolean, default: true },
+      pushNotifications: { type: Boolean, default: true },
+      healthAlerts: { type: Boolean, default: true },
+      airQualityAlerts: { type: Boolean, default: true },
+      weatherAlerts: { type: Boolean, default: true },
+      isMuted: { type: Boolean, default: false },
+      voiceAlertsEnabled: { type: Boolean, default: false }
+    },
+    privacy: {
+      profileVisibility: { type: String, enum: ['public', 'private', 'friends'], default: 'private' },
+      dataSharing: { type: Boolean, default: false },
+      analytics: { type: Boolean, default: true }
     },
     alertPreferences: {
       highRisk: { type: Boolean, default: true },

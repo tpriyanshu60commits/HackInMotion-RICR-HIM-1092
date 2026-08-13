@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Camera, MapPin, Upload, X } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 
@@ -54,11 +54,11 @@ export const ReportForm = ({ onSubmit, loading }) => {
               lng,
               address: data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`
             }));
-          } catch (error) {
+          } catch {
             setFormData(prev => ({ ...prev, lat, lng, address: `${lat.toFixed(4)}, ${lng.toFixed(4)}` }));
           }
         },
-        (error) => {
+        () => {
           alert('Could not detect location. Please enter address manually.');
         }
       );

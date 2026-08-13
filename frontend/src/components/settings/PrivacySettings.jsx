@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Shield, Download, Trash2, CheckCircle2 } from 'lucide-react';
-import { cn } from '../common/GlassCard';
+import { cn } from '../../utils/utils';
 
 export const PrivacySettings = () => {
   const [exportStatus, setExportStatus] = useState('idle'); // idle | loading | done

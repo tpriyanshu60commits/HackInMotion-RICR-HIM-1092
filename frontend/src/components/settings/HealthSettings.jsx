@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { ProfileCard } from '../health/ProfileCard';
 import { ConnectedDeviceCard } from '../health/ConnectedDeviceCard';
 import { AlertsList } from '../health/AlertsList';

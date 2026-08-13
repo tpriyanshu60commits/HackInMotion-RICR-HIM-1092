@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSavedLocations } from '../hooks/useSavedLocations';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -88,11 +88,15 @@ const AddLocationModal = ({ isOpen, onClose, onAdd }) => {
   const [selectedResult, setSelectedResult] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  const handleClose = () => {
+    setQuery('');
+    setResults([]);
+    setSelectedResult(null);
+    onClose();
+  };
+
   useEffect(() => {
     if (!isOpen) {
-      setQuery('');
-      setResults([]);
-      setSelectedResult(null);
       return;
     }
     const delayDebounceFn = setTimeout(async () => {
@@ -132,7 +136,7 @@ const AddLocationModal = ({ isOpen, onClose, onAdd }) => {
       locationType: 'other'
     });
     setIsSaving(false);
-    onClose();
+    handleClose();
   };
 
   return (
@@ -143,7 +147,7 @@ const AddLocationModal = ({ isOpen, onClose, onAdd }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
           />
           <div className="fixed inset-0 flex items-center justify-center z-[101] pointer-events-none p-4">
@@ -157,7 +161,7 @@ const AddLocationModal = ({ isOpen, onClose, onAdd }) => {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-white">Add Location</h2>
                 <button 
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-gray-400 hover:text-white transition-colors"
                 >
                   <X size={18} />
@@ -203,7 +207,7 @@ const AddLocationModal = ({ isOpen, onClose, onAdd }) => {
 
               <div className="flex gap-3 mt-8">
                 <button 
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="flex-1 py-3 px-4 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-white font-medium border border-white/10 transition-colors"
                 >
                   Cancel
