@@ -42,7 +42,7 @@ export const BasicProfile = () => {
   };
 
   return (
-    <div className="w-full bg-white/[0.035] backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">
+    <div className="w-full bg-black/40 backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">
       <div className="flex flex-col mb-8">
         <h2 className="text-xl font-semibold text-white tracking-tight mb-1 flex items-center gap-2">
           <User size={24} className="text-green-400" />

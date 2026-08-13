@@ -7,29 +7,31 @@ import { useVoiceAlert } from './useVoiceAlert';
 export const useLiveAlerts = () => {
   const [activeToast, setActiveToast] = useState(null);
   const [queue, setQueue] = useState([]);
-  
+
   // Data sources from the store
   const weatherCondition = useStore(state => state.weatherCondition);
   const currentAQI = useStore(state => state.currentAQI);
   const currentTemp = useStore(state => state.currentTemp);
   const language = useStore(state => state.language);
   const location = useStore(state => state.location);
-  
+
   const playSound = useAlertSound();
   const { speak } = useVoiceAlert();
 
-  // Evaluate rules every 60 seconds
+  // ─── Rule Evaluation ──────────────────────────────────────────────────────
   useEffect(() => {
     const evaluateRules = () => {
       const data = { weatherCondition, currentAQI, currentTemp };
       const todayDateStr = new Date().toDateString();
-      const shownAlerts = JSON.parse(localStorage.getItem('shown_live_alerts') || '{}');
-      
+      const shownAlerts = JSON.parse(
+        localStorage.getItem('shown_live_alerts') || '{}'
+      );
+
       const newAlerts = [];
 
       alertRules.forEach(rule => {
         if (rule.condition(data)) {
-          // Check de-duplication: Have we shown this rule today?
+          // De-duplication: only show each rule once per day
           const cacheKey = `${rule.id}-${todayDateStr}`;
           if (!shownAlerts[cacheKey]) {
             newAlerts.push(rule);
@@ -41,44 +43,48 @@ export const useLiveAlerts = () => {
       if (newAlerts.length > 0) {
         localStorage.setItem('shown_live_alerts', JSON.stringify(shownAlerts));
         setQueue(prev => [...prev, ...newAlerts]);
-        
-        // Also add them to the persistent notification dropdown store
+
+        // Persist to notification dropdown store
         newAlerts.forEach(alert => {
           useStore.getState().addAlert({
             title: 'Live Alert',
             message: alert.messages[language] || alert.messages.en,
-            type: alert.severity === 'red' || alert.severity === 'orange' ? 'danger' : alert.severity === 'amber' ? 'warning' : 'info',
-            timestamp: new Date()
+            type:
+              alert.severity === 'red' || alert.severity === 'orange'
+                ? 'danger'
+                : alert.severity === 'amber'
+                  ? 'warning'
+                  : 'info',
+            timestamp: new Date(),
           });
         });
       }
     };
 
-    // Run immediately on mount, then every 60s
+    // Run immediately on mount, then every 2 minutes
     evaluateRules();
-    const interval = setInterval(evaluateRules, 60000);
+    const interval = setInterval(evaluateRules, 120000);
 
-    // DEMO: Send a sample alert 2 seconds after mount to test Notification Bell
+    // TEMPORARY: single demo alert after 2s
     const demoTimeout = setTimeout(() => {
       const sampleAlert = {
-        id: 'demo-alert-' + Date.now(),
+        id: `demo-alert-${Date.now()}`,
         category: 'health',
         icon: alertRules[1].icon,
-        severity: 'red',
+        severity: 'amber',
         messages: {
-          en: "Demo Alert: Hazardous air detected nearby — stay indoors.",
-          hi: "डेमो अलर्ट: पास में खतरनाक हवा — घर के अंदर रहें।"
-        }
+          en: 'Demo Alert: This should hide automatically in 7 seconds.',
+          hi: 'डेमो अलर्ट: यह 7 सेकंड में छिप जाना चाहिए।',
+        },
       };
-      
+
       setQueue(prev => [...prev, sampleAlert]);
-      
-      // Also add it directly to the persistent notification dropdown store
+
       useStore.getState().addAlert({
-        title: 'Emergency Alert',
-        message: sampleAlert.messages[language] || sampleAlert.messages.en,
-        type: 'danger',
-        timestamp: new Date()
+        title: 'Test Alert',
+        message: sampleAlert.messages.en,
+        type: 'warning',
+        timestamp: new Date(),
       });
     }, 2000);
 
@@ -88,52 +94,55 @@ export const useLiveAlerts = () => {
     };
   }, [weatherCondition, currentAQI, currentTemp, language]);
 
-  // Process the queue
+  // ─── Queue Processor ──────────────────────────────────────────────────────
   useEffect(() => {
-    if (!activeToast && queue.length > 0) {
-      const nextAlert = queue[0];
-      
-      // Defer state updates to avoid synchronous cascading renders
-      const processTimeout = setTimeout(() => {
-        setQueue(prev => prev.slice(1));
-        
-        // Construct the toast object
-        const toastData = {
-          id: nextAlert.id + Date.now(),
-          ruleId: nextAlert.id,
-          category: nextAlert.category,
-          icon: nextAlert.icon,
-          severity: nextAlert.severity,
-          message: nextAlert.messages[language] || nextAlert.messages.en,
-          locationName: location?.name || 'Current Location',
-          timestamp: new Date()
-        };
+    if (activeToast || queue.length === 0) return;      // ✅ cleaner guard
 
-        setActiveToast(toastData);
-        
-        // Fire effects
-        playSound();
-        speak(toastData.message);
-      }, 0);
+    const nextAlert = queue[0];
 
-      // Auto-dismiss after 7 seconds
-      const timeout = setTimeout(() => {
-        setActiveToast(null);
-      }, 7000);
+    // Defer to avoid synchronous cascading renders
+    const processTimeout = setTimeout(() => {
+      setQueue(prev => prev.slice(1));
 
-      return () => {
-        clearTimeout(processTimeout);
-        clearTimeout(timeout);
+      const toastData = {
+        id: nextAlert.id + Date.now(),
+        ruleId: nextAlert.id,
+        category: nextAlert.category,
+        icon: nextAlert.icon,
+        severity: nextAlert.severity,
+        message: nextAlert.messages[language] || nextAlert.messages.en,
+        locationName: location?.name || 'Current Location',
+        timestamp: new Date(),
       };
-    }
+
+      setActiveToast(toastData);    // ✅ master: inside setTimeout
+
+      // Fire side effects
+      playSound();
+      speak(toastData.message);
+    }, 0);
+
+    return () => clearTimeout(processTimeout);          // ✅ master: cleanup
   }, [queue, activeToast, language, location, playSound, speak]);
 
+  // ─── Auto-dismiss ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!activeToast) return;
+
+    const timeout = setTimeout(() => {
+      setActiveToast(null);
+    }, 7000);                                           // ✅ master: 7s not 2s
+
+    return () => clearTimeout(timeout);                 // ✅ single cleanup
+  }, [activeToast]);
+
+  // ─── Manual Dismiss ───────────────────────────────────────────────────────
   const dismissToast = useCallback(() => {
     setActiveToast(null);
   }, []);
 
   return {
     activeToast,
-    dismissToast
+    dismissToast,
   };
 };

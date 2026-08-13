@@ -45,6 +45,13 @@ export const Dashboard = () => {
   const setCurrentAQI = useStore((state) => state.setCurrentAQI);
   const user = useStore(state => state.user);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good Morning';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon';
+    if (hour >= 17 && hour < 22) return 'Good Evening';
+    return 'Good Night';
+  };
   useEffect(() => {
     const fetchEnvData = async (lat, lng) => {
       setLoading(true);
@@ -112,7 +119,7 @@ export const Dashboard = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pt-2 md:pt-0">
         <div className="order-2 md:order-1">
           <h1 className="text-2xl md:text-[28px] font-bold tracking-tight mb-1 text-white drop-shadow-sm flex items-center gap-2">
-            Good Morning, {user?.name || 'Arpit'}! 👋
+            {getGreeting()}, {user?.name || 'Arpit'}! 👋
           </h1>
           <p className="text-sm text-gray-400 font-medium">Here's your environment summary</p>
         </div>
