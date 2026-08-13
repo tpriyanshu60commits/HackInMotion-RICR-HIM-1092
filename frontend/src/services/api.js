@@ -42,9 +42,17 @@ export const environmentService = {
   compareCities: (cities) => api.get(`/environment/compare?cities=${cities}`),
 };
 
-export const profileService = {
-  get: () => api.get('/profile'),
-  update: (data) => api.put('/profile', data),
+export const profileAPI = {
+  getProfile: () => api.get('/v1/profile'),
+  updateBasicProfile: (data) => api.put('/v1/profile', data),
+  getHealthProfile: () => api.get('/v1/profile/health'),
+  updateHealthProfile: (data) => api.put('/v1/profile/health', data),
+  getNotificationSettings: () => api.get('/v1/profile/notifications'),
+  updateNotificationSettings: (data) => api.put('/v1/profile/notifications', data),
+  getPreferences: () => api.get('/v1/profile/preferences'),
+  updatePreferences: (data) => api.put('/v1/profile/preferences', data),
+  getPrivacySettings: () => api.get('/v1/profile/privacy'),
+  updatePrivacySettings: (data) => api.put('/v1/profile/privacy', data),
 };
 
 export const aiService = {

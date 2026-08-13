@@ -15,7 +15,8 @@ import communityRoutes from './routes/communityRoutes.js';
 import aiRoutes from './routes/ai.js';
 import dataRoutes from './routes/data.js';
 import reportRoutes from './routes/reports.js';
-import myLocationRoutes from './routes/locations.js'; // My simple mocked ones if needed, but DEVICE 1 has auth so I should probably use theirs if frontend was updated, but frontend still uses `/api/locations` and `/api/reports` and `/api/data`.
+import myLocationRoutes from './routes/locations.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use('/api/locations', locationRoutes); // Device 1
 app.use('/api/environment', environmentRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/community', communityRoutes);
+app.use('/api/v1/profile', profileRoutes);
 
 // Device 3 routes (Ensuring frontend doesn't break if it relies on these specific paths)
 app.use('/api/ai', aiRoutes);
