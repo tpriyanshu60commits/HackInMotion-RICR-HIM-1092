@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { aiHealthAPI } from '../../services/api';
-import { cn } from '../../utils/utils';
 import { Save, RefreshCw, UploadCloud, X, ChevronDown } from 'lucide-react';
 import ConditionSelector from './ConditionSelector';
 
@@ -20,10 +19,6 @@ export const AIHealthProfileForm = () => {
   const [success, setSuccess] = useState(false);
   const [generating, setGenerating] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
   const fetchProfile = async () => {
     try {
       setLoading(true);
@@ -37,6 +32,11 @@ export const AIHealthProfileForm = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

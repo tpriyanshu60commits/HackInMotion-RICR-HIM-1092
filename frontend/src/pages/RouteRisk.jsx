@@ -47,7 +47,7 @@ export const RouteRisk = () => {
     setAnalyzing(true);
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/route/analyze',
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/route/analyze`,
         { origin, destination }
       );
       if (response.data.success) {
