@@ -1,0 +1,534 @@
+=== AIHealthProfile.js ===
+import mongoose from 'mongoose';
+
+const aiHealthProfileSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      unique: true,
+    },
+    ageGroup: {
+      type: String,
+      enum: ['child', 'adult', 'senior'],
+      required: true,
+    },
+    conditions: {
+      type: [String],
+      default: [],
+    },
+    sensitivityLevel: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium',
+    },
+    outdoorActivity: {
+      type: String,
+      enum: ['jogging', 'commute', 'sports', 'mostly indoors'],
+      default: 'mostly indoors',
+    },
+    activityTimeWindow: {
+      type: String,
+      default: '',
+    },
+    medicationReminder: {
+      type: Boolean,
+      default: false,
+    },
+    primaryCity: {
+      type: String,
+      default: '',
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const AIHealthProfile = mongoose.model('AIHealthProfile', aiHealthProfileSchema);
+
+export default AIHealthProfile;
+
+
+=== AIHealthReport.js ===
+import mongoose from 'mongoose';
+
+const aiHealthReportSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    environmentSnapshot: {
+      type: Object, // Stores AQI, pollutants, weather at generation time
+      default: {},
+    },
+    riskLevel: {
+      type: String,
+      enum: ['Good', 'Moderate', 'Unhealthy', 'Hazardous'],
+      required: true,
+    },
+    summary: {
+      type: String,
+      required: true,
+    },
+    keyConcern: {
+      type: String,
+      required: true,
+    },
+    dosAndDonts: {
+      type: [String],
+      default: [],
+    },
+    symptomWatch: {
+      type: [String],
+      default: [],
+    },
+    bestTimeWindow: {
+      type: String,
+      default: '',
+    },
+    cityComparisonNote: {
+      type: String,
+      default: null,
+    },
+    reportImageUrls: {
+      type: [String],
+      default: [],
+    },
+    rawModelResponse: {
+      type: String, // Store for debugging/history
+      default: '',
+    },
+  },
+  {
+    timestamps: true, // Will provide createdAt/updatedAt
+  }
+);
+
+// TTL index to automatically delete reports after 60 days
+aiHealthReportSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 24 * 60 * 60 });
+
+const AIHealthReport = mongoose.model('AIHealthReport', aiHealthReportSchema);
+
+export default AIHealthReport;
+
+
+=== AirQualitySnapshot.js ===
+import mongoose from 'mongoose';
+
+const airQualitySnapshotSchema = new mongoose.Schema(
+  {
+    locationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Location', // Can be null if it's a general city snapshot, but for MVP let's bind it to location searches or coordinates
+      required: false,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    latitude: {
+      type: Number,
+      required: true,
+    },
+    longitude: {
+      type: Number,
+      required: true,
+    },
+    aqi: {
+      type: Number,
+      required: true,
+    },
+    pm25: Number,
+    pm10: Number,
+    co: Number,
+    no2: Number,
+    so2: Number,
+    o3: Number,
+    temperature: Number,
+    humidity: Number,
+    wind: Number,
+    weather: String,
+    riskLevel: {
+      type: String,
+      enum: ['GOOD', 'MODERATE', 'UNHEALTHY', 'HIGH_RISK', 'HAZARDOUS'],
+      required: true,
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Index for efficient historical querying
+airQualitySnapshotSchema.index({ city: 1, timestamp: -1 });
+airQualitySnapshotSchema.index({ latitude: 1, longitude: 1, timestamp: -1 });
+
+const AirQualitySnapshot = mongoose.model('AirQualitySnapshot', airQualitySnapshotSchema);
+
+export default AirQualitySnapshot;
+
+
+=== Alert.js ===
+import mongoose from 'mongoose';
+
+const alertSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+    location: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Location',
+      required: false,
+    },
+    type: {
+      type: String,
+      enum: ['high-risk', 'moderate-risk', 'forecast', 'improvement'],
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    aqiValue: {
+      type: Number,
+    },
+    read: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Alert = mongoose.model('Alert', alertSchema);
+
+export default Alert;
+
+
+=== CommunityReport.js ===
+import mongoose from 'mongoose';
+
+const communityReportSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+    category: {
+      type: String,
+      enum: [
+        'smoke',
+        'waste burning',
+        'heavy pollution',
+        'unusual odor',
+        'dust',
+        'industrial emission',
+        'other',
+      ],
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      maxlength: 500,
+    },
+    latitude: {
+      type: Number,
+      required: true,
+    },
+    longitude: {
+      type: Number,
+      required: true,
+    },
+    city: {
+      type: String,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'resolved', 'dismissed'],
+      default: 'active',
+    },
+    upvotes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const CommunityReport = mongoose.model('CommunityReport', communityReportSchema);
+
+export default CommunityReport;
+
+
+=== Conversation.js ===
+import mongoose from 'mongoose';
+
+const messageSchema = new mongoose.Schema({
+  role: {
+    type: String,
+    enum: ['user', 'assistant', 'system'],
+    required: true
+  },
+  content: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const conversationSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true // One main conversation thread per user for now
+  },
+  messages: [messageSchema],
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+// Update the updatedAt timestamp before saving
+conversationSchema.pre('save', function() {
+  this.updatedAt = Date.now();
+});
+
+const Conversation = mongoose.model('Conversation', conversationSchema);
+export default Conversation;
+
+
+=== Location.js ===
+import mongoose from 'mongoose';
+
+const locationSchema = new mongoose.Schema(
+    {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'User',
+        },
+        name: {
+            type: String,
+            required: true, // User-defined label (e.g., "Home", "Office")
+        },
+        city: {
+            type: String,
+            required: false,
+        },
+        area: {
+            type: String,
+        },
+        country: {
+            type: String,
+        },
+        latitude: {
+            type: Number,
+            required: true,
+        },
+        longitude: {
+            type: Number,
+            required: true,
+        },
+        alertThresholdAQI: { 
+            type: Number, 
+            default: 100 
+        },
+        locationType: {
+            type: String,
+            enum: ['home', 'work', 'school', 'other'],
+            default: 'other',
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+// Prevent duplicate names for the same user
+locationSchema.index({ user: 1, name: 1 }, { unique: true });
+
+const Location = mongoose.model('Location', locationSchema);
+
+export default Location;
+
+
+=== Report.js ===
+import mongoose from 'mongoose';
+
+const reportSchema = new mongoose.Schema({
+  category: { type: String, enum: ['garbage', 'water', 'air'], required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  location: {
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true },
+    address: { type: String, required: true }
+  },
+  photoUrl: { type: String },
+  createdBy: { type: String, required: true },
+  status: { type: String, enum: ['Pending', 'In Review', 'Resolved', 'Escalated', 'CM Accepted'], default: 'Pending' },
+  deadline: { type: Date },
+  upvotes: { type: Number, default: 0 },
+  cmHelpForwarded: { type: Boolean, default: false },
+  cmHelpForwardedAt: { type: Date }
+}, { timestamps: true });
+
+// Pre-save hook to set deadline to 7 days from creation if not set
+reportSchema.pre('save', function () {
+  if (this.isNew && !this.deadline) {
+    const deadlineDate = new Date();
+    deadlineDate.setDate(deadlineDate.getDate() + 7);
+    this.deadline = deadlineDate;
+  }
+});
+
+export default mongoose.model('Report', reportSchema);
+
+
+=== User.js ===
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: false, // Optional for OAuth
+    },
+    googleId: { type: String, default: null },
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, default: null },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
+
+    phone: { type: String, default: '' },
+    height: { type: Number, default: 0 },
+    weight: { type: Number, default: 0 },
+    gender: { type: String, enum: ['Male', 'Female', 'Other', 'Prefer not to say'], default: 'Prefer not to say' },
+    profileImage: {
+      url: { type: String, default: '' },
+      publicId: { type: String, default: '' }
+    },
+    monitoringActive: { type: Boolean, default: false },
+    avatar: { type: String, default: '' },
+    bio: { type: String, default: '' },
+    healthProfile: {
+      age: Number,
+      height: { type: Number, default: 0 },
+      weight: { type: Number, default: 0 },
+      gender: { type: String, default: '' },
+      activityLevel: { type: String, default: '' },
+      healthGoals: { type: String, default: '' },
+      diagnosedConditions: { type: [String], default: [] },
+      prescribedMedication: { type: [String], default: [] },
+      customIssue: { type: String, default: '' },
+      lastCheckupDate: { type: String, default: '' },
+      wearableConnected: { type: Boolean, default: false },
+      respiratoryCondition: { type: Boolean, default: false },
+      asthma: { type: Boolean, default: false },
+      heartCondition: { type: Boolean, default: false },
+      children: { type: Boolean, default: false },
+      elderlyHouseholdMember: { type: Boolean, default: false },
+      outdoorWorker: { type: Boolean, default: false },
+      respiratorySensitivity: { type: String, enum: ['Low', 'Moderate', 'High'], default: 'Low' },
+      outdoorActivityFrequency: { type: String, enum: ['Rarely', 'Sometimes', 'Often'], default: 'Sometimes' }
+    },
+    preferences: {
+      language: { type: String, default: 'en' },
+      region: { type: String, default: '' },
+      timezone: { type: String, default: '' },
+      temperatureUnit: { type: String, enum: ['celsius', 'fahrenheit'], default: 'celsius' },
+      distanceUnit: { type: String, default: 'km' },
+      weightUnit: { type: String, default: 'kg' },
+      heightUnit: { type: String, default: 'cm' }
+    },
+    notificationSettings: {
+      emailNotifications: { type: Boolean, default: true },
+      pushNotifications: { type: Boolean, default: true },
+      healthAlerts: { type: Boolean, default: true },
+      airQualityAlerts: { type: Boolean, default: true },
+      weatherAlerts: { type: Boolean, default: true },
+      isMuted: { type: Boolean, default: false },
+      voiceAlertsEnabled: { type: Boolean, default: false }
+    },
+    privacy: {
+      profileVisibility: { type: String, enum: ['public', 'private', 'friends'], default: 'private' },
+      dataSharing: { type: Boolean, default: false },
+      analytics: { type: Boolean, default: true }
+    },
+    alertPreferences: {
+      highRisk: { type: Boolean, default: true },
+      moderateRisk: { type: Boolean, default: false },
+      forecastAlerts: { type: Boolean, default: false },
+      improvementAlerts: { type: Boolean, default: true },
+    },
+    savedLocations: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Location',
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Match user entered password to hashed password in database
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Encrypt password using bcrypt
+userSchema.pre('save', async function () {
+  if (!this.isModified('password') || !this.password) {
+    return;
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+const User = mongoose.model('User', userSchema);
+
+export default User;
+
+

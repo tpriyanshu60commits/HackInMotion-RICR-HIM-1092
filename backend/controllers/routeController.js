@@ -112,6 +112,9 @@ export const analyzeRoute = async (req, res, next) => {
 
   } catch (error) {
     console.error('Route Analysis Error:', error);
-    next(error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'An error occurred during route analysis' 
+    });
   }
 };

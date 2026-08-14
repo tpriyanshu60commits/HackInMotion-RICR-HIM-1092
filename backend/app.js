@@ -21,7 +21,7 @@ import snapshotRoutes from './routes/snapshotRoutes.js';
 import routeRoutes from './routes/routeRoutes.js';        // ← feature/SS06
 import profileRoutes from './routes/profileRoutes.js';    // ← master
 import userRoutes from './routes/userRoutes.js';
-import healthRoutes from './routes/healthRoutes.js';
+import aiHealthRoutes from './routes/aiHealthRoutes.js';
 
 const app = express();
 
@@ -79,10 +79,11 @@ app.use('/api/my-locations', myLocationRoutes);
 app.use('/api/snapshots', snapshotRoutes);
 app.use('/api/route', routeRoutes);             // ← feature/SS06
 app.use('/api/users', userRoutes);
-app.use('/api/health', healthRoutes);
+app.use('/api/ai-health', aiHealthRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
 
 export default app;
+
