@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import { User, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { profileAPI, usersAPI } from '../../services/api';
-import { cn } from '../../utils/utils';
 
 export const BasicProfile = () => {
   const user = useStore(state => state.user);
@@ -14,10 +12,10 @@ export const BasicProfile = () => {
   const [height, setHeight] = useState(user?.height || '');
   const [weight, setWeight] = useState(user?.weight || '');
   const [gender, setGender] = useState(user?.gender || 'Prefer not to say');
-  const [uploadingImage, setUploadingImage] = useState(false);
+  const [ setUploadingImage] = useState(false);
 
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [setIsSaving] = useState(false);
+  const [setSaveSuccess] = useState(false);
 
   // ✅ Keep the useEffect from master branch
   useEffect(() => {

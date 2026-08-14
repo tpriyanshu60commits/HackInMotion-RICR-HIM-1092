@@ -19,7 +19,7 @@ export const uploadHealthReport = async (req, res, next) => {
     if (conditions) {
       try {
         parsedConditions = JSON.parse(conditions);
-      } catch (e) {
+      } catch{
         parsedConditions = Array.isArray(conditions) ? conditions : [conditions];
       }
     }

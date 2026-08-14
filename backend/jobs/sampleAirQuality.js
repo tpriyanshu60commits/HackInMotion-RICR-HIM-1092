@@ -10,10 +10,10 @@ export const startSampleAirQualityJob = () => {
   cron.schedule('0 */6 * * *', async () => {
     try {
       console.log('Running Air Quality Sampling Cron Job...');
-      
+
       const users = await User.find({ savedLocations: { $exists: true, $not: { $size: 0 } } })
         .populate('savedLocations');
-        
+
       const uniqueLocations = new Map();
 
       users.forEach(user => {
@@ -28,7 +28,7 @@ export const startSampleAirQualityJob = () => {
         try {
           const { latitude, longitude, city } = loc;
           const aqiData = await getAirQualityByCoordinates(latitude, longitude, null);
-          
+
           if (aqiData) {
             const snapshot = await AirQualitySnapshot.create({
               locationId: loc._id,
@@ -57,7 +57,9 @@ export const startSampleAirQualityJob = () => {
                     locationId: loc._id,
                     data: snapshot
                   });
-                } catch(e) {} // ignore if io not initialized properly
+                } catch {
+                  // Ignore if Socket.IO is not initialized.
+                } 
               }
             });
           }
