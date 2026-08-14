@@ -10,7 +10,8 @@ import {
   updatePreferences,
   getPrivacySettings,
   updatePrivacySettings,
-  updateFCMToken,
+  exportData,
+  deleteAccount,
 } from '../controllers/profileController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -21,7 +22,8 @@ router.use(protect);
 
 router.route('/')
   .get(getProfile)
-  .put(updateBasicProfile);
+  .put(updateBasicProfile)
+  .delete(deleteAccount);
 
 router.route('/health')
   .get(getHealthProfile)
@@ -39,6 +41,6 @@ router.route('/privacy')
   .get(getPrivacySettings)
   .put(updatePrivacySettings);
 
-router.post('/fcm-token', updateFCMToken);
+router.get('/export', exportData);
 
 export default router;

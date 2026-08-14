@@ -38,6 +38,7 @@ export const ProfileCard = () => {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Sync local state whenever user profile changes
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (user?.healthProfile) {
       setDiagnosedConditions(
@@ -51,6 +52,7 @@ export const ProfileCard = () => {
       setCustomIssue(user.healthProfile.customIssue || '');
     }
   }, [user]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSave = async () => {
     setIsSaving(true);

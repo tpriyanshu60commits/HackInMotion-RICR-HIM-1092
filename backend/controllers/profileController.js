@@ -237,7 +237,35 @@ export const updatePrivacySettings = async (req, res, next) => {
   }
 };
 
-export const updateFCMToken = async (req, res, next) => {
+// @desc    Export user data
+// @route   GET /api/v1/profile/export
+// @access  Private
+export const exportData = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+    
+    const exportData = {
+      profile: user,
+      exportDate: new Date(),
+    };
+
+    res.json({
+      success: true,
+      data: exportData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Delete user account
+// @route   DELETE /api/v1/profile
+// @access  Private
+export const deleteAccount = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -245,12 +273,16 @@ export const updateFCMToken = async (req, res, next) => {
       throw new Error('User not found');
     }
 
-    user.fcmToken = req.body.token;
-    await user.save();
-    
+    await User.findByIdAndDelete(req.user._id);
+
+    res.cookie('jwt', '', {
+      httpOnly: true,
+      expires: new Date(0),
+    });
+
     res.json({
       success: true,
-      message: 'FCM token updated successfully',
+      message: 'Account deleted successfully',
     });
   } catch (error) {
     next(error);

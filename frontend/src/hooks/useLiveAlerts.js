@@ -65,32 +65,8 @@ export const useLiveAlerts = () => {
     evaluateRules();
     const interval = setInterval(evaluateRules, 120000);
 
-    // TEMPORARY: single demo alert after 2s
-    const demoTimeout = setTimeout(() => {
-      const sampleAlert = {
-        id: `demo-alert-${Date.now()}`,
-        category: 'health',
-        icon: alertRules[1].icon,
-        severity: 'amber',
-        messages: {
-          en: 'Demo Alert: This should hide automatically in 7 seconds.',
-          hi: 'डेमो अलर्ट: यह 7 सेकंड में छिप जाना चाहिए।',
-        },
-      };
-
-      setQueue(prev => [...prev, sampleAlert]);
-
-      useStore.getState().addAlert({
-        title: 'Test Alert',
-        message: sampleAlert.messages.en,
-        type: 'warning',
-        timestamp: new Date(),
-      });
-    }, 2000);
-
     return () => {
       clearInterval(interval);
-      clearTimeout(demoTimeout);
     };
   }, [weatherCondition, currentAQI, currentTemp, language]);
 
