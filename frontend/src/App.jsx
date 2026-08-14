@@ -54,15 +54,23 @@ function App() {
 
     const verifyAuth = async () => {
       try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setUser(null);
+          setInitializing(false);
+          return;
+        }
+
         const res = await api.get('/auth/me');
         if (res.data?.success && res.data?.data) {
           setUser(res.data.data);
-
         } else {
           setUser(null);
+          localStorage.removeItem('auth_token');
         }
       } catch {
         setUser(null);
+        localStorage.removeItem('auth_token');
       } finally {
         setInitializing(false);
       }

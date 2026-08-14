@@ -103,16 +103,13 @@ export const logoutUser = (req, res) => {
 // @access  Private
 export const getUserProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
-
-    if (user) {
+    if (req.user) {
       res.json({
         success: true,
-        data: user,
+        data: req.user,
       });
     } else {
-      res.status(404);
-      throw new Error('User not found');
+      res.status(404).json({ success: false, message: 'User not found' });
     }
   } catch (error) {
     next(error);
