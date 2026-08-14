@@ -98,18 +98,12 @@ export const logoutUser = (req, res) => {
 // @access  Private
 export const getUserProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select('-password');
 
     if (user) {
       res.json({
         success: true,
-        data: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          healthProfile: user.healthProfile,
-          alertPreferences: user.alertPreferences,
-        },
+        data: user,
       });
     } else {
       res.status(404);
@@ -145,15 +139,13 @@ export const updateUserProfile = async (req, res, next) => {
 
       const updatedUser = await user.save();
 
+      // Convert to object and remove password
+      const userObj = updatedUser.toObject();
+      delete userObj.password;
+
       res.json({
         success: true,
-        data: {
-          _id: updatedUser._id,
-          name: updatedUser.name,
-          email: updatedUser.email,
-          healthProfile: updatedUser.healthProfile,
-          alertPreferences: updatedUser.alertPreferences,
-        },
+        data: userObj,
       });
     } else {
       res.status(404);

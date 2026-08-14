@@ -23,6 +23,14 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpires: { type: Date, default: null },
     fcmToken: { type: String, default: null },
     phone: { type: String, default: '' },
+    height: { type: Number, default: 0 },
+    weight: { type: Number, default: 0 },
+    gender: { type: String, enum: ['Male', 'Female', 'Other', 'Prefer not to say'], default: 'Prefer not to say' },
+    profileImage: {
+      url: { type: String, default: '' },
+      publicId: { type: String, default: '' }
+    },
+    monitoringActive: { type: Boolean, default: false },
     avatar: { type: String, default: '' },
     bio: { type: String, default: '' },
     healthProfile: {
@@ -34,6 +42,7 @@ const userSchema = new mongoose.Schema(
       healthGoals: { type: String, default: '' },
       diagnosedConditions: { type: [String], default: [] },
       prescribedMedication: { type: [String], default: [] },
+      customIssue: { type: String, default: '' },
       lastCheckupDate: { type: String, default: '' },
       wearableConnected: { type: Boolean, default: false },
       respiratoryCondition: { type: Boolean, default: false },
@@ -92,9 +101,9 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    next();
+userSchema.pre('save', async function () {
+  if (!this.isModified('password') || !this.password) {
+    return;
   }
 
   const salt = await bcrypt.genSalt(10);

@@ -30,17 +30,26 @@ export const getPersonalizedRisk = (baseRisk, healthProfile) => {
     children,
     elderlyHouseholdMember,
     outdoorWorker,
+    diagnosedConditions = [],
+    customIssue = ''
   } = healthProfile;
 
-  const isSensitive = respiratoryCondition || asthma || heartCondition || children || elderlyHouseholdMember;
+  // Check array conditions too, since we migrated to using diagnosedConditions array
+  const hasRespiratory = respiratoryCondition || asthma || diagnosedConditions.includes("Asthma") || diagnosedConditions.includes("Respiratory condition (e.g. COPD)");
+  const hasHeart = heartCondition || diagnosedConditions.includes("Heart condition") || diagnosedConditions.includes("Hypertension");
+  const hasChildren = children || diagnosedConditions.includes("Children in household");
+  const hasElderly = elderlyHouseholdMember || diagnosedConditions.includes("Elderly in household");
+
+  const isSensitive = hasRespiratory || hasHeart || hasChildren || hasElderly || customIssue.trim().length > 0;
 
   if (isSensitive && baseRisk.severity >= 2) {
     personalizedSeverity = Math.min(6, baseRisk.severity + 1);
     
-    if (asthma || respiratoryCondition) reasons.push('Respiratory conditions increase susceptibility to poor air quality.');
-    if (heartCondition) reasons.push('Cardiovascular conditions require extra caution in polluted air.');
-    if (children) reasons.push('Children are more vulnerable to air pollution.');
-    if (elderlyHouseholdMember) reasons.push('Elderly individuals are at higher risk.');
+    if (hasRespiratory) reasons.push('Respiratory conditions increase susceptibility to poor air quality.');
+    if (hasHeart) reasons.push('Cardiovascular conditions require extra caution in polluted air.');
+    if (hasChildren) reasons.push('Children are more vulnerable to air pollution.');
+    if (hasElderly) reasons.push('Elderly individuals are at higher risk.');
+    if (customIssue.trim().length > 0) reasons.push(`We noted your custom condition: "${customIssue}". Please take extra precautions.`);
   }
 
   if (outdoorWorker && baseRisk.severity >= 3) {
