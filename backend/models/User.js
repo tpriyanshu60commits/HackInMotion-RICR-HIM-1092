@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema(
     },
     preferences: {
       language: { type: String, default: 'en' },
+      alertVoiceLanguage: { type: String, default: 'en' },
       region: { type: String, default: '' },
       timezone: { type: String, default: '' },
       temperatureUnit: { type: String, enum: ['celsius', 'fahrenheit'], default: 'celsius' },

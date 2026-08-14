@@ -54,8 +54,13 @@ export const WeatherBackground = ({ children }) => {
       
       {/* Weather overlay effects (e.g., subtle rain, clouds) */}
       {activeBg.startsWith('rainy') && (
-        <div className="absolute inset-0 -z-10 opacity-30 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjIwIj48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==')] bg-repeat" 
-             style={{ backgroundSize: '4px 30px', animation: 'rain 0.5s linear infinite' }} />
+        <div className="absolute inset-0 -z-[22] overflow-hidden pointer-events-none opacity-50">
+          <div className="absolute inset-[-20%] w-[140%] h-[140%] rotate-12">
+            <div className="absolute inset-0 rain-layer-3" />
+            <div className="absolute inset-0 rain-layer-2" />
+            <div className="absolute inset-0 rain-layer-1" />
+          </div>
+        </div>
       )}
       
       {activeBg.startsWith('cloudy') && (

@@ -66,6 +66,7 @@ export const usersAPI = {
   uploadProfileImage: (formData) => api.post('/users/profile-image', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
+  deleteAccount: () => api.delete('/users/me'),
 };
 
 export const healthAPI = {
