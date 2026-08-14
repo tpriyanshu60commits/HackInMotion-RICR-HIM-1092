@@ -61,4 +61,18 @@ export const aiService = {
   clearHistory: () => api.delete('/ai/history'),
 };
 
+export const usersAPI = {
+  updateExtendedProfile: (data) => api.patch('/users/profile', data),
+  uploadProfileImage: (formData) => api.post('/users/profile-image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+};
+
+export const healthAPI = {
+  uploadHealthReport: (formData) => api.post('/health/report', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  downloadReportPDF: () => api.get('/health/report/pdf', { responseType: 'blob' }),
+};
+
 export default api;

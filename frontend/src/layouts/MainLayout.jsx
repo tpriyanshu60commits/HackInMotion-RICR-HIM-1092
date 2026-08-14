@@ -86,10 +86,14 @@ export const MainLayout = () => {
               </Link>
               <Link
                 to="/profile"
-                className="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400 font-bold hover:bg-green-500/30 transition-colors"
+                className="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400 font-bold hover:bg-green-500/30 transition-colors overflow-hidden"
                 title="Account Settings"
               >
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
+                {user?.profileImage?.url ? (
+                  <img src={user.profileImage.url} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  user?.name ? user.name.charAt(0).toUpperCase() : 'A'
+                )}
               </Link>
             </div>
           </div>
