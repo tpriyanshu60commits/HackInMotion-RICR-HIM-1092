@@ -106,7 +106,7 @@ export const compareCities = async (req, res, next) => {
       try {
         const data = await getAirQualityByCity(city, healthProfile);
         comparisons.push(data);
-      } catch (err) {
+      } catch{
         comparisons.push({ city, error: 'Data unavailable' });
       }
     }

@@ -23,7 +23,7 @@ export const analyzeRoute = async (req, res, next) => {
     let routeData;
     try {
       routeData = await getRoute(originCoords, destCoords);
-    } catch (e) {
+    } catch{
       return res.status(404).json({ success: false, message: 'Could not find a route between these locations' });
     }
 
