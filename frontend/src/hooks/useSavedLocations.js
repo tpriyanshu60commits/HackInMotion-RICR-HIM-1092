@@ -1,5 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
-import { locationService, environmentService } from '../services/api';
+import {
+  locationService,
+  environmentService,
+  API_BASE_URL
+} from '../services/api';
 import useStore from '../store/useStore';
 import { io } from 'socket.io-client';
 
@@ -10,6 +14,7 @@ const getWeatherInfo = (code) => {
   if (code >= 51 && code <= 67) return { condition: 'Rain', icon: 'CloudRain' };
   if (code >= 71 && code <= 77) return { condition: 'Snow', icon: 'Cloud' };
   if (code >= 80 && code <= 99) return { condition: 'Storm', icon: 'CloudRain' };
+
   return { condition: 'Unknown', icon: 'Cloud' };
 };
 
@@ -19,6 +24,7 @@ const getAqiStatus = (aqi) => {
   if (aqi <= 150) return 'Sensitive';
   if (aqi <= 200) return 'Unhealthy';
   if (aqi <= 300) return 'Very Unhealthy';
+
   return 'Hazardous';
 };
 
@@ -65,13 +71,19 @@ export function useSavedLocations() {
   const fetchLocations = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
       // 1. Fetch saved locations from DB
       const dbRes = await locationService.getSaved();
       // Handle standard response shapes: dbRes.data.data is used by our backend controllers
       const savedLocs = dbRes.data?.data || dbRes.data || [];
 
-      // 2. Fetch live data for each location
+      const savedLocs =
+        dbRes.data?.data ||
+        dbRes.data ||
+        [];
+
+      // 2. Fetch live environment data
       const enrichedLocs = await Promise.all(
         savedLocs.map(async (loc) => {
           try {
@@ -90,13 +102,19 @@ export function useSavedLocations() {
               longitude: loc.longitude,
               aqi: envData.aqi || 0,
               status: getAqiStatus(envData.aqi || 0),
-              temperature: Math.round(envData.temperature || 0),
+              temperature: Math.round(
+                envData.temperature || 0
+              ),
               condition: weather.condition,
               icon: weather.icon,
             };
           } catch (err) {
-            console.error(`Failed to fetch live data for ${loc.name}`, err);
-            // Return fallback if live data fails so the location still renders
+            console.error(
+              `Failed to fetch live data for ${loc.name}`,
+              err
+            );
+
+            // Fallback so saved location still renders
             return {
               id: loc._id || loc.id,
               name: loc.name,
@@ -117,7 +135,11 @@ export function useSavedLocations() {
 
       setLocations(enrichedLocs);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch saved locations');
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to fetch saved locations'
+      );
     } finally {
       setLoading(false);
     }
@@ -125,16 +147,36 @@ export function useSavedLocations() {
 
   const addLocation = async (data) => {
     setLoading(true);
+    setError(null);
+
     try {
       const res = await locationService.save(data);
+
       if (res.data) {
-        await fetchLocations(); // Re-fetch all to get live data for the new one
-        return { success: true, data: res.data };
+        await fetchLocations();
+
+        return {
+          success: true,
+          data: res.data,
+        };
       }
+
+      return {
+        success: false,
+        error: 'Failed to save location',
+      };
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Failed to save location';
+      const errorMsg =
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to save location';
+
       setError(errorMsg);
-      return { success: false, error: errorMsg };
+
+      return {
+        success: false,
+        error: errorMsg,
+      };
     } finally {
       setLoading(false);
     }
@@ -142,14 +184,27 @@ export function useSavedLocations() {
 
   const removeLocation = async (id) => {
     setLoading(true);
+    setError(null);
+
     try {
       await locationService.delete(id);
       await fetchLocations();
-      return { success: true };
+
+      return {
+        success: true,
+      };
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Failed to delete location';
+      const errorMsg =
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to delete location';
+
       setError(errorMsg);
-      return { success: false, error: errorMsg };
+
+      return {
+        success: false,
+        error: errorMsg,
+      };
     } finally {
       setLoading(false);
     }

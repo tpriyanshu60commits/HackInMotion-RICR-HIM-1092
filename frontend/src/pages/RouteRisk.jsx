@@ -1,8 +1,5 @@
-// ✅ master: React default import not needed in modern React (17+)
 import { useState } from 'react';
-import { LocationSearch } from '../components/common/LocationSearch';
-
-// ✅ feature/SS06: all icons used in the component body
+import api from '../services/api';
 import {
   Navigation as NavIcon,
   MapPin,
@@ -36,39 +33,41 @@ const fuelIcon = createIcon('#F59E0B', '⛽');
 const hotelIcon = createIcon('#3B82F6', '🏨');
 const hospitalIcon = createIcon('#EF4444', '🏥');
 
-export const RouteRisk = () => {
-  const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState(null);
-
-  const [origin, setOrigin] = useState('New Delhi, India');
-  const [destination, setDestination] = useState('Gurgaon, India');
-
-  const handleAnalyze = async () => {
-    setAnalyzing(true);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/route/analyze`,
-        { origin, destination }
+      const res = await api.get(
+        `/data/current?lat=${city.lat}&lng=${city.lng}`
       );
-      if (response.data.success) {
-        setResult(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error analyzing route:', error);
-      alert('Failed to analyze route. Please try again.');
+
+      setCityData(prev => [
+        ...prev,
+        {
+          name: city.name,
+          AQI: res.data.aqi,
+          PM25: res.data.pm2_5,
+          temp: res.data.temperature
+        }
+      ]);
+    } catch (err) {
+      console.error(`Failed to fetch data for ${city.name}:`, err);
+
+      // Remove city if API request fails
+      setSelectedCities(prev =>
+        prev.filter(c => c.name !== city.name)
+      );
     } finally {
-      setAnalyzing(false);
+      setLoading(false);
     }
   };
 
-  // Dynamically generated route positions from API response
-  const routePositions = result?.route?.geometry || [];
+  const removeCity = (cityName) => {
+    setSelectedCities(prev =>
+      prev.filter(c => c.name !== cityName)
+    );
 
-  // Center map dynamically
-  const mapCenter =
-    routePositions.length > 0
-      ? routePositions[Math.floor(routePositions.length / 2)]
-      : [28.6139, 77.209];
+    setCityData(prev =>
+      prev.filter(c => c.name !== cityName)
+    );
+  };
 
   return (
     <div className="min-h-full relative px-4 lg:px-8 py-8 animate-fade-in flex flex-col">
@@ -105,20 +104,11 @@ export const RouteRisk = () => {
             />
           </div>
 
-          <button
-            onClick={handleAnalyze}
-            disabled={analyzing}
-            className="w-full lg:w-auto px-8 py-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl font-bold hover:bg-green-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {analyzing ? (
-              <span className="flex items-center gap-2">
-                Analyzing <span className="animate-spin">↻</span>
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">Analyze</span>
-            )}
-          </button>
+          <p className="text-muted-foreground text-sm">
+            Compare environmental risk across multiple locations
+          </p>
         </div>
+      </div>
 
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 flex-1">
@@ -229,37 +219,10 @@ export const RouteRisk = () => {
                     {result.route.durationMin} min
                   </span>
                 </div>
-              </div>
-
-              {/* Amenities */}
-              <div className="space-y-8 flex-1 flex flex-col">
-                <div>
-                  <h4 className="text-sm font-semibold text-white uppercase tracking-widest flex items-center gap-2 mb-4">
-                    Amenities Along Route
-                  </h4>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Fuel className="text-orange-400 mb-2" size={20} />
-                      <span className="text-xl font-bold text-white">
-                        {result.amenities.fuelStations.count}
-                      </span>
-                      <span className="text-xs text-gray-400">Pumps</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Bed className="text-blue-400 mb-2" size={20} />
-                      <span className="text-xl font-bold text-white">
-                        {result.amenities.hotels.count}
-                      </span>
-                      <span className="text-xs text-gray-400">Hotels</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Activity className="text-red-400 mb-2" size={20} />
-                      <span className="text-xl font-bold text-white">
-                        {result.amenities.hospitals.count}
-                      </span>
-                      <span className="text-xs text-gray-400">Hospitals</span>
-                    </div>
-                  </div>
+              )}
+            </div>
+          )}
+        </div>
 
                   {result.risk.worstPoint && (
                     <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
@@ -290,6 +253,83 @@ export const RouteRisk = () => {
             </div>
           )}
         </div>
+
+        {cityData.length > 0 ? (
+          <div className="h-96 w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={cityData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5
+                }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--border)"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--muted-foreground)"
+                />
+
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--card)',
+                    borderColor: 'var(--border)',
+                    borderRadius: '12px',
+                    boxShadow: 'var(--shadow)'
+                  }}
+                  itemStyle={{
+                    color: 'var(--foreground)',
+                    fontWeight: 500
+                  }}
+                  cursor={{
+                    fill: 'var(--muted)',
+                    opacity: 0.4
+                  }}
+                />
+
+                <Legend />
+
+                <Bar
+                  dataKey="AQI"
+                  fill="var(--destructive)"
+                  radius={[4, 4, 0, 0]}
+                  name="US AQI"
+                />
+
+                <Bar
+                  dataKey="PM25"
+                  fill="var(--warning)"
+                  radius={[4, 4, 0, 0]}
+                  name="PM2.5 (µg/m³)"
+                />
+
+                <Bar
+                  dataKey="temp"
+                  fill="var(--primary)"
+                  radius={[4, 4, 0, 0]}
+                  name="Temp (°C)"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="text-center py-20 border-2 border-dashed border-border rounded-2xl">
+            <p className="text-muted-foreground">
+              Add cities to begin comparison
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

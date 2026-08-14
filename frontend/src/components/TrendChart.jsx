@@ -15,24 +15,37 @@ const TrendChart = ({ locationId }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!locationId) return;
+    if (!locationId) {
+      setData([]);
+      return;
+    }
 
     const fetchSnapshots = async () => {
       setLoading(true);
+
       try {
         const { environmentService } = await import('../services/api');
-        const res = await environmentService.getSnapshots(locationId, range);
+
+        const res = await environmentService.getSnapshots(
+          locationId,
+          range
+        );
+
         const result = res.data;
 
         if (result.success) {
-          const formatted = result.data.map((d) => ({
-            ...d,
-            date: new Date(d.timestamp).toLocaleDateString(),
+          const formatted = result.data.map((snapshot) => ({
+            ...snapshot,
+            date: new Date(snapshot.timestamp).toLocaleDateString(),
           }));
+
           setData(formatted);
+        } else {
+          setData([]);
         }
       } catch (err) {
-        console.error('Failed to fetch snapshots', err);
+        console.error('Failed to fetch snapshots:', err);
+        setData([]);
       } finally {
         setLoading(false);
       }
@@ -44,7 +57,10 @@ const TrendChart = ({ locationId }) => {
   return (
     <div className="bg-white p-4 rounded-xl shadow border border-gray-100">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-gray-800">Historical AQI Trend</h3>
+        <h3 className="font-semibold text-gray-800">
+          Historical AQI Trend
+        </h3>
+
         <div className="space-x-2">
           {['7d', '30d', '90d'].map((r) => (
             <button
@@ -63,7 +79,9 @@ const TrendChart = ({ locationId }) => {
       </div>
 
       {loading ? (
-        <div className="h-64 flex items-center justify-center text-gray-400">Loading trends...</div>
+        <div className="h-64 flex items-center justify-center text-gray-400">
+          Loading trends...
+        </div>
       ) : data.length === 0 ? (
         <div className="h-64 flex items-center justify-center text-gray-400">
           No historical data available yet.
@@ -73,26 +91,60 @@ const TrendChart = ({ locationId }) => {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data}>
               <defs>
-                <linearGradient id="colorAqi" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#16a34a" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+                <linearGradient
+                  id="colorAqi"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor="#16a34a"
+                    stopOpacity={0.3}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="#16a34a"
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#e5e7eb"
+              />
+
               <XAxis
                 dataKey="date"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: '#6b7280' }}
+                tick={{
+                  fontSize: 12,
+                  fill: '#6b7280',
+                }}
               />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{
+                  fontSize: 12,
+                  fill: '#6b7280',
+                }}
+              />
+
               <Tooltip
                 contentStyle={{
                   borderRadius: '8px',
                   border: 'none',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  boxShadow:
+                    '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                 }}
               />
+
               <Area
                 type="monotone"
                 dataKey="aqi"

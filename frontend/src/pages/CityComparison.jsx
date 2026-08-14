@@ -49,7 +49,12 @@ export default function CityComparison() {
         },
       ]);
     } catch (err) {
-      console.error(err);
+      console.error(`Failed to fetch data for ${city.name}:`, err);
+
+      // Remove city if API request fails
+      setSelectedCities(prev =>
+        prev.filter(c => c.name !== city.name)
+      );
     } finally {
       setLoading(false);
     }
@@ -72,6 +77,7 @@ export default function CityComparison() {
         <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
           <Map className="w-5 h-5" />
         </div>
+
         <div>
           <h1 className="text-2xl font-bold">City Comparison</h1>
           <p className="text-muted-foreground text-sm">
@@ -89,6 +95,7 @@ export default function CityComparison() {
             onChange={(e) => setSearch(e.target.value)}
             className="w-full max-w-md bg-background border border-border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           />
+
           {search && (
             <div className="absolute top-full left-0 mt-2 w-full max-w-md bg-card border border-border rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto">
               {filteredCities.map((city) => (
@@ -101,8 +108,11 @@ export default function CityComparison() {
                   <Plus className="w-4 h-4 text-primary" />
                 </button>
               ))}
+
               {filteredCities.length === 0 && (
-                <div className="p-4 text-muted-foreground text-center">No cities found</div>
+                <div className="p-4 text-muted-foreground text-center">
+                  No cities found
+                </div>
               )}
             </div>
           )}
@@ -123,6 +133,7 @@ export default function CityComparison() {
               </button>
             </div>
           ))}
+
           {loading && (
             <div className="flex items-center justify-center px-4 py-2">
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
@@ -147,6 +158,33 @@ export default function CityComparison() {
                   itemStyle={{ color: 'var(--foreground)', fontWeight: 500 }}
                   cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
                 />
+
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--muted-foreground)"
+                />
+
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--card)',
+                    borderColor: 'var(--border)',
+                    borderRadius: '12px',
+                    boxShadow: 'var(--shadow)'
+                  }}
+                  itemStyle={{
+                    color: 'var(--foreground)',
+                    fontWeight: 500
+                  }}
+                  cursor={{
+                    fill: 'var(--muted)',
+                    opacity: 0.4
+                  }}
+                />
+
                 <Legend />
                 <Bar dataKey="AQI" fill="var(--destructive)" radius={[4, 4, 0, 0]} name="US AQI" />
                 <Bar
@@ -161,7 +199,9 @@ export default function CityComparison() {
           </div>
         ) : (
           <div className="text-center py-20 border-2 border-dashed border-border rounded-2xl">
-            <p className="text-muted-foreground">Add cities to begin comparison</p>
+            <p className="text-muted-foreground">
+              Add cities to begin comparison
+            </p>
           </div>
         )}
       </div>
