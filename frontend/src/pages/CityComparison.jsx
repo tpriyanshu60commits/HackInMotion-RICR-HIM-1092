@@ -27,7 +27,7 @@ export default function CityComparison() {
     setSearch('');
     
     try {
-      const res = await axios.get(`http://localhost:5000/api/data/current?lat=${city.lat}&lng=${city.lng}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/data/current?lat=${city.lat}&lng=${city.lng}`);
       setCityData(prev => [...prev, {
         name: city.name,
         AQI: res.data.aqi,

@@ -19,6 +19,7 @@ export const LanguageSettings = () => {
 
   useEffect(() => {
     if (user && user.preferences) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLanguage(user.preferences.language || 'en');
       setAlertVoiceLanguage(user.preferences.alertVoiceLanguage || 'en');
       setRegion(user.preferences.region || 'IN');
