@@ -10,16 +10,17 @@ import {
   escalateToCMHelp,
   acceptEscalation
 } from '../controllers/reportController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/', upload.single('photo'), createReport);
+router.post('/', protect, upload.single('photo'), createReport);
 router.get('/', getAllReports);
-router.get('/mine/:userId', getMyReports);
+router.get('/mine/:userId', protect, getMyReports);
 router.get('/:id', getReportById);
-router.patch('/:id/status', updateStatus);
-router.post('/:id/upvote', upvoteReport);
-router.post('/:id/escalate', escalateToCMHelp);
+router.patch('/:id/status', protect, updateStatus);
+router.post('/:id/upvote', protect, upvoteReport);
+router.post('/:id/escalate', protect, escalateToCMHelp);
 router.get('/:id/accept-escalation', acceptEscalation);
 
 export default router;

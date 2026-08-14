@@ -15,7 +15,7 @@ export const BottomNavMobile = ({ setMobileMenuOpen }) => {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-[env(safe-area-inset-bottom)] pt-2 mb-2">
+    <div className="bottom-nav-mobile md:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-[env(safe-area-inset-bottom)] pt-2 mb-2">
       <div className="glass border border-border/50 rounded-2xl flex items-center justify-around h-16 px-2 shadow-2xl backdrop-blur-md bg-background/60">
         {NAV_ITEMS.map((item) => {
           const isActive = item.to ? location.pathname.startsWith(item.to) : false;

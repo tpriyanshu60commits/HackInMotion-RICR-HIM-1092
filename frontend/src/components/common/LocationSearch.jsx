@@ -45,7 +45,7 @@ export const LocationSearch = ({ onLocationSelect, className, initialQuery = '',
     }, 500);
 
     return () => clearTimeout(searchTimeout);
-  }, [query]);
+  }, [query, isTyping]);
 
   const handleSelect = (loc) => {
     const selectedName = loc.display_name.split(',')[0];

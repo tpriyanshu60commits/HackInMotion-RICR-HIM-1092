@@ -5,10 +5,8 @@ import { useState } from 'react';
 import {
   Navigation as NavIcon,
   MapPin,
-  Play,
   ArrowRight,
   ShieldAlert,
-  CheckCircle2,
   Fuel,
   Bed,
   Activity,

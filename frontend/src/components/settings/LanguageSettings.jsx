@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Globe, Check, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { profileAPI } from '../../services/api';
@@ -13,11 +13,7 @@ export const LanguageSettings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  useEffect(() => {
-    if (user && user.preferences) {
-      setLanguage(user.preferences.language || 'en');
-    }
-  }, [user]);
+
 
   const handleSave = async () => {
     setIsSaving(true);

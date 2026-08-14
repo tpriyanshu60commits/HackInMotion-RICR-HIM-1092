@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { environmentService } from '../services/api';
 import { Navigation, MapPin, Activity, ArrowRight, ShieldAlert } from 'lucide-react';
 
 export default function RoutePlanner() {
@@ -15,27 +15,24 @@ export default function RoutePlanner() {
     setLoading(true);
     // Simulate geocoding and midpoint AQI calculation since we don't have a real routing API here
     try {
-      // Mock coordinates for demonstration
-      const mockLat = 28.6139; 
-      const mockLng = 77.2090;
-      
-      const res = await axios.get(`http://localhost:5000/api/data/current?lat=${mockLat}&lng=${mockLng}`);
+      const res = await environmentService.getCurrentByCity(dest);
+      const data = res.data.data; // backend wraps in { success: true, data: { ... } }
       
       let riskLevel = 'Low';
       let recommendation = 'Great time for outdoor activities.';
-      if (res.data.aqi > 150) {
+      if (data.aqi > 150) {
         riskLevel = 'High';
         recommendation = 'Avoid prolonged outdoor exertion. Consider alternative indoor routes or transport.';
-      } else if (res.data.aqi > 50) {
+      } else if (data.aqi > 50) {
         riskLevel = 'Moderate';
         recommendation = 'Unusually sensitive individuals should consider reducing prolonged outdoor exertion.';
       }
 
       setRisk({
-        aqi: res.data.aqi,
+        aqi: data.aqi,
         level: riskLevel,
         recommendation: recommendation,
-        temp: res.data.temperature
+        temp: data.temperature
       });
     } catch (err) {
       console.error(err);

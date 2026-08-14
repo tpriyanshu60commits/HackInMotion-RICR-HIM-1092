@@ -1,43 +1,40 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'; // AirSense standard is VITE_API_URL
+import api from '../services/api';
 
 export async function createReport(formData) {
-  const res = await fetch(`${BASE_URL}/reports`, { 
-    method: "POST", 
-    body: formData 
+  const res = await api.post('/reports', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    }
   });
-  return res.json();
+  return res.data;
 }
 
 export async function getAllReports() {
-  const res = await fetch(`${BASE_URL}/reports`);
-  return res.json();
+  const res = await api.get('/reports');
+  return res.data;
 }
 
 export async function getMyReports(userId) {
-  const res = await fetch(`${BASE_URL}/reports/mine/${userId}`);
-  return res.json();
+  const res = await api.get(`/reports/mine/${userId}`);
+  return res.data;
 }
 
 export async function getReportById(id) {
-  const res = await fetch(`${BASE_URL}/reports/${id}`);
-  return res.json();
+  const res = await api.get(`/reports/${id}`);
+  return res.data;
 }
 
 export async function updateStatus(id, status) {
-  const res = await fetch(`${BASE_URL}/reports/${id}/status`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
-  });
-  return res.json();
+  const res = await api.patch(`/reports/${id}/status`, { status });
+  return res.data;
 }
 
 export async function upvoteReport(id) {
-  const res = await fetch(`${BASE_URL}/reports/${id}/upvote`, { method: "POST" });
-  return res.json();
+  const res = await api.post(`/reports/${id}/upvote`);
+  return res.data;
 }
 
 export async function escalateToCMHelp(id) {
-  const res = await fetch(`${BASE_URL}/reports/${id}/escalate`, { method: "POST" });
-  return res.json();
+  const res = await api.post(`/reports/${id}/escalate`);
+  return res.data;
 }
