@@ -68,7 +68,7 @@ export const checkLocationsAndAlert = async () => {
   }
 };
 
-import { sendPushNotification } from '../utils/firebaseAdmin.js';
+
 
 const createAlertIfNotExists = async (
   user,
@@ -100,14 +100,7 @@ const createAlertIfNotExists = async (
     });
     console.log(`Created alert for user ${user._id} at location ${locationId}`);
     
-    // Send Push Notification if token exists
-    if (user.fcmToken) {
-      await sendPushNotification(user.fcmToken, title, message, {
-        locationId: locationId.toString(),
-        type,
-        aqiValue: aqiValue.toString()
-      });
-    }
+
   }
 };
 

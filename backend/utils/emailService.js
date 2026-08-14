@@ -1,14 +1,21 @@
 import nodemailer from 'nodemailer';
 
-export const sendEmail = async ({ to, subject, html }) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER || 'placeholder@gmail.com',
-      pass: process.env.EMAIL_PASS || 'placeholder_pass',
-    },
-  });
+let transporter;
 
+const getTransporter = () => {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER || 'placeholder@gmail.com',
+        pass: process.env.EMAIL_PASS || 'placeholder_pass',
+      },
+    });
+  }
+  return transporter;
+};
+
+export const sendEmail = async ({ to, subject, html }) => {
   const mailOptions = {
     from: `"VerdantX" <${process.env.EMAIL_USER || 'noreply@verdantx.com'}>`,
     to,
@@ -18,12 +25,13 @@ export const sendEmail = async ({ to, subject, html }) => {
 
   try {
     if (process.env.NODE_ENV !== 'test') {
-      await transporter.sendMail(mailOptions);
+      const mailTransporter = getTransporter();
+      await mailTransporter.sendMail(mailOptions);
     } else {
       console.log('Test env - simulated email send to:', to);
     }
   } catch (error) {
-    console.error('Email send failed:', error);
-    // don't throw to prevent breaking flow if email fails
+    console.error('Email send failed:', error.message);
+    throw new Error('Could not send email. Please try again later.');
   }
 };

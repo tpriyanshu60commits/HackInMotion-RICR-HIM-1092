@@ -26,11 +26,16 @@ export const registerUser = async (req, res, next) => {
     });
 
     const verifyUrl = `${req.protocol}://${req.get('host')}/api/auth/verify/${verificationToken}`;
-    await sendEmail({
-      to: user.email,
-      subject: 'Verify your email address - VerdantX',
-      html: `<p>Please click this link to verify your email:</p><a href="${verifyUrl}">${verifyUrl}</a>`
-    });
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Verify your email address - VerdantX',
+        html: `<p>Please click this link to verify your email:</p><a href="${verifyUrl}">${verifyUrl}</a>`
+      });
+    } catch (emailError) {
+      console.error('Registration email failed:', emailError.message);
+      // We still return success but maybe the user can request another verification email later.
+    }
 
     if (user) {
       const token = generateToken(res, user._id);
@@ -125,9 +130,6 @@ export const updateUserProfile = async (req, res, next) => {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
 
-      if (req.body.password) {
-        user.password = req.body.password;
-      }
 
       if (req.body.healthProfile) {
         user.healthProfile = { ...user.healthProfile, ...req.body.healthProfile };
@@ -179,12 +181,19 @@ export const forgotPassword = async (req, res, next) => {
     await user.save();
 
     const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
-    await sendEmail({
-      to: user.email,
-      subject: 'Password Reset - VerdantX',
-      html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`
-    });
-    res.json({ success: true, message: 'Password reset email sent' });
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: 'Password Reset - VerdantX',
+        html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`
+      });
+      res.json({ success: true, message: 'Password reset email sent' });
+    } catch  {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(500).json({ success: false, message: 'Email could not be sent' });
+    }
   } catch (err) { next(err); }
 };
 
@@ -210,4 +219,35 @@ export const googleAuthCallback = async (req, res, next) => {
     const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/login?token=${token}`;
     res.redirect(redirectUrl);
   } catch (err) { next(err); }
+};
+
+// @desc    Update password securely
+// @route   PUT /api/auth/password
+// @access  Private
+export const updatePassword = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    const { currentPassword, newPassword } = req.body;
+    
+    // For users who registered via OAuth and have no password
+    if (user.password && !(await user.matchPassword(currentPassword))) {
+      res.status(401);
+      throw new Error('Incorrect current password');
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Password updated successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
 };

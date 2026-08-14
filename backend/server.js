@@ -6,8 +6,7 @@ dotenv.config();
 
 connectDB();
 
-import { initFirebaseAdmin } from './utils/firebaseAdmin.js';
-initFirebaseAdmin();
+
 
 import { initCronJobs } from './services/alertService.js';
 initCronJobs();
