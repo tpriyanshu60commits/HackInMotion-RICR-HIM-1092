@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { Shield, Download, Trash2, CheckCircle2, AlertTriangle, Eye, Activity, Share2 } from 'lucide-react';
+import { Shield, Download, Trash2, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { cn } from '../../utils/utils';
 import useStore from '../../store/useStore';
-import api, { profileAPI } from '../../services/api';
+import { usersAPI } from '../../services/api';
 
 export const PrivacySettings = () => {
   const user = useStore(state => state.user);
@@ -16,8 +19,13 @@ export const PrivacySettings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [exportStatus, setExportStatus] = useState('idle'); // idle | loading | done
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const navigate = useNavigate();
+  const logout = useStore(state => state.logout);
+  const user = useStore(state => state.user);
+  const location = useStore(state => state.location);
+  const weatherCondition = useStore(state => state.weatherCondition);
+  const currentAQI = useStore(state => state.currentAQI);
+  const currentTemp = useStore(state => state.currentTemp);
 
   const handleSavePrivacy = async () => {
     setIsSaving(true);
@@ -41,34 +49,64 @@ export const PrivacySettings = () => {
 
   const handleExport = async () => {
     setExportStatus('loading');
-    try {
-      const response = await api.get('/profile/export');
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(response.data.data, null, 2));
-      const downloadAnchorNode = document.createElement('a');
-      downloadAnchorNode.setAttribute("href",     dataStr);
-      downloadAnchorNode.setAttribute("download", `verdantx_export_${Date.now()}.json`);
-      document.body.appendChild(downloadAnchorNode); // required for firefox
-      downloadAnchorNode.click();
-      downloadAnchorNode.remove();
-      
-      setExportStatus('done');
-      setTimeout(() => setExportStatus('idle'), 3000);
-    } catch (error) {
-      console.error('Failed to export data', error);
-      setExportStatus('idle');
-    }
+    setTimeout(() => {
+      try {
+        const doc = new jsPDF();
+
+        doc.setFontSize(20);
+        doc.text('VerdantX - User Data Export', 14, 22);
+
+        doc.setFontSize(14);
+        doc.text('User Profile', 14, 35);
+        autoTable(doc, {
+          startY: 40,
+          head: [['Field', 'Value']],
+          body: [
+            ['Name', user?.name || 'N/A'],
+            ['Email', user?.email || 'N/A'],
+            ['Role', user?.role || 'user'],
+            ['Height', user?.height ? `${user.height} cm` : 'N/A'],
+            ['Weight', user?.weight ? `${user.weight} kg` : 'N/A'],
+            ['Gender', user?.gender || 'N/A'],
+          ],
+        });
+
+        let finalY = doc.lastAutoTable.finalY || 40;
+
+        doc.text('Current Weather & Location Report', 14, finalY + 15);
+        autoTable(doc, {
+          startY: finalY + 20,
+          head: [['Metric', 'Value']],
+          body: [
+            ['Location', location?.name || 'N/A'],
+            ['Weather Condition', weatherCondition || 'N/A'],
+            ['AQI', currentAQI ? currentAQI.toString() : 'N/A'],
+            ['Temperature', currentTemp ? `${currentTemp}°C` : 'N/A'],
+          ],
+        });
+
+        doc.save('VerdantX_Data_Export.pdf');
+        
+        setExportStatus('done');
+        setTimeout(() => setExportStatus('idle'), 3000);
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        setExportStatus('idle');
+      }
+    }, 1000);
   };
 
   const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    try {
-      await api.delete('/profile');
-      logout();
-      window.location.href = '/login';
-    } catch (error) {
-      console.error('Failed to delete account', error);
-      setIsDeleting(false);
-      setShowDeleteConfirm(false);
+    const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    if (confirmed) {
+      try {
+        await usersAPI.deleteAccount();
+        logout();
+        navigate('/');
+      } catch (error) {
+        console.error("Failed to delete account", error);
+        alert("Failed to delete account. Please try again later.");
+      }
     }
   };
 
@@ -232,9 +270,17 @@ export const PrivacySettings = () => {
               </button>
             )}
           </div>
+          <button 
+            onClick={handleDeleteAccount}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Trash2 size={16} />
+            Delete Account
+          </button>
         </div>
 
       </div>
     </div>
   );
 };
+

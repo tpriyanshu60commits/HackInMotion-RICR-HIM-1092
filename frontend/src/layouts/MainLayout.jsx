@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Leaf,
   MapPin,
@@ -22,30 +23,37 @@ import { AlertToastContainer } from '../components/alerts/AlertToastContainer';
 import { BottomNavMobile } from './BottomNavMobile';
 
 const NAV_ITEMS = [
-  { to: '/locations', icon: MapPin, label: 'Locations' },
-  { to: '/history', icon: Activity, label: 'History' },
-  { to: '/compare', icon: Wind, label: 'Compare' },
-  { to: '/route', icon: NavIcon, label: 'Route Risk' },
-  { to: '/education', icon: BookOpen, label: 'Education' },
+  { to: '/locations', icon: MapPin, label: 'Locations', tKey: 'locations' },
+  { to: '/history', icon: Activity, label: 'History', tKey: 'history' },
+  { to: '/compare', icon: Wind, label: 'Compare', tKey: 'compare' },
+  { to: '/route', icon: NavIcon, label: 'Route Risk', tKey: 'routeRisk' },
+  { to: '/education', icon: BookOpen, label: 'Education', tKey: 'education' },
 ];
 
 export const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const user = useStore((state) => state.user);
+  const { t, i18n } = useTranslation();
 
+  // Sync i18n language with user preferences
+  useEffect(() => {
+    if (user?.preferences?.language) {
+      i18n.changeLanguage(user.preferences.language);
+    }
+  }, [user?.preferences?.language, i18n]);
 
   const navItems = user?.role === 'admin'
-    ? [...NAV_ITEMS, { to: '/admin', icon: User, label: 'Admin Panel' }]
+    ? [...NAV_ITEMS, { to: '/admin', icon: User, label: 'Admin Panel', tKey: 'adminPanel' }]
     : NAV_ITEMS;
 
   return (
     <WeatherBackground>
-      <div className="min-h-screen w-full flex flex-col text-text-main overflow-x-hidden">
+      <div className="min-h-screen  w-full flex flex-col text-text-main overflow-x-hidden">
 
         {/* =====================================================
             TOP NAVBAR
         ====================================================== */}
-        <header className="glass border-b border-border fixed top-2 z-100 w-full h-16 hidden md:flex items-center justify-between px-4 md:px-8 rounded-2xl">
+        <header className="glass border-b border-border fixed top-2 z-[90] w-full h-16 hidden md:flex items-center justify-between px-4 md:px-8 rounded-2xl">
 
           {/* Logo Section */}
           <Link to="/dashboard" className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity">
@@ -70,7 +78,7 @@ export const MainLayout = () => {
                   }
                 >
                   <item.icon size={18} className="transition-transform group-hover:scale-110 shrink-0" />
-                  <span className="text-xs">{item.label}</span>
+                  <span className="text-xs">{t(`nav.${item.tKey}`, item.label)}</span>
                 </NavLink>
               ))}
             </nav>
@@ -82,7 +90,7 @@ export const MainLayout = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-sm shadow-lg shadow-green-500/20 mr-2"
               >
                 <AlertCircle size={16} />
-                <span>Report Issue</span>
+                <span>{t('nav.reportIssue', 'Report Issue')}</span>
               </Link>
               <Link
                 to="/profile"
@@ -119,7 +127,7 @@ export const MainLayout = () => {
             />
             <div className="absolute right-0 top-0 bottom-0 w-72 glass shadow-2xl flex flex-col h-full animate-fade-in">
               <div className="flex justify-between items-center p-4 border-b border-border">
-                <span className="font-bold text-lg text-white">Menu</span>
+                <span className="font-bold text-lg text-white">{t('nav.menu', 'Menu')}</span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 text-text-muted hover:text-text-main rounded-lg transition-colors"
@@ -144,7 +152,7 @@ export const MainLayout = () => {
                     }
                   >
                     <item.icon size={20} />
-                    <span>{item.label}</span>
+                    <span>{t(`nav.${item.tKey}`, item.label)}</span>
                   </NavLink>
                 ))}
               </div>
@@ -156,7 +164,7 @@ export const MainLayout = () => {
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors shadow-lg shadow-green-500/20"
                 >
                   <AlertCircle size={20} />
-                  Report Issue
+                  {t('nav.reportIssue', 'Report Issue')}
                 </Link>
                 <Link
                   to="/profile"
@@ -164,7 +172,7 @@ export const MainLayout = () => {
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10"
                 >
                   <User size={20} />
-                  Account Settings
+                  {t('nav.accountSettings', 'Account Settings')}
                 </Link>
               </div>
             </div>
@@ -174,7 +182,7 @@ export const MainLayout = () => {
         {/* =====================================================
             MAIN CONTENT
         ====================================================== */}
-        <main className="flex-1 w-full relative mt-0 md:mt-10 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
+        <main className="flex-1 w-full relative mt-0 md:mt-20 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
           <Outlet />
         </main>
 

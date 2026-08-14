@@ -2,16 +2,18 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Menu as MenuIcon, Settings } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/utils';
 
 export const BottomNavMobile = ({ setMobileMenuOpen }) => {
   const location = useLocation();
   const shouldReduceMotion = useReducedMotion();
+  const { t } = useTranslation();
 
   const NAV_ITEMS = [
-    { id: 'home', to: '/dashboard', icon: Home, label: 'Home' },
-    { id: 'menu', isAction: true, icon: MenuIcon, label: 'Menu' },
-    { id: 'settings', to: '/profile', icon: Settings, label: 'Settings' },
+    { id: 'home', to: '/dashboard', icon: Home, label: t('nav.home', 'Home') },
+    { id: 'menu', isAction: true, icon: MenuIcon, label: t('nav.menu', 'Menu') },
+    { id: 'settings', to: '/profile', icon: Settings, label: t('nav.settings', 'Settings') },
   ];
 
   return (

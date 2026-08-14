@@ -177,7 +177,7 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.95 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-[80px] md:bottom-24 right-4 md:right-8 w-[calc(100vw-32px)] md:w-[400px] h-[calc(100vh-120px)] md:h-[600px] max-h-[800px] glass rounded-3xl border border-border shadow-2xl flex flex-col z-50 overflow-hidden"
+          className="fixed bottom-[80px] md:bottom-24 right-4 md:right-8 w-[calc(100vw-32px)] md:w-[400px] h-[calc(100dvh-160px)] md:h-[600px] max-h-[800px] glass rounded-3xl border border-border shadow-2xl flex flex-col z-[99] overflow-hidden"
         >
           {/* Header */}
           <div className="p-4 border-b border-border flex items-center justify-between bg-surface-inner">

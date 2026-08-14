@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "locations": "Locations",
+    "history": "History",
+    "alerts": "Alerts",
+    "profile": "Profile"
+  },
+  "settings": {
+    "languageAndRegion": "Language & Region",
+    "interfaceLanguage": "Interface Language",
+    "voiceAlertLanguage": "Alert Voice Language",
+    "region": "Region",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Saved!"
+  },
+  "app": {
+    "welcome": "Welcome back",
+    "search": "Search location..."
+  }
+}
