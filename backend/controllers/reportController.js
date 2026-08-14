@@ -3,7 +3,7 @@ import { checkEscalation, checkEscalations } from '../utils/escalation.js';
 
 export const createReport = async (req, res, next) => {
   try {
-    const { category, title, description, lat, lng, address, createdBy } = req.body;
+    const { category, title, description, lat, lng, address } = req.body;
     let photoUrl = '';
     
     if (req.file) {
@@ -20,7 +20,7 @@ export const createReport = async (req, res, next) => {
         address
       },
       photoUrl,
-      createdBy
+      createdBy: req.user._id
     });
 
     await newReport.save();
@@ -44,6 +44,9 @@ export const getAllReports = async (req, res, next) => {
 export const getMyReports = async (req, res, next) => {
   try {
     const { userId } = req.params;
+    if (userId !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, error: 'Unauthorized to view these reports' });
+    }
     let reports = await Report.find({ createdBy: userId }).sort({ createdAt: -1 });
     reports = await checkEscalations(reports);
     res.json({ success: true, data: reports });

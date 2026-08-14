@@ -6,8 +6,7 @@ dotenv.config();
 
 connectDB();
 
-import { initFirebaseAdmin } from './utils/firebaseAdmin.js';
-initFirebaseAdmin();
+
 
 import { initCronJobs } from './services/alertService.js';
 initCronJobs();
@@ -29,7 +28,7 @@ const server = httpServer.listen(
 );
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
+process.on('unhandledRejection', (err) => {
   console.log(`Error: ${err.message}`);
   // Close server & exit process
   server.close(() => process.exit(1));

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/common/GlassCard';
 
-import { WaterDropLoader } from '../components/common/WaterDropLoader';
+
 import { LocationSearch } from '../components/common/LocationSearch';
 import {
   MapPin, Wind, Droplets, Thermometer, CloudRain, Activity,
@@ -12,7 +12,7 @@ import { NotificationDropdown } from '../components/common/NotificationDropdown'
 import { environmentService } from '../services/api';
 import useStore from '../store/useStore';
 import { resolveBackground } from '../utils/resolveBackground';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+
 import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 import Skeleton from '../components/common/Skeleton';
 
@@ -102,7 +102,7 @@ export const Dashboard = () => {
     } else {
       setLocation({ lat: 51.5072, lng: 0.1276, name: 'London' });
     }
-  }, [location, setLocation, setWeatherCondition]);
+  }, [location, setLocation, setWeatherCondition, setCurrentAQI, setIsDay]);
 
   const handleLocationSelect = (loc) => {
     setLocation(loc);

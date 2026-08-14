@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, HeartPulse, Bell, Globe, Thermometer, Shield, LogOut } from 'lucide-react';
+import { User, HeartPulse, Bell, Globe, Thermometer, Shield, LogOut, Key } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api, { profileAPI } from '../services/api';
 import useStore from '../store/useStore';
@@ -12,6 +12,7 @@ import { NotificationSettings } from '../components/settings/NotificationSetting
 import { LanguageSettings } from '../components/settings/LanguageSettings';
 import { UnitSettings } from '../components/settings/UnitSettings';
 import { PrivacySettings } from '../components/settings/PrivacySettings';
+import { SecuritySettings } from '../components/settings/SecuritySettings';
 
 const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -19,6 +20,7 @@ const TABS = [
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'language', label: 'Language & Region', icon: Globe },
   { id: 'units', label: 'Units', icon: Thermometer },
+  { id: 'security', label: 'Security & Password', icon: Key },
   { id: 'privacy', label: 'Privacy & Data', icon: Shield },
 ];
 
@@ -62,6 +64,7 @@ export const Profile = () => {
       case 'notifications': return <NotificationSettings />;
       case 'language': return <LanguageSettings />;
       case 'units': return <UnitSettings />;
+      case 'security': return <SecuritySettings />;
       case 'privacy': return <PrivacySettings />;
       default: return <BasicProfile />;
     }

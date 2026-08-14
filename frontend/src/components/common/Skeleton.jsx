@@ -1,5 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+
 
 const Skeleton = ({ className, width, height, borderRadius = '0.5rem' }) => {
   return (

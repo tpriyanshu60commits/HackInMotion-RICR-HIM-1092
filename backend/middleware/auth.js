@@ -5,32 +5,29 @@ export const protect = async (req, res, next) => {
   let token;
 
   // Check if token is in cookies
-  token = req.cookies.jwt;
+  token = req.cookies?.jwt;
 
   // Fallback to Bearer token in headers if cookie not present
   if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
 
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Not authorized, no token' });
+  }
 
-      req.user = await User.findById(decoded.userId).select('-password');
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      if (!req.user) {
-        res.status(401);
-        throw new Error('Not authorized, user not found');
-      }
+    req.user = await User.findById(decoded.userId).select('-password');
 
-      next();
-    } catch (error) {
-      console.error(error);
-      res.status(401);
-      next(new Error('Not authorized, token failed'));
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Not authorized, user not found' });
     }
-  } else {
-    res.status(401);
-    next(new Error('Not authorized, no token'));
+
+    next();
+  } catch (error) {
+    console.error(error);
+    return res.status(401).json({ success: false, message: 'Not authorized, token failed' });
   }
 };

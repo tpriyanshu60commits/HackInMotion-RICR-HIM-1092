@@ -48,7 +48,7 @@ export const MainLayout = () => {
 
   return (
     <WeatherBackground>
-      <div className="min-h-screen w-full flex flex-col text-text-main overflow-x-hidden">
+      <div className="min-h-screen  w-full flex flex-col text-text-main overflow-x-hidden">
 
         {/* =====================================================
             TOP NAVBAR
@@ -182,7 +182,7 @@ export const MainLayout = () => {
         {/* =====================================================
             MAIN CONTENT
         ====================================================== */}
-        <main className="flex-1 w-full relative mt-0 md:mt-10 scroll-smooth p-0 md:p-8 overflow-x-hidden">
+        <main className="flex-1 w-full relative mt-0 md:mt-20 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
           <Outlet />
         </main>
 

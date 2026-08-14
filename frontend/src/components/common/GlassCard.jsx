@@ -4,7 +4,7 @@ export const GlassCard = ({ children, className, hover = false, ...props }) => {
   return (
     <div 
       className={cn(
-        "glass rounded-2xl p-6",
+        " liquid rounded-2xl p-6",
         "transition-all duration-300 ease-in-out",
         "hover:scale-[1.03] hover:-translate-y-1",
         "hover:bg-white/[0.09] hover:border-white/20",

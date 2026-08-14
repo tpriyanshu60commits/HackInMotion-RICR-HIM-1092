@@ -5,7 +5,7 @@ import { MainLayout } from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
-import { requestFirebaseNotificationPermission } from './utils/firebasePush';
+
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -20,6 +20,8 @@ import { RouteRisk } from './pages/RouteRisk';
 import { HistoricalTrends } from './pages/HistoricalTrends';
 import { Education } from './pages/Education';
 import { ReportPage } from './pages/ReportPage';
+import NotFound from './pages/NotFound';
+
 // Public Route Wrapper (Redirects to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isInitializing, user } = useStore();
@@ -52,18 +54,23 @@ function App() {
 
     const verifyAuth = async () => {
       try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          setUser(null);
+          setInitializing(false);
+          return;
+        }
+
         const res = await api.get('/auth/me');
         if (res.data?.success && res.data?.data) {
           setUser(res.data.data);
-          // Request FCM permission after successful auth
-          if (import.meta.env.VITE_FIREBASE_API_KEY) {
-            requestFirebaseNotificationPermission();
-          }
         } else {
           setUser(null);
+          localStorage.removeItem('auth_token');
         }
       } catch {
         setUser(null);
+        localStorage.removeItem('auth_token');
       } finally {
         setInitializing(false);
       }
@@ -91,7 +98,7 @@ function App() {
           <Route path="/report" element={<ReportPage />} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

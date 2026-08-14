@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Bell, Volume2, VolumeX, Mic, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { profileAPI } from '../../services/api';
@@ -14,12 +14,7 @@ export const NotificationSettings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  useEffect(() => {
-    if (user && user.notificationSettings) {
-      setIsMuted(user.notificationSettings.isMuted || false);
-      setVoiceAlertsEnabled(user.notificationSettings.voiceAlertsEnabled || false);
-    }
-  }, [user]);
+
 
   const handleSave = async () => {
     setIsSaving(true);

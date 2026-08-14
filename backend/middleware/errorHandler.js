@@ -17,6 +17,7 @@ export const errorHandler = (err, req, res, next) => {
   // Standardized MNC-level error response
   res.status(statusCode).json({
     success: false,
+    message: message, // For compatibility with frontend expecting .message
     error: {
       code: err.code || statusCode.toString(),
       message,

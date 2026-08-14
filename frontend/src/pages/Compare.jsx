@@ -4,41 +4,7 @@ import { environmentService } from '../services/api';
 import useStore from '../store/useStore';
 import { LocationSearch } from '../components/common/LocationSearch';
 
-const COMPARE_DATA = [
-  {
-    city: "Rewa",
-    aqi: 78,
-    risk: "MODERATE",
-    temp: 28,
-    hum: 65,
-    wind: 12,
-    pm25: 35.4,
-    pm10: 82.1,
-    trend: "Improving"
-  },
-  {
-    city: "Bhopal",
-    aqi: 185,
-    risk: "UNHEALTHY",
-    temp: 31,
-    hum: 45,
-    wind: 8,
-    pm25: 120.5,
-    pm10: 190.2,
-    trend: "Worsening"
-  },
-  {
-    city: "Indore",
-    aqi: 45,
-    risk: "GOOD",
-    temp: 26,
-    hum: 70,
-    wind: 15,
-    pm25: 12.1,
-    pm10: 30.5,
-    trend: "Stable"
-  }
-];
+
 
 const getAqiStyle = (aqi) => {
   if (aqi <= 50) {
@@ -79,39 +45,42 @@ export const Compare = () => {
   const [selectedCity1, setSelectedCity1] = useState(initialCity1);
   const [selectedCity2, setSelectedCity2] = useState("");
   const [comparisonData, setComparisonData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchComparisonData = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      if (selectedCity1 && selectedCity2) {
-        const cities = `${selectedCity1},${selectedCity2}`;
-        const res = await environmentService.compareCities(cities);
-        setComparisonData({ data: res.data.data });
-      } else if (selectedCity1) {
-        const res = await environmentService.getCurrentByCity(selectedCity1);
-        setComparisonData({ data: [res.data.data] });
-      } else if (selectedCity2) {
-        const res = await environmentService.getCurrentByCity(selectedCity2);
-        setComparisonData({ data: [res.data.data] });
-      } else {
-        setComparisonData({ data: [] });
-      }
-    } catch (err) {
-      console.error("Failed to fetch comparison data:", err);
-      setError("Failed to fetch comparison data. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchComparisonData();
-  }, [selectedCity1, selectedCity2]);
+    let active = true;
 
-  console.log("Current comparisonData state:", comparisonData);
+    const fetchData = async () => {
+      try {
+        if (selectedCity1 && selectedCity2) {
+          const cities = `${selectedCity1},${selectedCity2}`;
+          const res = await environmentService.compareCities(cities);
+          if (active) setComparisonData({ data: res.data.data });
+        } else if (selectedCity1) {
+          const res = await environmentService.getCurrentByCity(selectedCity1);
+          if (active) setComparisonData({ data: [res.data.data] });
+        } else if (selectedCity2) {
+          const res = await environmentService.getCurrentByCity(selectedCity2);
+          if (active) setComparisonData({ data: [res.data.data] });
+        } else {
+          if (active) setComparisonData({ data: [] });
+        }
+        if (active) setError(null);
+      } catch (err) {
+        console.error("Failed to fetch comparison data:", err);
+        if (active) setError("Failed to fetch comparison data. Please try again.");
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      active = false;
+    };
+  }, [selectedCity1, selectedCity2]);
 
   // Use actual fetched data or fallback to empty array
   const comparisonCities = comparisonData?.data || [];
@@ -147,7 +116,10 @@ export const Compare = () => {
               <LocationSearch 
                 initialQuery={initialCity1}
                 retainSelection={true}
-                onLocationSelect={(loc) => setSelectedCity1(loc.name.split(',')[0].trim())} 
+                onLocationSelect={(loc) => {
+                  setIsLoading(true);
+                  setSelectedCity1(loc.name.split(',')[0].trim());
+                }} 
               />
             </div>
           </div>
@@ -173,7 +145,10 @@ export const Compare = () => {
               <LocationSearch 
                 initialQuery=""
                 retainSelection={true}
-                onLocationSelect={(loc) => setSelectedCity2(loc.name.split(',')[0].trim())} 
+                onLocationSelect={(loc) => {
+                  setIsLoading(true);
+                  setSelectedCity2(loc.name.split(',')[0].trim());
+                }} 
               />
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
   forgotPassword,
   resetPassword,
   googleAuthCallback,
+  updatePassword,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import validateRequest from '../middleware/validateRequest.js';
@@ -39,5 +40,8 @@ router
 
 // For backwards compatibility with the PRD naming 'profile'
 router.put('/profile', protect, validateRequest(updateProfileSchema), updateUserProfile);
+
+// Password update
+router.put('/password', protect, updatePassword);
 
 export default router;

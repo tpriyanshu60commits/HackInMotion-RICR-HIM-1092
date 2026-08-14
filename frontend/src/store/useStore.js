@@ -11,7 +11,7 @@ const useStore = create(
       isAuthenticated: false,
       isInitializing: true,
       setUser: (user) => set({ user, isAuthenticated: !!user }),
-      updateUserProfile: (profileData) => set((state) => ({
+      updateUserProfile: (profileData) => set({
         user: profileData,
         userName: profileData.name || '',
         userAge: profileData.healthProfile?.age || '',
@@ -23,7 +23,7 @@ const useStore = create(
         voiceAlertsEnabled: profileData.notificationSettings?.voiceAlertsEnabled || false,
         language: profileData.preferences?.language || 'en',
         temperatureUnit: profileData.preferences?.temperatureUnit || 'celsius',
-      })),
+      }),
       setInitializing: (isInitializing) => set({ isInitializing }),
       logout: () => {
         localStorage.removeItem('auth_token');
@@ -36,11 +36,10 @@ const useStore = create(
       
       isDay: true,
       setIsDay: (isDay) => set({ isDay }),
-      
-      currentAQI: 50, // mock value
+      currentAQI: null,
       setCurrentAQI: (aqi) => set({ currentAQI: aqi }),
       
-      currentTemp: 25, // mock value
+      currentTemp: null,
       setCurrentTemp: (temp) => set({ currentTemp: temp }),
       
       // Health Profile State

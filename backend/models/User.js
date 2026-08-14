@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     emailVerificationToken: { type: String, default: null },
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
-    fcmToken: { type: String, default: null },
+
     phone: { type: String, default: '' },
     height: { type: Number, default: 0 },
     weight: { type: Number, default: 0 },
