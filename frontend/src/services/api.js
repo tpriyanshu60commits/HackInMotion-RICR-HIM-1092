@@ -134,15 +134,11 @@ export const alertService = {
 
 // Master - Extended User Profile
 export const usersAPI = {
-  updateExtendedProfile: (data) =>
-    api.patch('/users/profile', data),
-
-  uploadProfileImage: (formData) =>
-    api.post('/users/profile-image', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }),
+  updateExtendedProfile: (data) => api.patch('/users/profile', data),
+  uploadProfileImage: (formData) => api.post('/users/profile-image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  deleteAccount: () => api.delete('/users/me'),
 };
 
 // Master - Health Reports

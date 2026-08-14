@@ -70,3 +70,27 @@ export const uploadProfileImage = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Delete user account and all associated data
+// @route   DELETE /api/users/me
+// @access  Private
+export const deleteAccount = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    // Delete the user from the database
+    await user.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: 'Account deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
