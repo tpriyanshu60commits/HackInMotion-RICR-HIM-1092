@@ -5,6 +5,7 @@ import {
   Search, Plus, MapPin, ChevronRight, X, 
   CloudRain, Cloud, Sun, CloudFog 
 } from 'lucide-react';
+import Skeleton from '../components/common/Skeleton';
 
 
 const WeatherIcon = ({ type, size = 20, className }) => {
@@ -261,12 +262,14 @@ export const Locations = () => {
               placeholder="Search location..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search saved locations"
               className="w-full bg-white/[0.04] backdrop-blur-xl border border-white/[0.1] rounded-full pl-11 pr-4 py-2.5 text-sm text-white outline-none focus:border-green-500/50 focus:bg-white/[0.06] transition-all placeholder:text-gray-500"
             />
           </div>
 
           <button 
             onClick={() => setIsModalOpen(true)}
+            aria-label="Add new location"
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 hover:border-green-500/40 rounded-full font-bold transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]"
           >
             <Plus size={18} />
@@ -276,9 +279,20 @@ export const Locations = () => {
       </div>
 
       {loading && locations.length === 0 ? (
-        <div className="w-full py-20 flex flex-col items-center justify-center text-center">
-           <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-           <p className="text-gray-400 font-medium">Fetching live location data...</p>
+        <div className="flex flex-col gap-4">
+           {[1, 2, 3].map((i) => (
+             <div key={i} className="w-full rounded-[20px] bg-white/[0.04] p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+               <Skeleton width="48px" height="48px" borderRadius="9999px" />
+               <div className="flex-1 flex flex-col gap-2">
+                 <Skeleton width="150px" height="24px" />
+                 <Skeleton width="100px" height="16px" />
+               </div>
+               <div className="flex flex-col gap-2 items-start md:items-center">
+                 <Skeleton width="80px" height="16px" />
+                 <Skeleton width="60px" height="32px" />
+               </div>
+             </div>
+           ))}
         </div>
       ) : (
         <>

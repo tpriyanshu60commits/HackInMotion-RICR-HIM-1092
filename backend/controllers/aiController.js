@@ -1,7 +1,7 @@
 import Conversation from '../models/Conversation.js';
 import { askAI, askAIStream } from '../services/aiService.js';
 
-export const getHistory = async (req, res) => {
+export const getHistory = async (req, res, next) => {
   try {
     const conversation = await Conversation.findOne({ user: req.user.id });
     if (!conversation) {
@@ -10,21 +10,21 @@ export const getHistory = async (req, res) => {
     res.status(200).json({ success: true, data: conversation.messages });
   } catch (error) {
     console.error('AI History Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch chat history' });
+    next(error);
   }
 };
 
-export const clearHistory = async (req, res) => {
+export const clearHistory = async (req, res, next) => {
   try {
     await Conversation.findOneAndDelete({ user: req.user.id });
     res.status(200).json({ success: true, message: 'Chat history cleared' });
   } catch (error) {
     console.error('AI Clear History Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to clear chat history' });
+    next(error);
   }
 };
 
-export const askQuestion = async (req, res) => {
+export const askQuestion = async (req, res, next) => {
   try {
     const { message, contextData, stream } = req.body;
     
@@ -50,7 +50,7 @@ export const askQuestion = async (req, res) => {
       res.setHeader('Connection', 'keep-alive');
 
       try {
-        const chatStream = await askAIStream(message, contextData, contextMessages.slice(0, -1));
+        const chatStream = await askAIStream(message, contextData, contextMessages.slice(0, -1), req.user.healthProfile);
         
         let fullResponse = '';
         
@@ -82,7 +82,7 @@ export const askQuestion = async (req, res) => {
       }
     } else {
       // Non-streaming response
-      const responseText = await askAI(message, contextData, contextMessages.slice(0, -1));
+      const responseText = await askAI(message, contextData, contextMessages.slice(0, -1), req.user.healthProfile);
       
       conversation.messages.push({ role: 'assistant', content: responseText });
       if (conversation.messages.length > 100) {
@@ -101,6 +101,6 @@ export const askQuestion = async (req, res) => {
 
   } catch (error) {
     console.error('AI Ask Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to process AI request' });
+    next(error);
   }
 };

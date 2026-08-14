@@ -5,6 +5,7 @@ import { MainLayout } from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
+import { requestFirebaseNotificationPermission } from './utils/firebasePush';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -47,14 +48,17 @@ function App() {
   const { setUser, setInitializing } = useStore();
 
   useEffect(() => {
+    // ... inside App ...
+
     const verifyAuth = async () => {
-      // If there's no token in localStorage, backend route won't work anyway
-      // since the interceptor looks for localStorage 'auth_token'. 
-      // (Even if using httpOnly cookies, this explicit check verifies the user profile).
       try {
         const res = await api.get('/auth/me');
         if (res.data?.success && res.data?.data) {
           setUser(res.data.data);
+          // Request FCM permission after successful auth
+          if (import.meta.env.VITE_FIREBASE_API_KEY) {
+            requestFirebaseNotificationPermission();
+          }
         } else {
           setUser(null);
         }

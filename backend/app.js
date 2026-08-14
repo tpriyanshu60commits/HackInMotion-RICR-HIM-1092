@@ -7,6 +7,7 @@ import { rateLimit } from 'express-rate-limit';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 // Import routes
+import './config/passport.js';
 import authRoutes from './routes/authRoutes.js';
 import locationRoutes from './routes/locationRoutes.js';
 import environmentRoutes from './routes/environmentRoutes.js';
@@ -16,6 +17,7 @@ import aiRoutes from './routes/ai.js';
 import dataRoutes from './routes/data.js';
 import reportRoutes from './routes/reports.js';
 import myLocationRoutes from './routes/locations.js';
+import snapshotRoutes from './routes/snapshotRoutes.js';
 import routeRoutes from './routes/routeRoutes.js';        // ← feature/SS06
 import profileRoutes from './routes/profileRoutes.js';    // ← master
 
@@ -59,7 +61,8 @@ app.get('/', (req, res) => {
 });
 
 // ─── Device 1 Routes ──────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
+import { authLimiter } from './middleware/authLimiter.js';
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/environment', environmentRoutes);
 app.use('/api/alerts', alertRoutes);
@@ -71,6 +74,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/data', dataRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/my-locations', myLocationRoutes);
+app.use('/api/snapshots', snapshotRoutes);
 app.use('/api/route', routeRoutes);             // ← feature/SS06
 
 // ─── Error Handling ───────────────────────────────────────────────────────────

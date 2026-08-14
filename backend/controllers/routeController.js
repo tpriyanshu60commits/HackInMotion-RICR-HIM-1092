@@ -3,7 +3,7 @@ import { geocodeLocation, getRoute, getAmenitiesNearPoint } from '../services/ge
 import { sampleRoutePoints } from '../utils/samplePoints.js';
 import { calculateBaseRisk } from '../services/riskEngine.js';
 
-export const analyzeRoute = async (req, res) => {
+export const analyzeRoute = async (req, res, next) => {
   try {
     const { origin, destination } = req.body;
 
@@ -112,6 +112,6 @@ export const analyzeRoute = async (req, res) => {
 
   } catch (error) {
     console.error('Route Analysis Error:', error);
-    res.status(500).json({ success: false, message: 'Server error analyzing route' });
+    next(error);
   }
 };

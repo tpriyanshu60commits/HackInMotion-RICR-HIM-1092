@@ -14,8 +14,14 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false, // Optional for OAuth
     },
+    googleId: { type: String, default: null },
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: { type: String, default: null },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
+    fcmToken: { type: String, default: null },
     phone: { type: String, default: '' },
     avatar: { type: String, default: '' },
     bio: { type: String, default: '' },

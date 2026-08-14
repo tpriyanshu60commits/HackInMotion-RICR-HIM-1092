@@ -53,12 +53,16 @@ Be helpful, natural, conversational, context-aware, accurate, concise when appro
 - If the question requires current or location-specific data, use the application's available data/API (Current Context) rather than inventing values. NEVER fabricate real-time environmental measurements.
 - If you don't have enough information, clearly say so instead of guessing.`;
 
-export const askAI = async (message, contextData, previousMessages = []) => {
+export const askAI = async (message, contextData, previousMessages = [], healthProfile = null) => {
     try {
 
         let systemMessageContent = SYSTEM_PROMPT;
         if (contextData) {
             systemMessageContent += `\n\nCurrent Context provided by system:\n${JSON.stringify(contextData)}`;
+        }
+        
+        if (healthProfile) {
+            systemMessageContent += `\n\nUser Health Profile (Personalize responses accordingly):\n${JSON.stringify(healthProfile)}`;
         }
 
         const messages = [
@@ -81,12 +85,16 @@ export const askAI = async (message, contextData, previousMessages = []) => {
     }
 };
 
-export const askAIStream = async (message, contextData, previousMessages = []) => {
+export const askAIStream = async (message, contextData, previousMessages = [], healthProfile = null) => {
     try {
 
         let systemMessageContent = SYSTEM_PROMPT;
         if (contextData) {
             systemMessageContent += `\n\nCurrent Context provided by system:\n${JSON.stringify(contextData)}`;
+        }
+        
+        if (healthProfile) {
+            systemMessageContent += `\n\nUser Health Profile (Personalize responses accordingly):\n${JSON.stringify(healthProfile)}`;
         }
 
         const messages = [

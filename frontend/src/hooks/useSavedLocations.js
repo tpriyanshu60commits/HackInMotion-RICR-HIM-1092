@@ -1,5 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { locationService, environmentService } from '../services/api';
+import useStore from '../store/useStore';
+import { io } from 'socket.io-client';
 
 const getWeatherInfo = (code) => {
   if (code === 0) return { condition: 'Clear', icon: 'Sun' };
@@ -24,6 +26,34 @@ export function useSavedLocations() {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const user = useStore(state => state.user);
+
+  useEffect(() => {
+    if (!user?._id) return;
+    
+    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+      withCredentials: true
+    });
+    
+    socket.emit('join', user._id);
+    
+    socket.on('location:update', ({ locationId, data }) => {
+      setLocations(prevLocs => prevLocs.map(loc => {
+        if (loc.id === locationId || loc.id === locationId.toString()) {
+          return {
+            ...loc,
+            aqi: data.aqi,
+            status: getAqiStatus(data.aqi),
+            temperature: data.temperature ? Math.round(data.temperature) : loc.temperature,
+            condition: data.weather || loc.condition,
+          };
+        }
+        return loc;
+      }));
+    });
+    
+    return () => socket.disconnect();
+  }, [user?._id]);
 
   const fetchLocations = useCallback(async () => {
     setLoading(true);

@@ -1,7 +1,7 @@
 import Report from '../models/Report.js';
 import { checkEscalation, checkEscalations } from '../utils/escalation.js';
 
-export const createReport = async (req, res) => {
+export const createReport = async (req, res, next) => {
   try {
     const { category, title, description, lat, lng, address, createdBy } = req.body;
     let photoUrl = '';
@@ -27,32 +27,32 @@ export const createReport = async (req, res) => {
     res.status(201).json({ success: true, data: newReport });
   } catch (error) {
     console.error('Create report error:', error);
-    res.status(500).json({ success: false, error: 'Failed to create report', details: error.stack });
+    next(error);
   }
 };
 
-export const getAllReports = async (req, res) => {
+export const getAllReports = async (req, res, next) => {
   try {
     let reports = await Report.find().sort({ createdAt: -1 });
     reports = await checkEscalations(reports);
     res.json({ success: true, data: reports });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to fetch reports' });
+    next(error);
   }
 };
 
-export const getMyReports = async (req, res) => {
+export const getMyReports = async (req, res, next) => {
   try {
     const { userId } = req.params;
     let reports = await Report.find({ createdBy: userId }).sort({ createdAt: -1 });
     reports = await checkEscalations(reports);
     res.json({ success: true, data: reports });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to fetch user reports' });
+    next(error);
   }
 };
 
-export const getReportById = async (req, res) => {
+export const getReportById = async (req, res, next) => {
   try {
     let report = await Report.findById(req.params.id);
     if (!report) {
@@ -61,11 +61,11 @@ export const getReportById = async (req, res) => {
     report = await checkEscalation(report);
     res.json({ success: true, data: report });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to fetch report' });
+    next(error);
   }
 };
 
-export const updateStatus = async (req, res) => {
+export const updateStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
     const report = await Report.findById(req.params.id);
@@ -79,11 +79,11 @@ export const updateStatus = async (req, res) => {
     
     res.json({ success: true, data: report });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to update status' });
+    next(error);
   }
 };
 
-export const upvoteReport = async (req, res) => {
+export const upvoteReport = async (req, res, next) => {
   try {
     const report = await Report.findById(req.params.id);
     
@@ -96,11 +96,11 @@ export const upvoteReport = async (req, res) => {
     
     res.json({ success: true, data: report });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to upvote report' });
+    next(error);
   }
 };
 
-export const escalateToCMHelp = async (req, res) => {
+export const escalateToCMHelp = async (req, res, next) => {
   try {
     const report = await Report.findById(req.params.id);
     
@@ -114,11 +114,11 @@ export const escalateToCMHelp = async (req, res) => {
     
     res.json({ success: true, data: report });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to escalate report' });
+    next(error);
   }
 };
 
-export const acceptEscalation = async (req, res) => {
+export const acceptEscalation = async (req, res, next) => {
   try {
     const report = await Report.findById(req.params.id);
     
@@ -133,6 +133,6 @@ export const acceptEscalation = async (req, res) => {
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     res.redirect(`${clientUrl}/report?accepted=true&id=${report._id}`);
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to accept escalation' });
+    next(error);
   }
 };
