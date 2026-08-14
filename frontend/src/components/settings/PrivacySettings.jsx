@@ -42,7 +42,7 @@ export const PrivacySettings = () => {
   const handleExport = async () => {
     setExportStatus('loading');
     try {
-      const response = await api.get('/profile/export');
+      const response = await api.get('/v1/profile/export');
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(response.data.data, null, 2));
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute("href",     dataStr);
@@ -62,7 +62,7 @@ export const PrivacySettings = () => {
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      await api.delete('/profile');
+      await api.delete('/v1/profile');
       logout();
       window.location.href = '/login';
     } catch (error) {

@@ -40,12 +40,12 @@ export const MainLayout = () => {
 
   return (
     <WeatherBackground>
-      <div className="min-h-screen w-full flex flex-col text-text-main overflow-x-hidden">
+      <div className="min-h-screen  w-full flex flex-col text-text-main overflow-x-hidden">
 
         {/* =====================================================
             TOP NAVBAR
         ====================================================== */}
-        <header className="glass border-b border-border fixed top-2 z-100 w-full h-16 hidden md:flex items-center justify-between px-4 md:px-8 rounded-2xl">
+        <header className="glass border-b border-border mt-5 fixed top-2 z-100 w-19/20 h-16 hidden md:flex items-center justify-between px-4 ms-10 md:px-8 rounded-full">
 
           {/* Logo Section */}
           <Link to="/dashboard" className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity">
@@ -174,7 +174,7 @@ export const MainLayout = () => {
         {/* =====================================================
             MAIN CONTENT
         ====================================================== */}
-        <main className="flex-1 w-full relative mt-0 md:mt-10 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
+        <main className="flex-1 w-full relative mt-0 md:mt-20 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
           <Outlet />
         </main>
 
