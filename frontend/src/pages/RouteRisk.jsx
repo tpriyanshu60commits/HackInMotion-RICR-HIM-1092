@@ -1,5 +1,6 @@
 // ✅ master: React default import not needed in modern React (17+)
 import { useState } from 'react';
+import { LocationSearch } from '../components/common/LocationSearch';
 
 // ✅ feature/SS06: all icons used in the component body
 import {
@@ -84,37 +85,25 @@ export const RouteRisk = () => {
         </div>
 
         {/* Location Inputs */}
-        <div className="w-full bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-4 lg:p-6 shadow-2xl flex flex-col lg:flex-row items-center gap-4 lg:gap-6">
+        <div className="w-full relative z-30 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-4 lg:p-6 shadow-2xl flex flex-col lg:flex-row items-center gap-4 lg:gap-6">
 
-          <div className="flex-1 w-full relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.07] flex items-center justify-center group-focus-within:bg-green-400/10 group-focus-within:border-green-400/20 transition-all">
-              <MapPin
-                size={16}
-                className="text-gray-400 group-focus-within:text-green-400 transition-colors"
-              />
-            </div>
-            <input
-              type="text"
-              value={origin}
-              onChange={e => setOrigin(e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-xl pl-16 pr-4 py-4 outline-none focus:border-white/20 focus:bg-white/[0.04] text-white font-medium transition-all"
+          <div className="flex-1 w-full relative group z-20">
+            <LocationSearch
+              initialQuery={origin}
+              onLocationSelect={(loc) => setOrigin(loc.name)}
+              retainSelection={true}
+              className="w-full"
             />
           </div>
 
           <ArrowRight className="text-gray-500 hidden lg:block shrink-0" size={20} />
 
-          <div className="flex-1 w-full relative group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.07] flex items-center justify-center group-focus-within:bg-green-400/10 group-focus-within:border-green-400/20 transition-all">
-              <MapPin
-                size={16}
-                className="text-gray-400 group-focus-within:text-green-400 transition-colors"
-              />
-            </div>
-            <input
-              type="text"
-              value={destination}
-              onChange={e => setDestination(e.target.value)}
-              className="w-full bg-black/40 border border-white/10 rounded-xl pl-16 pr-4 py-4 outline-none focus:border-white/20 focus:bg-white/[0.04] text-white font-medium transition-all"
+          <div className="flex-1 w-full relative group z-10">
+            <LocationSearch
+              initialQuery={destination}
+              onLocationSelect={(loc) => setDestination(loc.name)}
+              retainSelection={true}
+              className="w-full"
             />
           </div>
 

@@ -83,17 +83,17 @@ export const LocationSearch = ({ onLocationSelect, className, initialQuery = '',
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0A0F0D]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto animate-fade-in-up z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0A0F0D] border border-white/20 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden max-h-64 overflow-y-auto animate-fade-in-up z-[9999]">
           {results.map((loc) => (
             <button
               key={loc.place_id}
               onClick={() => handleSelect(loc)}
-              className="w-full text-left px-4 py-3 border-b border-white/5 hover:bg-white/10 flex items-start gap-3 transition-colors last:border-b-0"
+              className="w-full text-left px-4 py-3 border-b border-white/10 hover:bg-white/10 focus:bg-white/10 focus:outline-none flex items-start gap-3 transition-colors last:border-b-0 cursor-pointer"
             >
               <MapPin size={18} className="text-green-400 mt-1 shrink-0" />
               <div>
                 <div className="text-sm font-medium text-white line-clamp-1">{loc.display_name.split(',')[0]}</div>
-                <div className="text-xs text-gray-400 line-clamp-1">{loc.display_name}</div>
+                <div className="text-xs text-gray-300 line-clamp-1">{loc.display_name}</div>
               </div>
             </button>
           ))}
