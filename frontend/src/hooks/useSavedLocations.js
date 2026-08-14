@@ -1,5 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
-import { locationService, environmentService, API_BASE_URL } from '../services/api';
+import {
+  locationService,
+  environmentService,
+  API_BASE_URL
+} from '../services/api';
 import useStore from '../store/useStore';
 import { io } from 'socket.io-client';
 
@@ -10,6 +14,7 @@ const getWeatherInfo = (code) => {
   if (code >= 51 && code <= 67) return { condition: 'Rain', icon: 'CloudRain' };
   if (code >= 71 && code <= 77) return { condition: 'Snow', icon: 'Cloud' };
   if (code >= 80 && code <= 99) return { condition: 'Storm', icon: 'CloudRain' };
+
   return { condition: 'Unknown', icon: 'Cloud' };
 };
 
@@ -19,6 +24,7 @@ const getAqiStatus = (aqi) => {
   if (aqi <= 150) return 'Sensitive';
   if (aqi <= 200) return 'Unhealthy';
   if (aqi <= 300) return 'Very Unhealthy';
+
   return 'Hazardous';
 };
 
@@ -26,57 +32,85 @@ export function useSavedLocations() {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const user = useStore(state => state.user);
+
+  const user = useStore((state) => state.user);
 
   useEffect(() => {
     if (!user?._id) return;
-    
-<<<<<<< Updated upstream
-    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
-=======
-    const socketUrl = API_BASE_URL.replace(/\/api$/, '');
+
+    // API_BASE_URL normally contains something like:
+    // https://your-backend.onrender.com/api
+    // Socket.IO needs the backend root:
+    // https://your-backend.onrender.com
+    const socketUrl = API_BASE_URL
+      ? API_BASE_URL.replace(/\/api\/?$/, '')
+      : 'http://localhost:5000';
+
     const socket = io(socketUrl, {
->>>>>>> Stashed changes
-      withCredentials: true
+      withCredentials: true,
     });
-    
+
     socket.emit('join', user._id);
-    
+
     socket.on('location:update', ({ locationId, data }) => {
-      setLocations(prevLocs => prevLocs.map(loc => {
-        if (loc.id === locationId || loc.id === locationId.toString()) {
-          return {
-            ...loc,
-            aqi: data.aqi,
-            status: getAqiStatus(data.aqi),
-            temperature: data.temperature ? Math.round(data.temperature) : loc.temperature,
-            condition: data.weather || loc.condition,
-          };
-        }
-        return loc;
-      }));
+      setLocations((prevLocs) =>
+        prevLocs.map((loc) => {
+          if (
+            loc.id === locationId ||
+            loc.id === locationId?.toString()
+          ) {
+            return {
+              ...loc,
+              aqi: data.aqi,
+              status: getAqiStatus(data.aqi),
+              temperature: data.temperature
+                ? Math.round(data.temperature)
+                : loc.temperature,
+              condition: data.weather || loc.condition,
+            };
+          }
+
+          return loc;
+        })
+      );
     });
-    
-    return () => socket.disconnect();
+
+    return () => {
+      socket.disconnect();
+    };
   }, [user?._id]);
 
   const fetchLocations = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
       // 1. Fetch saved locations from DB
       const dbRes = await locationService.getSaved();
-      // Handle standard response shapes: dbRes.data.data is used by our backend controllers
-      const savedLocs = dbRes.data?.data || dbRes.data || []; 
 
-      // 2. Fetch live data for each location
+      const savedLocs =
+        dbRes.data?.data ||
+        dbRes.data ||
+        [];
+
+      // 2. Fetch live environment data
       const enrichedLocs = await Promise.all(
         savedLocs.map(async (loc) => {
           try {
-            const envRes = await environmentService.getCurrentByCoords(loc.latitude, loc.longitude);
-            const envData = envRes.data?.data || envRes.data || {};
-            
-            const weather = getWeatherInfo(envData.weatherCode || 0);
+            const envRes =
+              await environmentService.getCurrentByCoords(
+                loc.latitude,
+                loc.longitude
+              );
+
+            const envData =
+              envRes.data?.data ||
+              envRes.data ||
+              {};
+
+            const weather = getWeatherInfo(
+              envData.weatherCode || 0
+            );
 
             return {
               id: loc._id || loc.id,
@@ -88,13 +122,19 @@ export function useSavedLocations() {
               longitude: loc.longitude,
               aqi: envData.aqi || 0,
               status: getAqiStatus(envData.aqi || 0),
-              temperature: Math.round(envData.temperature || 0),
+              temperature: Math.round(
+                envData.temperature || 0
+              ),
               condition: weather.condition,
               icon: weather.icon,
             };
           } catch (err) {
-            console.error(`Failed to fetch live data for ${loc.name}`, err);
-            // Return fallback if live data fails so the location still renders
+            console.error(
+              `Failed to fetch live data for ${loc.name}`,
+              err
+            );
+
+            // Fallback so saved location still renders
             return {
               id: loc._id || loc.id,
               name: loc.name,
@@ -115,7 +155,11 @@ export function useSavedLocations() {
 
       setLocations(enrichedLocs);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to fetch saved locations');
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to fetch saved locations'
+      );
     } finally {
       setLoading(false);
     }
@@ -123,16 +167,36 @@ export function useSavedLocations() {
 
   const addLocation = async (data) => {
     setLoading(true);
+    setError(null);
+
     try {
       const res = await locationService.save(data);
+
       if (res.data) {
-        await fetchLocations(); // Re-fetch all to get live data for the new one
-        return { success: true, data: res.data };
+        await fetchLocations();
+
+        return {
+          success: true,
+          data: res.data,
+        };
       }
+
+      return {
+        success: false,
+        error: 'Failed to save location',
+      };
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Failed to save location';
+      const errorMsg =
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to save location';
+
       setError(errorMsg);
-      return { success: false, error: errorMsg };
+
+      return {
+        success: false,
+        error: errorMsg,
+      };
     } finally {
       setLoading(false);
     }
@@ -140,14 +204,27 @@ export function useSavedLocations() {
 
   const removeLocation = async (id) => {
     setLoading(true);
+    setError(null);
+
     try {
       await locationService.delete(id);
       await fetchLocations();
-      return { success: true };
+
+      return {
+        success: true,
+      };
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Failed to delete location';
+      const errorMsg =
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to delete location';
+
       setError(errorMsg);
-      return { success: false, error: errorMsg };
+
+      return {
+        success: false,
+        error: errorMsg,
+      };
     } finally {
       setLoading(false);
     }
@@ -159,6 +236,6 @@ export function useSavedLocations() {
     error,
     fetchLocations,
     addLocation,
-    removeLocation
+    removeLocation,
   };
 }

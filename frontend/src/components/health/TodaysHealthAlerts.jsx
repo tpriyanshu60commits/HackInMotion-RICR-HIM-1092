@@ -45,6 +45,7 @@ export const TodaysHealthAlerts = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLatestReport();
     
     // Listen for the custom event to refresh when a new report is generated

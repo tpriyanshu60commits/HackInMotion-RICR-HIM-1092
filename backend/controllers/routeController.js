@@ -3,7 +3,7 @@ import { geocodeLocation, getRoute, getAmenitiesNearPoint } from '../services/ge
 import { sampleRoutePoints } from '../utils/samplePoints.js';
 import { calculateBaseRisk } from '../services/riskEngine.js';
 
-export const analyzeRoute = async (req, res, next) => {
+export const analyzeRoute = async (req, res, _next) => {
   try {
     const { origin, destination } = req.body;
 

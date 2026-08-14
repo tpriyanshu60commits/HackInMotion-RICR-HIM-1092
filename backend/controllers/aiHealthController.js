@@ -44,7 +44,7 @@ export const getProfile = async (req, res, next) => {
 // @desc    Generate a new AI health report
 // @route   POST /api/ai-health/report/generate
 // @access  Private
-export const generateReport = async (req, res, next) => {
+export const generateReport = async (req, res, _next) => {
   let currentStage = 'init';
   try {
     currentStage = 'user_auth';

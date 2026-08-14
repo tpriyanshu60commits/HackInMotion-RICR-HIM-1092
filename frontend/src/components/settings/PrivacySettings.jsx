@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Shield, Download, Trash2, CheckCircle2 } from 'lucide-react';
+import { Shield, Download, Trash2, CheckCircle2, Eye, Share2, Activity, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { cn } from '../../utils/utils';
 import useStore from '../../store/useStore';
-import { usersAPI } from '../../services/api';
+import { usersAPI, profileAPI } from '../../services/api';
 
 export const PrivacySettings = () => {
   const user = useStore(state => state.user);
@@ -19,9 +19,10 @@ export const PrivacySettings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [exportStatus, setExportStatus] = useState('idle'); // idle | loading | done
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   const navigate = useNavigate();
-  const logout = useStore(state => state.logout);
-  const user = useStore(state => state.user);
   const location = useStore(state => state.location);
   const weatherCondition = useStore(state => state.weatherCondition);
   const currentAQI = useStore(state => state.currentAQI);
@@ -97,16 +98,16 @@ export const PrivacySettings = () => {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (confirmed) {
-      try {
-        await usersAPI.deleteAccount();
-        logout();
-        navigate('/');
-      } catch (error) {
-        console.error("Failed to delete account", error);
-        alert("Failed to delete account. Please try again later.");
-      }
+    setIsDeleting(true);
+    try {
+      await usersAPI.deleteAccount();
+      logout();
+      navigate('/');
+    } catch (error) {
+      console.error("Failed to delete account", error);
+      alert("Failed to delete account. Please try again later.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -270,13 +271,6 @@ export const PrivacySettings = () => {
               </button>
             )}
           </div>
-          <button 
-            onClick={handleDeleteAccount}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-lg text-sm font-medium transition-colors"
-          >
-            <Trash2 size={16} />
-            Delete Account
-          </button>
         </div>
 
       </div>
