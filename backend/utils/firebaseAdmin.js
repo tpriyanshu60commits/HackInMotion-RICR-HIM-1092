@@ -1,12 +1,13 @@
-import admin from 'firebase-admin';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getMessaging } from 'firebase-admin/messaging';
 
 export const initFirebaseAdmin = () => {
   try {
-    if (admin.apps.length === 0) {
+    if (getApps().length === 0) {
       if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
         const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount)
+        initializeApp({
+          credential: cert(serviceAccount)
         });
         console.log('Firebase Admin initialized successfully');
       } else {
@@ -19,10 +20,10 @@ export const initFirebaseAdmin = () => {
 };
 
 export const sendPushNotification = async (fcmToken, title, body, data = {}) => {
-  if (!fcmToken || admin.apps.length === 0) return;
+  if (!fcmToken || getApps().length === 0) return;
   
   try {
-    await admin.messaging().send({
+    await getMessaging().send({
       token: fcmToken,
       notification: { title, body },
       data

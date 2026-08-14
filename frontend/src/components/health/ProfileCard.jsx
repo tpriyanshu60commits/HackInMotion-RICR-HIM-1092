@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { HeartPulse, Activity, FileText, Upload, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
-import { profileAPI } from '../../services/api';
+import { profileAPI, healthAPI } from '../../services/api';
 import { cn } from '../../utils/utils';
 
 export const ProfileCard = () => {
@@ -10,9 +10,12 @@ export const ProfileCard = () => {
   
   const [diagnosedConditions, setDiagnosedConditions] = useState(user?.healthProfile?.diagnosedConditions || []);
   const [prescribedMedication, setPrescribedMedication] = useState(user?.healthProfile?.prescribedMedication || []);
+  const [customIssue, setCustomIssue] = useState(user?.healthProfile?.customIssue || '');
+  const [reportFile, setReportFile] = useState(null);
   
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -21,20 +24,41 @@ export const ProfileCard = () => {
     if (user && user.healthProfile) {
       setDiagnosedConditions(user.healthProfile.diagnosedConditions || []);
       setPrescribedMedication(user.healthProfile.prescribedMedication || []);
+      setCustomIssue(user.healthProfile.customIssue || '');
     }
   }, [user]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await profileAPI.updateHealthProfile({ diagnosedConditions, prescribedMedication });
+      if (reportFile) {
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('image', reportFile);
+        formData.append('conditions', JSON.stringify(diagnosedConditions));
+        formData.append('customIssue', customIssue);
+        
+        await healthAPI.uploadHealthReport(formData);
+        
+        // Also update regular profile conditions
+        await profileAPI.updateHealthProfile({ diagnosedConditions, prescribedMedication, customIssue });
+        
+        setUploadSuccess(true);
+        setIsUploading(false);
+        setReportFile(null); // Clear after upload
+      } else {
+        await profileAPI.updateHealthProfile({ diagnosedConditions, prescribedMedication, customIssue });
+      }
+
       const fullProfile = await profileAPI.getProfile();
       updateUserProfile(fullProfile.data.data);
       
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+      setTimeout(() => setUploadSuccess(false), 3000);
     } catch (error) {
       console.error('Failed to save health profile', error);
+      setIsUploading(false);
     } finally {
       setIsSaving(false);
     }
@@ -48,20 +72,30 @@ export const ProfileCard = () => {
     }
   };
 
-  const handleSimulatedUpload = () => {
-    setIsUploading(true);
-    // Simulate OCR processing time
-    setTimeout(() => {
-      setIsUploading(false);
-      setUploadSuccess(true);
-      // Auto-populate mock structured fields from "Doctor's Report"
-      const autoConditions = ["Asthma", "Hypertension"];
-      const newConditions = [...new Set([...diagnosedConditions, ...autoConditions])];
-      setDiagnosedConditions(newConditions);
-      setPrescribedMedication(["Inhaler - Salbutamol", "BP Medication"]);
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setReportFile(e.target.files[0]);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
+    try {
+      const response = await healthAPI.downloadReportPDF();
       
-      setTimeout(() => setUploadSuccess(false), 4000);
-    }, 1500);
+      // Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `health-report-${Date.now()}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Failed to download PDF', error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -79,21 +113,20 @@ export const ProfileCard = () => {
       </div>
 
       <div className="space-y-6 flex-1">
-        {/* Doctor's Report (Simulated Upload) */}
+        {/* Doctor's Report (Upload) */}
         <div className="space-y-2">
           <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
             <FileText size={14} /> Doctor's Report Upload
           </h3>
           
-          <button 
-            onClick={handleSimulatedUpload}
-            disabled={isUploading}
+          <label 
             className={cn(
-              "w-full border border-dashed rounded-xl p-4 flex flex-col items-center justify-center transition-all",
-              isUploading ? "border-gray-500 bg-gray-500/10" : 
+              "w-full border border-dashed rounded-xl p-4 flex flex-col items-center justify-center transition-all cursor-pointer relative",
+              isUploading ? "border-gray-500 bg-gray-500/10 pointer-events-none" : 
               uploadSuccess ? "border-green-500 bg-green-500/10" : "border-white/20 bg-white/5 hover:bg-white/10"
             )}
           >
+            <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} disabled={isUploading} />
             {isUploading ? (
               <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
             ) : uploadSuccess ? (
@@ -101,10 +134,12 @@ export const ProfileCard = () => {
             ) : (
               <Upload className="text-gray-400 mb-1" size={20} />
             )}
-            <span className="text-sm font-medium text-gray-300 mt-2">
-              {isUploading ? "Scanning document..." : uploadSuccess ? "Data extracted!" : "Upload Medical Report (Simulated)"}
+            <span className="text-sm font-medium text-gray-300 mt-2 text-center">
+              {isUploading ? "Uploading report..." : 
+               uploadSuccess ? "Report uploaded & monitoring started!" : 
+               reportFile ? `Selected: ${reportFile.name}` : "Click to select Medical Report Image"}
             </span>
-          </button>
+          </label>
         </div>
 
         {/* Conditions */}
@@ -141,6 +176,17 @@ export const ProfileCard = () => {
           </div>
         </div>
 
+        {/* Custom Issue */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Additional/Custom Conditions</h3>
+          <textarea
+            value={customIssue}
+            onChange={(e) => setCustomIssue(e.target.value)}
+            placeholder="E.g. Migraines, allergic to pollen..."
+            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/20 focus:bg-white/[0.04] text-white font-medium text-sm transition-all min-h-[80px]"
+          />
+        </div>
+
         {/* Prescribed Meds (Read Only - Populated by Mock Upload) */}
         {prescribedMedication.length > 0 && (
           <div className="space-y-2">
@@ -153,15 +199,33 @@ export const ProfileCard = () => {
           </div>
         )}
       </div>
-      <div className="mt-6 flex justify-end">
+
+      <div className="mt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        {user?.monitoringActive ? (
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30"
+          >
+            {isDownloading ? (
+              <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <FileText size={18} />
+            )}
+            {isDownloading ? "Generating PDF..." : "Download Report PDF"}
+          </button>
+        ) : (
+          <div></div> // Spacer
+        )}
+
         <button
           onClick={handleSave}
           disabled={isSaving}
           className={cn(
-            "flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm",
+            "w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm",
             saveSuccess ? "bg-green-500/20 text-green-400 border border-green-500/30" :
             isSaving ? "bg-white/10 text-gray-400 border border-white/10" :
-            "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+            "bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-500/20"
           )}
         >
           {isSaving ? (
