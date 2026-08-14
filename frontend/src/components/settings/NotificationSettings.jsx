@@ -5,16 +5,16 @@ import { profileAPI } from '../../services/api';
 import { cn } from '../../utils/utils';
 
 export const NotificationSettings = () => {
-  const user = useStore(state => state.user);
-  const updateUserProfile = useStore(state => state.updateUserProfile);
-  
+  const user = useStore((state) => state.user);
+  const updateUserProfile = useStore((state) => state.updateUserProfile);
+
   const [isMuted, setIsMuted] = useState(user?.notificationSettings?.isMuted || false);
-  const [voiceAlertsEnabled, setVoiceAlertsEnabled] = useState(user?.notificationSettings?.voiceAlertsEnabled || false);
+  const [voiceAlertsEnabled, setVoiceAlertsEnabled] = useState(
+    user?.notificationSettings?.voiceAlertsEnabled || false
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
-
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -22,7 +22,7 @@ export const NotificationSettings = () => {
       await profileAPI.updateNotificationSettings({ isMuted, voiceAlertsEnabled });
       const fullProfile = await profileAPI.getProfile();
       updateUserProfile(fullProfile.data.data);
-      
+
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
@@ -45,20 +45,31 @@ export const NotificationSettings = () => {
       </div>
 
       <div className="space-y-6">
-        
         {/* Sound Toggle */}
         <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
           <div className="flex items-center gap-4">
-            <div className={cn("p-2 rounded-lg", !isMuted ? "bg-green-500/20 text-green-400" : "bg-gray-500/20 text-gray-400")}>
+            <div
+              className={cn(
+                'p-2 rounded-lg',
+                !isMuted ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
+              )}
+            >
               {!isMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
             </div>
             <div>
               <h3 className="text-sm font-semibold text-white">Alert Sounds</h3>
-              <p className="text-xs text-gray-400 mt-1">Play a chime when a new live alert arrives.</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Play a chime when a new live alert arrives.
+              </p>
             </div>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" className="sr-only peer" checked={!isMuted} onChange={(e) => setIsMuted(!e.target.checked)} />
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={!isMuted}
+              onChange={(e) => setIsMuted(!e.target.checked)}
+            />
             <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
           </label>
         </div>
@@ -66,30 +77,45 @@ export const NotificationSettings = () => {
         {/* Voice Alerts Toggle */}
         <div className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl">
           <div className="flex items-center gap-4">
-            <div className={cn("p-2 rounded-lg", voiceAlertsEnabled ? "bg-green-500/20 text-green-400" : "bg-gray-500/20 text-gray-400")}>
+            <div
+              className={cn(
+                'p-2 rounded-lg',
+                voiceAlertsEnabled
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-gray-500/20 text-gray-400'
+              )}
+            >
               <Mic size={20} />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-white">Voice Alerts</h3>
-              <p className="text-xs text-gray-400 mt-1">Read high-priority alerts out loud (Web Speech API).</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Read high-priority alerts out loud (Web Speech API).
+              </p>
             </div>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" className="sr-only peer" checked={voiceAlertsEnabled} onChange={(e) => setVoiceAlertsEnabled(e.target.checked)} />
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={voiceAlertsEnabled}
+              onChange={(e) => setVoiceAlertsEnabled(e.target.checked)}
+            />
             <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
           </label>
         </div>
-
       </div>
       <div className="mt-8 flex justify-end">
         <button
           onClick={handleSave}
           disabled={isSaving}
           className={cn(
-            "flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm",
-            saveSuccess ? "bg-green-500/20 text-green-400 border border-green-500/30" :
-            isSaving ? "bg-white/10 text-gray-400 border border-white/10" :
-            "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+            'flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm',
+            saveSuccess
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : isSaving
+                ? 'bg-white/10 text-gray-400 border border-white/10'
+                : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
           )}
         >
           {isSaving ? (
@@ -97,7 +123,7 @@ export const NotificationSettings = () => {
           ) : saveSuccess ? (
             <CheckCircle2 size={18} />
           ) : null}
-          {isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save Changes"}
+          {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
     </div>

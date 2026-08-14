@@ -12,7 +12,7 @@ const validateRequest = (schema) => async (req, res, next) => {
       path: e.path.join('.'),
       message: e.message,
     }));
-    
+
     return res.status(400).json({
       success: false,
       message: 'Validation failed',

@@ -6,22 +6,20 @@ import translationHI from './locales/hi/translation.json';
 
 const resources = {
   en: {
-    translation: translationEN
+    translation: translationEN,
   },
   hi: {
-    translation: translationHI
-  }
+    translation: translationHI,
+  },
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: 'en',
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false 
-    }
-  });
+i18n.use(initReactI18next).init({
+  resources,
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export default i18n;

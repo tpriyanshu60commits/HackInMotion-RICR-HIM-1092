@@ -1,4 +1,3 @@
-
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Menu as MenuIcon, Settings } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -26,32 +25,34 @@ export const BottomNavMobile = ({ setMobileMenuOpen }) => {
             <>
               <motion.div
                 variants={{
-                  active: { 
-                    y: shouldReduceMotion ? 0 : -5, 
-                    scale: shouldReduceMotion ? 1 : 1.1 
+                  active: {
+                    y: shouldReduceMotion ? 0 : -5,
+                    scale: shouldReduceMotion ? 1 : 1.1,
                   },
                   inactive: { y: 0, scale: 1 },
-                  tap: { 
-                    y: shouldReduceMotion ? 0 : -5, 
-                    scale: shouldReduceMotion ? 1 : 1.05 
-                  }
+                  tap: {
+                    y: shouldReduceMotion ? 0 : -5,
+                    scale: shouldReduceMotion ? 1 : 1.05,
+                  },
                 }}
                 initial="inactive"
                 animate={isActive ? 'active' : 'inactive'}
                 whileTap="tap"
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 className={cn(
-                  "p-2 rounded-xl transition-colors duration-200",
-                  isActive ? "bg-green-500/20 text-green-400" : "text-text-muted",
-                  item.isAction && "bg-white/5 text-white/90 p-3 rounded-full"
+                  'p-2 rounded-xl transition-colors duration-200',
+                  isActive ? 'bg-green-500/20 text-green-400' : 'text-text-muted',
+                  item.isAction && 'bg-white/5 text-white/90 p-3 rounded-full'
                 )}
               >
                 <item.icon size={item.isAction ? 24 : 20} strokeWidth={2} />
               </motion.div>
-              <span className={cn(
-                "text-[10px] font-medium mt-1 transition-colors duration-200",
-                isActive ? "text-green-400" : "text-text-muted"
-              )}>
+              <span
+                className={cn(
+                  'text-[10px] font-medium mt-1 transition-colors duration-200',
+                  isActive ? 'text-green-400' : 'text-text-muted'
+                )}
+              >
                 {item.label}
               </span>
             </>

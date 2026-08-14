@@ -6,7 +6,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 
 const TrendChart = ({ locationId }) => {
@@ -16,22 +16,18 @@ const TrendChart = ({ locationId }) => {
 
   useEffect(() => {
     if (!locationId) return;
-    
+
     const fetchSnapshots = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/snapshots/${locationId}?range=${range}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        const result = await res.json();
-        
+        const { environmentService } = await import('../services/api');
+        const res = await environmentService.getSnapshots(locationId, range);
+        const result = res.data;
+
         if (result.success) {
-          const formatted = result.data.map(d => ({
+          const formatted = result.data.map((d) => ({
             ...d,
-            date: new Date(d.timestamp).toLocaleDateString()
+            date: new Date(d.timestamp).toLocaleDateString(),
           }));
           setData(formatted);
         }
@@ -55,8 +51,8 @@ const TrendChart = ({ locationId }) => {
               key={r}
               onClick={() => setRange(r)}
               className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                range === r 
-                  ? 'bg-green-600 text-white' 
+                range === r
+                  ? 'bg-green-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -69,24 +65,42 @@ const TrendChart = ({ locationId }) => {
       {loading ? (
         <div className="h-64 flex items-center justify-center text-gray-400">Loading trends...</div>
       ) : data.length === 0 ? (
-        <div className="h-64 flex items-center justify-center text-gray-400">No historical data available yet.</div>
+        <div className="h-64 flex items-center justify-center text-gray-400">
+          No historical data available yet.
+        </div>
       ) : (
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="colorAqi" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#16a34a" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#16a34a" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#16a34a" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
-              <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              <XAxis
+                dataKey="date"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: '#6b7280' }}
               />
-              <Area type="monotone" dataKey="aqi" stroke="#16a34a" strokeWidth={2} fillOpacity={1} fill="url(#colorAqi)" />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '8px',
+                  border: 'none',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="aqi"
+                stroke="#16a34a"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorAqi)"
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>

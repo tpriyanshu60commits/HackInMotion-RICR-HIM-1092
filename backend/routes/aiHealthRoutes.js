@@ -10,9 +10,7 @@ import {
 
 const router = express.Router();
 
-router.route('/profile')
-  .post(protect, saveProfile)
-  .get(protect, getProfile);
+router.route('/profile').post(protect, saveProfile).get(protect, getProfile);
 
 router.post('/report/generate', protect, uploadHealthReport.array('images', 5), generateReport);
 router.get('/report/latest', protect, getLatestReport);

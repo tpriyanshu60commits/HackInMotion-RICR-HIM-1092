@@ -30,7 +30,7 @@ export const registerUser = async (req, res, next) => {
       await sendEmail({
         to: user.email,
         subject: 'Verify your email address - VerdantX',
-        html: `<p>Please click this link to verify your email:</p><a href="${verifyUrl}">${verifyUrl}</a>`
+        html: `<p>Please click this link to verify your email:</p><a href="${verifyUrl}">${verifyUrl}</a>`,
       });
     } catch (emailError) {
       console.error('Registration email failed:', emailError.message);
@@ -127,7 +127,6 @@ export const updateUserProfile = async (req, res, next) => {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
 
-
       if (req.body.healthProfile) {
         user.healthProfile = { ...user.healthProfile, ...req.body.healthProfile };
       }
@@ -158,13 +157,18 @@ export const updateUserProfile = async (req, res, next) => {
 export const verifyEmail = async (req, res, next) => {
   try {
     const user = await User.findOne({ emailVerificationToken: req.params.token });
-    if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired verification token' });
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid or expired verification token' });
 
     user.emailVerified = true;
     user.emailVerificationToken = undefined;
     await user.save();
     res.json({ success: true, message: 'Email verified successfully' });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const forgotPassword = async (req, res, next) => {
@@ -182,23 +186,26 @@ export const forgotPassword = async (req, res, next) => {
       await sendEmail({
         to: user.email,
         subject: 'Password Reset - VerdantX',
-        html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`
+        html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`,
       });
       res.json({ success: true, message: 'Password reset email sent' });
-    } catch  {
+    } catch {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
       await user.save({ validateBeforeSave: false });
-      return res.status(500).json({ success: false, message: 'Email could not be sent' });
+      res.status(500);
+      return next(new Error('Email could not be sent'));
     }
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const resetPassword = async (req, res, next) => {
   try {
     const user = await User.findOne({
       resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() }
+      resetPasswordExpires: { $gt: Date.now() },
     });
     if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired token' });
 
@@ -207,7 +214,9 @@ export const resetPassword = async (req, res, next) => {
     user.resetPasswordExpires = undefined;
     await user.save();
     res.json({ success: true, message: 'Password reset successful' });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const googleAuthCallback = async (req, res, next) => {
@@ -215,7 +224,9 @@ export const googleAuthCallback = async (req, res, next) => {
     const token = generateToken(res, req.user._id);
     const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/login?token=${token}`;
     res.redirect(redirectUrl);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 // @desc    Update password securely
@@ -230,7 +241,7 @@ export const updatePassword = async (req, res, next) => {
     }
 
     const { currentPassword, newPassword } = req.body;
-    
+
     // For users who registered via OAuth and have no password
     if (user.password && !(await user.matchPassword(currentPassword))) {
       res.status(401);

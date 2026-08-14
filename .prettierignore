@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+.next
+.nuxt
+coverage
+.env*
+public
+!public/index.html
+package-lock.json
+*.log

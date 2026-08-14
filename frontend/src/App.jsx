@@ -6,7 +6,6 @@ import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
 
-
 // Pages
 import LandingPage from './pages/LandingPage';
 import { Login } from './pages/Login';
@@ -26,10 +25,16 @@ import NotFound from './pages/NotFound';
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isInitializing, user } = useStore();
 
-  if (isInitializing) return <div className="flex min-h-screen items-center justify-center"><WaterDropLoader message="Initializing Environment..." /></div>;
-  
+  if (isInitializing)
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <WaterDropLoader message="Initializing Environment..." />
+      </div>
+    );
+
   if (isAuthenticated) {
-    const dashboardRoute = user?.role === 'admin' || user?.userType === 'admin' ? '/admin' : '/dashboard';
+    const dashboardRoute =
+      user?.role === 'admin' || user?.userType === 'admin' ? '/admin' : '/dashboard';
     return <Navigate to={dashboardRoute} replace />;
   }
 
@@ -40,7 +45,12 @@ const PublicRoute = ({ children }) => {
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isInitializing } = useStore();
 
-  if (isInitializing) return <div className="flex min-h-screen items-center justify-center"><WaterDropLoader message="Verifying access..." /></div>;
+  if (isInitializing)
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <WaterDropLoader message="Verifying access..." />
+      </div>
+    );
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return children;
@@ -82,11 +92,38 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
-        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
 
-        <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        <Route
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/locations" element={<Locations />} />
           <Route path="/history" element={<HistoricalTrends />} />

@@ -1,25 +1,27 @@
-import js from "@eslint/js";
+import js from '@eslint/js';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
   js.configs.recommended,
   {
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: "module",
+      sourceType: 'module',
       globals: {
-        process: "readonly",
-        console: "readonly",
-        setTimeout: "readonly",
-        clearTimeout: "readonly",
-        setInterval: "readonly",
-        clearInterval: "readonly",
-        __dirname: "readonly",
-        fetch: "readonly",
-        FormData: "readonly"
-      }
+        process: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        __dirname: 'readonly',
+        fetch: 'readonly',
+        FormData: 'readonly',
+      },
     },
     rules: {
-      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
-    }
-  }
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    },
+  },
+  prettierConfig,
 ];

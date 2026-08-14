@@ -45,7 +45,11 @@ export const reverseGeocode = async (lat, lng) => {
 
     if (response.data) {
       return {
-        city: response.data.address.city || response.data.address.town || response.data.address.village || 'Unknown Location',
+        city:
+          response.data.address.city ||
+          response.data.address.town ||
+          response.data.address.village ||
+          'Unknown Location',
         country: response.data.address.country,
       };
     }

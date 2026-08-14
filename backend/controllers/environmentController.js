@@ -1,4 +1,8 @@
-import { getAirQualityByCoordinates, getAirQualityByCity, getHistoricalData } from '../services/airQualityService.js';
+import {
+  getAirQualityByCoordinates,
+  getAirQualityByCity,
+  getHistoricalData,
+} from '../services/airQualityService.js';
 
 // @desc    Get current environmental data by coordinates
 // @route   GET /api/environment/current
@@ -92,7 +96,10 @@ export const compareCities = async (req, res, next) => {
       throw new Error('Cities query parameter is required');
     }
 
-    const cityList = cities.split(',').map((c) => c.trim()).filter((c) => c);
+    const cityList = cities
+      .split(',')
+      .map((c) => c.trim())
+      .filter((c) => c);
 
     if (cityList.length < 2) {
       res.status(400);
@@ -106,7 +113,7 @@ export const compareCities = async (req, res, next) => {
       try {
         const data = await getAirQualityByCity(city, healthProfile);
         comparisons.push(data);
-      } catch{
+      } catch {
         comparisons.push({ city, error: 'Data unavailable' });
       }
     }

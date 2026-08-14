@@ -44,7 +44,7 @@ export const getProfile = async (req, res, next) => {
 // @desc    Generate a new AI health report
 // @route   POST /api/ai-health/report/generate
 // @access  Private
-export const generateReport = async (req, res, _next) => {
+export const generateReport = async (req, res, next) => {
   let currentStage = 'init';
   try {
     currentStage = 'user_auth';
@@ -54,13 +54,25 @@ export const generateReport = async (req, res, _next) => {
     currentStage = 'fetch_profile';
     const profile = await AIHealthProfile.findOne({ userId });
     if (!profile) {
-      console.error(`[generateReport] Failed at stage: ${currentStage}. Reason: Profile not found.`);
-      return res.status(400).json({ success: false, error: 'Health profile must be created first.', stage: currentStage });
+      console.error(
+        `[generateReport] Failed at stage: ${currentStage}. Reason: Profile not found.`
+      );
+      return res.status(400).json({
+        success: false,
+        error: 'Health profile must be created first.',
+        stage: currentStage,
+      });
     }
 
     if (!profile.primaryCity) {
-      console.error(`[generateReport] Failed at stage: ${currentStage}. Reason: Missing primaryCity.`);
-      return res.status(400).json({ success: false, error: 'Primary city is required in health profile.', stage: currentStage });
+      console.error(
+        `[generateReport] Failed at stage: ${currentStage}. Reason: Missing primaryCity.`
+      );
+      return res.status(400).json({
+        success: false,
+        error: 'Primary city is required in health profile.',
+        stage: currentStage,
+      });
     }
 
     // Check cache: reuse if < 3 hours old AND profile hasn't changed
@@ -68,7 +80,8 @@ export const generateReport = async (req, res, _next) => {
     const latestReport = await AIHealthReport.findOne({ userId }).sort({ createdAt: -1 });
     if (latestReport) {
       const reportAgeHours = (new Date() - new Date(latestReport.createdAt)) / (1000 * 60 * 60);
-      const profileChangedSinceReport = new Date(profile.updatedAt) > new Date(latestReport.createdAt);
+      const profileChangedSinceReport =
+        new Date(profile.updatedAt) > new Date(latestReport.createdAt);
 
       if (reportAgeHours < 3 && !profileChangedSinceReport) {
         return res.status(200).json({ success: true, data: latestReport, cached: true });
@@ -79,17 +92,18 @@ export const generateReport = async (req, res, _next) => {
     currentStage = 'fetch_environment_data';
     let environmentData;
     try {
-        environmentData = await getAirQualityByCity(profile.primaryCity);
+      environmentData = await getAirQualityByCity(profile.primaryCity);
     } catch (err) {
-        console.error(`[generateReport] Failed at stage: ${currentStage}. Error: ${err.message}`);
-        return res.status(500).json({ success: false, error: 'Could not fetch environmental data for the specified city.', details: err.message, stage: currentStage });
+      console.error(`[generateReport] Failed at stage: ${currentStage}. Error: ${err.message}`);
+      res.status(500);
+      return next(new Error('Could not fetch environmental data for the specified city.'));
     }
 
     // 3. Process uploaded medical images via OCR/Vision if any
     currentStage = 'process_images_ocr';
     let extractedMedicalContext = '';
-    const imageUrls = req.files ? req.files.map(file => file.path) : [];
-    
+    const imageUrls = req.files ? req.files.map((file) => file.path) : [];
+
     if (imageUrls.length > 0) {
       extractedMedicalContext = await analyzeMedicalImages(imageUrls);
     }
@@ -111,17 +125,22 @@ export const generateReport = async (req, res, _next) => {
       bestTimeWindow: aiReportJson.bestTimeWindow || '',
       cityComparisonNote: aiReportJson.cityComparisonNote || null,
       reportImageUrls: imageUrls,
-      rawModelResponse: JSON.stringify(aiReportJson)
+      rawModelResponse: JSON.stringify(aiReportJson),
     });
 
     await report.save();
 
     res.status(201).json({ success: true, data: report });
   } catch (error) {
-    console.error(`[generateReport] Caught an exception at stage: ${currentStage}. Full error:`, error);
+    console.error(
+      `[generateReport] Caught an exception at stage: ${currentStage}. Full error:`,
+      error
+    );
     // Explicitly return 400 if it was an API/Parsing issue from Groq, else 500
-    const statusCode = error.message.includes('Groq') || error.message.includes('validation') ? 400 : 500;
-    return res.status(statusCode).json({ success: false, error: error.message || 'Internal Server Error', stage: currentStage, details: error.stack });
+    const statusCode =
+      error.message.includes('Groq') || error.message.includes('validation') ? 400 : 500;
+    res.status(statusCode);
+    return next(error);
   }
 };
 

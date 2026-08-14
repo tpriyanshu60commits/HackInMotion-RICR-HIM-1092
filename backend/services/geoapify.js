@@ -49,11 +49,11 @@ export const getRoute = async (origin, destination) => {
     if (response.data.features && response.data.features.length > 0) {
       const route = response.data.features[0];
       const properties = route.properties;
-      
+
       // Geoapify routing geometry comes as [lon, lat], convert to [lat, lon] for Leaflet
       const rawGeometry = route.geometry.coordinates[0] || [];
-      const geometry = rawGeometry.map(coord => [coord[1], coord[0]]);
-      
+      const geometry = rawGeometry.map((coord) => [coord[1], coord[0]]);
+
       return {
         geometry,
         distanceKm: properties.distance / 1000,
@@ -69,17 +69,17 @@ export const getRoute = async (origin, destination) => {
 
 /**
  * Fetches amenities within a radius of a coordinate.
- * @param {number} lat 
- * @param {number} lng 
- * @param {number} radiusMeters 
+ * @param {number} lat
+ * @param {number} lng
+ * @param {number} radiusMeters
  * @returns {Promise<{fuelStations: any[], hotels: any[], hospitals: any[]}>}
  */
 export const getAmenitiesNearPoint = async (lat, lng, radiusMeters = 2000) => {
   try {
-    // Geoapify categories: 
+    // Geoapify categories:
     // service.vehicle.fuel, accommodation.hotel, healthcare.hospital
     const categories = 'service.vehicle.fuel,accommodation.hotel,healthcare.hospital';
-    
+
     const response = await axios.get(GEOAPIFY_PLACES_URL, {
       params: {
         categories,
@@ -94,7 +94,7 @@ export const getAmenitiesNearPoint = async (lat, lng, radiusMeters = 2000) => {
     const hospitals = [];
 
     if (response.data.features) {
-      response.data.features.forEach(feature => {
+      response.data.features.forEach((feature) => {
         const props = feature.properties;
         const place = {
           place_id: props.place_id,

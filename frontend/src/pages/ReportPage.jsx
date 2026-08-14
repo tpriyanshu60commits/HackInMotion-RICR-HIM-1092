@@ -11,16 +11,16 @@ import { AlertCircle, FileText, Globe2, PlusCircle } from 'lucide-react';
 
 export const ReportPage = () => {
   const { user } = useStore();
-  const { 
-    reports, 
-    myReports, 
-    loading, 
-    error, 
-    fetchAllReports, 
-    fetchMyReports, 
-    createReport, 
-    upvoteReport, 
-    escalateToCMHelp 
+  const {
+    reports,
+    myReports,
+    loading,
+    error,
+    fetchAllReports,
+    fetchMyReports,
+    createReport,
+    upvoteReport,
+    escalateToCMHelp,
   } = useReports();
 
   const [activeTab, setActiveTab] = useState('nearby'); // 'new', 'mine', 'nearby'
@@ -40,7 +40,7 @@ export const ReportPage = () => {
         newParams.delete('accepted');
         newParams.delete('id');
         setSearchParams(newParams);
-        
+
         // Hide message after 5 seconds
         setTimeout(() => setShowAcceptedMessage(false), 5000);
       }, 0);
@@ -65,13 +65,13 @@ export const ReportPage = () => {
         title: 'Report Submitted',
         message: 'Your environmental report has been successfully submitted and is pending review.',
         type: 'success',
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
   };
 
-  const selectedReport = selectedReportId 
-    ? [...reports, ...myReports].find(r => r._id === selectedReportId)
+  const selectedReport = selectedReportId
+    ? [...reports, ...myReports].find((r) => r._id === selectedReportId)
     : null;
 
   const TABS = [
@@ -81,12 +81,8 @@ export const ReportPage = () => {
   ];
 
   return (
-    <div 
-      className="min-h-screen w-full pt-8 pb-12 px-4 lg:px-8"
-      
-    >
+    <div className="min-h-screen w-full pt-8 pb-12 px-4 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
-        
         {/* Header & Navigation */}
         {!selectedReportId && (
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -95,21 +91,19 @@ export const ReportPage = () => {
                 <AlertCircle className="text-green-500" />
                 Community Reports
               </h1>
-              <p className="text-text-muted mt-1">
-                Report and track local environmental issues.
-              </p>
+              <p className="text-text-muted mt-1">Report and track local environmental issues.</p>
             </div>
 
             <GlassCard className="p-1.5 flex bg-[#0A0F0D]/80 backdrop-blur-xl border border-white/20">
-              {TABS.map(tab => (
+              {TABS.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
+                    'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300',
                     activeTab === tab.id
-                      ? "bg-green-500/20 text-green-400 shadow-sm"
-                      : "text-text-muted hover:text-white hover:bg-white/5"
+                      ? 'bg-green-500/20 text-green-400 shadow-sm'
+                      : 'text-text-muted hover:text-white hover:bg-white/5'
                   )}
                 >
                   <tab.icon size={16} />
@@ -135,7 +129,7 @@ export const ReportPage = () => {
 
         {/* Main Content Area */}
         {selectedReportId && selectedReport ? (
-          <ReportDetail 
+          <ReportDetail
             report={selectedReport}
             onBack={() => setSelectedReportId(null)}
             onUpvote={(id) => upvoteReport(id, user?._id)}
@@ -157,10 +151,10 @@ export const ReportPage = () => {
                     No reports found in your area.
                   </div>
                 )}
-                {reports.map(report => (
-                  <ReportCard 
-                    key={report._id} 
-                    report={report} 
+                {reports.map((report) => (
+                  <ReportCard
+                    key={report._id}
+                    report={report}
                     onUpvote={(id) => upvoteReport(id, user?._id)}
                     currentUserId={user?._id}
                     onClick={() => setSelectedReportId(report._id)}
@@ -181,14 +175,15 @@ export const ReportPage = () => {
                     You haven't submitted any reports yet.
                   </div>
                 )}
-                {user && myReports.map(report => (
-                  <ReportCard 
-                    key={report._id} 
-                    report={report} 
-                    currentUserId={user?._id}
-                    onClick={() => setSelectedReportId(report._id)}
-                  />
-                ))}
+                {user &&
+                  myReports.map((report) => (
+                    <ReportCard
+                      key={report._id}
+                      report={report}
+                      currentUserId={user?._id}
+                      onClick={() => setSelectedReportId(report._id)}
+                    />
+                  ))}
               </div>
             )}
 

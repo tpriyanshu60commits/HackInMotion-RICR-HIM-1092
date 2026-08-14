@@ -37,6 +37,7 @@ frontend/
 ## Installation
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -49,17 +50,20 @@ frontend/
 ## Environment Variables
 
 Make sure the following variables are set in your `.env` file:
+
 - `VITE_API_BASE_URL`: The URL to the backend API (e.g., `http://localhost:5000/api`)
 - `VITE_GEOAPIFY_MAP_KEY`: API Key for map tiles used in Route Risk.
 
 ## Running the App
 
 **Development Mode:**
+
 ```bash
 npm run dev
 ```
 
 **Production Build:**
+
 ```bash
 npm run build
 npm run preview
@@ -77,6 +81,7 @@ npm run preview
 ## Deployment
 
 The application is built as a static Single Page Application (SPA).
+
 1. Build the app using `npm run build`.
 2. Deploy the `dist/` directory to Vercel, Netlify, AWS S3, or any static hosting service.
 3. Configure the hosting platform to redirect all 404s to `index.html` to support client-side routing.

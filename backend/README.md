@@ -30,6 +30,7 @@ backend/
 ## Installation
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -42,6 +43,7 @@ backend/
 ## Environment Variables
 
 Make sure the following variables are set in your `.env` file:
+
 - `PORT`: (default 5000)
 - `MONGODB_URI`: MongoDB connection string
 - `JWT_SECRET`: Secret for signing tokens
@@ -49,16 +51,18 @@ Make sure the following variables are set in your `.env` file:
 - `GROQ_API_KEY`: Groq AI Key for health analysis
 - `CLIENT_URL`: URL of the frontend (e.g., http://localhost:5173)
 
-*(See `.env.example` for the full list of supported variables)*
+_(See `.env.example` for the full list of supported variables)_
 
 ## Running the Server
 
 **Development Mode (Nodemon):**
+
 ```bash
 npm run dev
 ```
 
 **Production Mode:**
+
 ```bash
 npm start
 ```

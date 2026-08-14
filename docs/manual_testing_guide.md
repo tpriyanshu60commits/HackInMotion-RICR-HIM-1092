@@ -5,11 +5,13 @@
 ## STEP 1 & 2 — PROJECT STRUCTURE & ARCHITECTURE
 
 ### Technology Stack
+
 - **Frontend**: React (Vite), Zustand (State Management), TailwindCSS, Framer Motion
 - **Backend**: Node.js, Express.js, Mongoose (MongoDB)
 - **External APIs**: Groq (AI), Cloudinary (Images), Nodemailer/EmailJS, Weather/AQI services (implied via external data).
 
 ### Standard Architecture Flow
+
 ```text
 User Interaction -> React Component -> API Service (Axios) -> Express Route -> Auth/Upload Middleware -> Controller -> Database (Mongoose) / External API -> JSON Response -> Zustand Store/Local State -> UI Update
 ```
@@ -19,6 +21,7 @@ User Interaction -> React Component -> API Service (Axios) -> Express Route -> A
 The application uses MongoDB via Mongoose. The following models are implemented:
 
 ### AIHealthProfile
+
 - **userId**
 - **required** (true)
 - **unique** (true)
@@ -40,6 +43,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **timestamps** (true)
 
 ### AIHealthReport
+
 - **userId**
 - **required** (true)
 - **environmentSnapshot**
@@ -67,6 +71,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **timestamps** (true)
 
 ### AirQualitySnapshot
+
 - **locationId**
 - **required** (false)
 - **city**
@@ -100,6 +105,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **timestamps** (true)
 
 ### Alert
+
 - **user**
 - **required** (true)
 - **location**
@@ -121,6 +127,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **timestamps** (true)
 
 ### CommunityReport
+
 - **user**
 - **required** (true)
 - **category**
@@ -142,6 +149,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **timestamps** (true)
 
 ### Conversation
+
 - **role**
 - **type** (String)
 - **content**
@@ -154,6 +162,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **type** (Date)
 
 ### Location
+
 - **user**
 - **required** (true)
 - **name**
@@ -179,6 +188,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **timestamps** (true)
 
 ### Report
+
 - **category**
 - **title**
 - **description**
@@ -195,6 +205,7 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **cmHelpForwardedAt**
 
 ### User
+
 - **name**
 - **type** (String)
 - **required** (true)
@@ -270,17 +281,20 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 ## STEP 8 & 9 — BACKEND APIS & ROUTES
 
 ### ai.js
+
 - **POST** `/ask`
 - **GET** `/history`
 - **DELETE** `/history`
 
 ### aiHealthRoutes.js
+
 - **POST** `/report/generate`
 - **GET** `/report/latest`
 
 ### alertRoutes.js
 
 ### authRoutes.js
+
 - **POST** `/register`
 - **POST** `/login`
 - **POST** `/logout`
@@ -295,10 +309,12 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 ### communityRoutes.js
 
 ### data.js
+
 - **GET** `/current`
 - **GET** `/forecast`
 
 ### environmentRoutes.js
+
 - **GET** `/current`
 - **GET** `/city`
 - **GET** `/history`
@@ -307,14 +323,17 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 ### locationRoutes.js
 
 ### locations.js
+
 - **POST** `/`
 - **GET** `/`
 - **DELETE** `/:id`
 
 ### profileRoutes.js
+
 - **GET** `/export`
 
 ### reports.js
+
 - **POST** `/`
 - **GET** `/`
 - **GET** `/mine/:userId`
@@ -325,72 +344,89 @@ The application uses MongoDB via Mongoose. The following models are implemented:
 - **GET** `/:id/accept-escalation`
 
 ### routeRoutes.js
+
 - **POST** `/analyze`
 
 ### snapshotRoutes.js
+
 - **GET** `/:locationId`
 
 ### userRoutes.js
+
 - **PATCH** `/profile`
 - **POST** `/profile-image`
 
 ## STEP 4 & 5 — FRONTEND PAGES & UI ELEMENTS
 
 ### Page: Alerts.jsx
+
 - **UI Elements**: 2 Buttons, 0 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: CityComparison.jsx
+
 - **UI Elements**: 2 Buttons, 1 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: Compare.jsx
+
 - **UI Elements**: 0 Buttons, 0 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: Dashboard.jsx
+
 - **UI Elements**: 0 Buttons, 0 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: Education.jsx
+
 - **UI Elements**: 0 Buttons, 0 Inputs, 0 Internal Links
 
 ### Page: HistoricalTrends.jsx
+
 - **UI Elements**: 1 Buttons, 0 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: LandingPage.jsx
+
 - **UI Elements**: 1 Buttons, 0 Inputs, 7 Internal Links
 - **Local State**: Yes
 
 ### Page: Locations.jsx
+
 - **UI Elements**: 5 Buttons, 2 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: Login.jsx
+
 - **UI Elements**: 1 Buttons, 2 Inputs, 1 Internal Links
 - **Local State**: Yes
 
 ### Page: NotFound.jsx
+
 - **UI Elements**: 1 Buttons, 0 Inputs, 1 Internal Links
 
 ### Page: Profile.jsx
+
 - **UI Elements**: 2 Buttons, 0 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: Register.jsx
+
 - **UI Elements**: 1 Buttons, 4 Inputs, 1 Internal Links
 - **Local State**: Yes
 
 ### Page: ReportPage.jsx
+
 - **UI Elements**: 1 Buttons, 0 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: RoutePlanner.jsx
+
 - **UI Elements**: 1 Buttons, 2 Inputs, 0 Internal Links
 - **Local State**: Yes
 
 ### Page: RouteRisk.jsx
+
 - **UI Elements**: 1 Buttons, 2 Inputs, 0 Internal Links
 - **Local State**: Yes
-

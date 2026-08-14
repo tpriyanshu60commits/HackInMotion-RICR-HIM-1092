@@ -11,7 +11,7 @@ import {
   Navigation as NavIcon,
   Activity,
   BookOpen,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 import useStore from '../store/useStore';
@@ -42,27 +42,29 @@ export const MainLayout = () => {
     }
   }, [user?.preferences?.language, i18n]);
 
-  const navItems = user?.role === 'admin'
-    ? [...NAV_ITEMS, { to: '/admin', icon: User, label: 'Admin Panel', tKey: 'adminPanel' }]
-    : NAV_ITEMS;
+  const navItems =
+    user?.role === 'admin'
+      ? [...NAV_ITEMS, { to: '/admin', icon: User, label: 'Admin Panel', tKey: 'adminPanel' }]
+      : NAV_ITEMS;
 
   return (
     <WeatherBackground>
       <div className="min-h-screen  w-full flex flex-col text-text-main overflow-x-hidden">
-
         {/* =====================================================
             TOP NAVBAR
         ====================================================== */}
         <header className="glass border-b border-border fixed top-2 z-[90] w-full h-16 hidden md:flex items-center justify-between px-4 md:px-8 rounded-2xl">
-
           {/* Logo Section */}
-          <Link to="/dashboard" className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity"
+          >
             <Leaf className="text-green-500 shrink-0" size={28} />
             <span>VerdantX</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             <nav className="hidden xl:flex items-center gap-1">
               {navItems.map((item) => (
                 <NavLink
@@ -77,7 +79,10 @@ export const MainLayout = () => {
                     )
                   }
                 >
-                  <item.icon size={18} className="transition-transform group-hover:scale-110 shrink-0" />
+                  <item.icon
+                    size={18}
+                    className="transition-transform group-hover:scale-110 shrink-0"
+                  />
                   <span className="text-xs">{t(`nav.${item.tKey}`, item.label)}</span>
                 </NavLink>
               ))}
@@ -98,9 +103,15 @@ export const MainLayout = () => {
                 title="Account Settings"
               >
                 {user?.profileImage?.url ? (
-                  <img src={user.profileImage.url} alt="Avatar" className="w-full h-full object-cover" />
+                  <img
+                    src={user.profileImage.url}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : user?.name ? (
+                  user.name.charAt(0).toUpperCase()
                 ) : (
-                  user?.name ? user.name.charAt(0).toUpperCase() : 'A'
+                  'A'
                 )}
               </Link>
             </div>

@@ -58,7 +58,6 @@ export const SecuritySettings = () => {
       </div>
 
       <form onSubmit={handleUpdatePassword} className="space-y-6 max-w-md">
-        
         {error && (
           <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
             <AlertCircle size={18} className="text-red-400 shrink-0 mt-0.5" />
@@ -69,8 +68,8 @@ export const SecuritySettings = () => {
         <div className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-gray-300">Current Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="••••••••"
@@ -80,8 +79,8 @@ export const SecuritySettings = () => {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-gray-300">New Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="••••••••"
@@ -91,8 +90,8 @@ export const SecuritySettings = () => {
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-gray-300">Confirm New Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
@@ -101,23 +100,26 @@ export const SecuritySettings = () => {
           </div>
         </div>
 
-        <button 
+        <button
           type="submit"
           disabled={isSaving}
           className={cn(
-            "w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all text-sm",
-            saveSuccess ? "bg-green-500/20 text-green-400 border border-green-500/30" : "bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-500/20"
+            'w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium transition-all text-sm',
+            saveSuccess
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-500/20'
           )}
         >
           {isSaving ? (
             <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
           ) : saveSuccess ? (
-            <><CheckCircle2 size={18} /> Password Updated</>
+            <>
+              <CheckCircle2 size={18} /> Password Updated
+            </>
           ) : (
             'Update Password'
           )}
         </button>
-
       </form>
     </div>
   );

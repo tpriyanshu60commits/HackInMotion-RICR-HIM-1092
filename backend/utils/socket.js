@@ -7,13 +7,13 @@ export const initSocket = (server) => {
     cors: {
       origin: process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173',
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      credentials: true
-    }
+      credentials: true,
+    },
   });
 
   io.on('connection', (socket) => {
     console.log(`Client connected: ${socket.id}`);
-    
+
     // User joins a room identified by their user ID
     socket.on('join', (userId) => {
       socket.join(userId);

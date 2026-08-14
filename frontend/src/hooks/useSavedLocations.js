@@ -26,32 +26,39 @@ export function useSavedLocations() {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const user = useStore(state => state.user);
+  const user = useStore((state) => state.user);
 
   useEffect(() => {
     if (!user?._id) return;
-    
-    const socket = io(import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') : 'http://localhost:5000', {
-      withCredentials: true
-    });
-    
+
+    const socket = io(
+      import.meta.env.VITE_API_BASE_URL
+        ? import.meta.env.VITE_API_BASE_URL.replace('/api', '')
+        : 'http://localhost:5000',
+      {
+        withCredentials: true,
+      }
+    );
+
     socket.emit('join', user._id);
-    
+
     socket.on('location:update', ({ locationId, data }) => {
-      setLocations(prevLocs => prevLocs.map(loc => {
-        if (loc.id === locationId || loc.id === locationId.toString()) {
-          return {
-            ...loc,
-            aqi: data.aqi,
-            status: getAqiStatus(data.aqi),
-            temperature: data.temperature ? Math.round(data.temperature) : loc.temperature,
-            condition: data.weather || loc.condition,
-          };
-        }
-        return loc;
-      }));
+      setLocations((prevLocs) =>
+        prevLocs.map((loc) => {
+          if (loc.id === locationId || loc.id === locationId.toString()) {
+            return {
+              ...loc,
+              aqi: data.aqi,
+              status: getAqiStatus(data.aqi),
+              temperature: data.temperature ? Math.round(data.temperature) : loc.temperature,
+              condition: data.weather || loc.condition,
+            };
+          }
+          return loc;
+        })
+      );
     });
-    
+
     return () => socket.disconnect();
   }, [user?._id]);
 
@@ -62,7 +69,7 @@ export function useSavedLocations() {
       // 1. Fetch saved locations from DB
       const dbRes = await locationService.getSaved();
       // Handle standard response shapes: dbRes.data.data is used by our backend controllers
-      const savedLocs = dbRes.data?.data || dbRes.data || []; 
+      const savedLocs = dbRes.data?.data || dbRes.data || [];
 
       // 2. Fetch live data for each location
       const enrichedLocs = await Promise.all(
@@ -70,7 +77,7 @@ export function useSavedLocations() {
           try {
             const envRes = await environmentService.getCurrentByCoords(loc.latitude, loc.longitude);
             const envData = envRes.data?.data || envRes.data || {};
-            
+
             const weather = getWeatherInfo(envData.weatherCode || 0);
 
             return {
@@ -154,6 +161,6 @@ export function useSavedLocations() {
     error,
     fetchLocations,
     addLocation,
-    removeLocation
+    removeLocation,
   };
 }

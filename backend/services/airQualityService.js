@@ -50,13 +50,17 @@ export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null)
     const locationInfo = await reverseGeocode(lat, lng);
 
     const [airQualityResponse, weatherResponse] = await Promise.all([
-      axios.get(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`),
-      axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,is_day&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`)
+      axios.get(
+        `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`
+      ),
+      axios.get(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,is_day&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`
+      ),
     ]);
 
     const data = {
       airQuality: airQualityResponse.data,
-      weather: weatherResponse.data
+      weather: weatherResponse.data,
     };
 
     const normalizedData = normalizeOpenMeteoData(data, locationInfo, healthProfile);
@@ -116,9 +120,12 @@ export const getHistoricalData = async (lat, lng, days = 7) => {
 
       if (!dailyData[dateOnly]) {
         dailyData[dateOnly] = {
-          aqiSum: 0, aqiCount: 0,
-          pm25Sum: 0, pm25Count: 0,
-          pm10Sum: 0, pm10Count: 0
+          aqiSum: 0,
+          aqiCount: 0,
+          pm25Sum: 0,
+          pm25Count: 0,
+          pm10Sum: 0,
+          pm10Count: 0,
         };
       }
 
@@ -136,9 +143,9 @@ export const getHistoricalData = async (lat, lng, days = 7) => {
       }
     });
 
-    const result = Object.keys(dailyData).map(dateStr => {
+    const result = Object.keys(dailyData).map((dateStr) => {
       const data = dailyData[dateStr];
-      const dateObj = new Date(dateStr + "T12:00:00Z"); // Safe mid-day UTC parsing
+      const dateObj = new Date(dateStr + 'T12:00:00Z'); // Safe mid-day UTC parsing
       const name = dateObj.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
 
       return {
@@ -153,6 +160,6 @@ export const getHistoricalData = async (lat, lng, days = 7) => {
     return result;
   } catch (error) {
     console.error('Failed to fetch historical air quality data:', error.message);
-    throw new Error("Failed to fetch historical air quality data");
+    throw new Error('Failed to fetch historical air quality data');
   }
 };

@@ -32,8 +32,8 @@ const createIcon = (color, emoji) =>
     popupAnchor: [0, -12],
   });
 
-const fuelIcon     = createIcon('#F59E0B', '⛽');
-const hotelIcon    = createIcon('#3B82F6', '🏨');
+const fuelIcon = createIcon('#F59E0B', '⛽');
+const hotelIcon = createIcon('#3B82F6', '🏨');
 const hospitalIcon = createIcon('#EF4444', '🏥');
 
 export const RouteRisk = () => {
@@ -73,7 +73,6 @@ export const RouteRisk = () => {
   return (
     <div className="min-h-full relative px-4 lg:px-8 py-8 animate-fade-in flex flex-col">
       <div className="max-w-[1600px] w-full mx-auto flex flex-col h-full gap-8">
-
         {/* Header */}
         <div className="flex flex-col">
           <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight mb-2">
@@ -86,7 +85,6 @@ export const RouteRisk = () => {
 
         {/* Location Inputs */}
         <div className="w-full relative z-30 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-4 lg:p-6 shadow-2xl flex flex-col lg:flex-row items-center gap-4 lg:gap-6">
-
           <div className="flex-1 w-full relative group z-20">
             <LocationSearch
               initialQuery={origin}
@@ -124,7 +122,6 @@ export const RouteRisk = () => {
 
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 flex-1">
-
           {/* Map Container (70%) */}
           <div className="col-span-1 lg:col-span-2 bg-white/[0.02] backdrop-blur-sm border border-white/[0.07] rounded-2xl p-2 relative overflow-hidden min-h-[480px] lg:min-h-[600px] shadow-2xl flex flex-col group hover:border-white/[0.12] transition-colors duration-300">
             <div className="w-full h-full rounded-xl overflow-hidden flex-1 relative z-0">
@@ -157,41 +154,24 @@ export const RouteRisk = () => {
 
                   {/* High Risk Point */}
                   {result?.risk?.worstPoint && (
-                    <Marker
-                      position={[
-                        result.risk.worstPoint.lat,
-                        result.risk.worstPoint.lng,
-                      ]}
-                    >
+                    <Marker position={[result.risk.worstPoint.lat, result.risk.worstPoint.lng]}>
                       <Popup>Worst AQI: {result.risk.worstPoint.aqi}</Popup>
                     </Marker>
                   )}
 
                   {/* Amenity Markers */}
                   {result?.amenities?.fuelStations?.list?.map((p, i) => (
-                    <Marker
-                      key={`fuel-${i}`}
-                      position={[p.lat, p.lng]}
-                      icon={fuelIcon}
-                    >
+                    <Marker key={`fuel-${i}`} position={[p.lat, p.lng]} icon={fuelIcon}>
                       <Popup>{p.name || 'Fuel Station'}</Popup>
                     </Marker>
                   ))}
                   {result?.amenities?.hotels?.list?.map((p, i) => (
-                    <Marker
-                      key={`hotel-${i}`}
-                      position={[p.lat, p.lng]}
-                      icon={hotelIcon}
-                    >
+                    <Marker key={`hotel-${i}`} position={[p.lat, p.lng]} icon={hotelIcon}>
                       <Popup>{p.name || 'Hotel'}</Popup>
                     </Marker>
                   ))}
                   {result?.amenities?.hospitals?.list?.map((p, i) => (
-                    <Marker
-                      key={`hospital-${i}`}
-                      position={[p.lat, p.lng]}
-                      icon={hospitalIcon}
-                    >
+                    <Marker key={`hospital-${i}`} position={[p.lat, p.lng]} icon={hospitalIcon}>
                       <Popup>{p.name || 'Hospital'}</Popup>
                     </Marker>
                   ))}
@@ -209,7 +189,6 @@ export const RouteRisk = () => {
           {/* Risk Summary (30%) */}
           {result ? (
             <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out hover:-translate-y-[2px] flex flex-col shadow-2xl">
-
               <h2 className="text-lg font-semibold text-white mb-8 pb-4 border-b border-white/[0.05]">
                 Route Risk
               </h2>
@@ -292,8 +271,8 @@ export const RouteRisk = () => {
                         <span className="font-bold text-orange-400">
                           {result.risk.worstPoint.aqi}
                         </span>{' '}
-                        along your route. Ensure your windows are rolled up and
-                        air recirculation is active.
+                        along your route. Ensure your windows are rolled up and air recirculation is
+                        active.
                       </p>
                     </div>
                   )}
@@ -303,12 +282,10 @@ export const RouteRisk = () => {
           ) : (
             <div className="col-span-1 bg-white/[0.02] backdrop-blur-[24px] border border-white/[0.04] rounded-2xl p-6 lg:p-8 flex flex-col items-center justify-center text-center shadow-2xl">
               <NavIcon size={48} className="text-gray-600 mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">
-                No Route Selected
-              </h3>
+              <h3 className="text-lg font-semibold text-white mb-2">No Route Selected</h3>
               <p className="text-sm text-gray-500">
-                Enter your start location and destination to analyze
-                environmental risks along your journey.
+                Enter your start location and destination to analyze environmental risks along your
+                journey.
               </p>
             </div>
           )}
