@@ -29,10 +29,12 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin:
-      process.env.CLIENT_URL ||
-      process.env.FRONTEND_URL ||
+    origin: [
+      process.env.CLIENT_URL,
+      process.env.FRONTEND_URL,
       'http://localhost:5173',
+      'https://hack-in-motion-ricr-him-1092.vercel.app'
+    ].filter(Boolean),
     credentials: true,
   })
 );
