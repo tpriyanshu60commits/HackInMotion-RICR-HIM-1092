@@ -247,7 +247,7 @@ export const exportData = async (req, res, next) => {
       res.status(404);
       throw new Error('User not found');
     }
-    
+
     const exportData = {
       profile: user,
       exportDate: new Date(),

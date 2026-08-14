@@ -30,17 +30,19 @@ export const AlertToast = ({ toast, onDismiss }) => {
       initial={{ opacity: 0, x: 50, scale: 0.95 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 20, scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       className={cn(
-        "relative flex gap-3 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl border-y border-r border-border glass shadow-2xl backdrop-blur-xl border-l-4 overflow-hidden",
+        'relative flex gap-3 md:gap-4 p-3 md:p-4 rounded-xl md:rounded-2xl border-y border-r border-border glass shadow-2xl backdrop-blur-xl border-l-4 overflow-hidden',
         typeStyles[toast.type] || typeStyles.bad,
-        "w-[calc(100vw-2rem)] max-w-[400px] pointer-events-auto"
+        'w-[calc(100vw-2rem)] max-w-[400px] pointer-events-auto'
       )}
     >
-      <div className={cn(
-        "shrink-0 mt-0.5 md:mt-1 p-1.5 rounded-full",
-        toast.type === 'good' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-      )}>
+      <div
+        className={cn(
+          'shrink-0 mt-0.5 md:mt-1 p-1.5 rounded-full',
+          toast.type === 'good' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+        )}
+      >
         <Icon className="w-5 h-5 md:w-6 md:h-6" />
       </div>
 
@@ -50,14 +52,14 @@ export const AlertToast = ({ toast, onDismiss }) => {
           <MapPin className="w-3 h-3" />
           <span className="truncate">{toast.locationName}</span>
         </div>
-        
+
         <p className="text-xs md:text-sm font-semibold leading-snug drop-shadow-sm break-words line-clamp-3">
           {toast.message}
         </p>
-        
+
         <div className="flex items-center gap-4 pt-1 text-[10px] md:text-xs opacity-60 font-medium">
           <span>{timeAgo}</span>
-          <button 
+          <button
             onClick={() => speak(toast.message, true)}
             className="flex items-center gap-1 hover:text-white transition-colors"
             title="Read aloud"
@@ -69,7 +71,7 @@ export const AlertToast = ({ toast, onDismiss }) => {
       </div>
 
       {/* Dismiss Button */}
-      <button 
+      <button
         onClick={onDismiss}
         className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-white/10 transition-colors opacity-70 hover:opacity-100"
       >

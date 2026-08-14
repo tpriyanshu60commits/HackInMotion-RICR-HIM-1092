@@ -13,7 +13,7 @@ export const getApiBaseUrl = () => {
 export const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -34,7 +34,11 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token');
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/register' && window.location.pathname !== '/') {
+      if (
+        window.location.pathname !== '/login' &&
+        window.location.pathname !== '/register' &&
+        window.location.pathname !== '/'
+      ) {
         window.location.href = '/login';
       }
     }
@@ -43,11 +47,9 @@ api.interceptors.response.use(
 );
 
 export const locationService = {
-  search: (query) =>
-    api.get(`/locations/search?q=${query}`),
+  search: (query) => api.get(`/locations/search?q=${query}`),
 
-  getSaved: () =>
-    api.get('/locations'),
+  getSaved: () => api.get('/locations'),
 
   save: (data) =>
     api.post('/locations', {
@@ -60,16 +62,19 @@ export const locationService = {
       locationType: data.locationType || 'other',
     }),
 
-  delete: (id) =>
-    api.delete(`/locations/${id}`),
+  delete: (id) => api.delete(`/locations/${id}`),
 };
 
 export const environmentService = {
-  getCurrentByCoords: (lat, lng) =>
-    api.get(`/environment/current?lat=${lat}&lng=${lng}`),
+  getCurrentByCoords: (lat, lng) => api.get(`/environment/current?lat=${lat}&lng=${lng}`),
 
-  getCurrentByCity: (city) =>
-    api.get(`/environment/city?city=${city}`),
+  getCurrentByCity: (city) => api.get(`/environment/city?city=${city}`),
+
+  getForecast: (lat, lng) => api.get(`/data/forecast?lat=${lat}&lng=${lng}`),
+
+  getSnapshots: (locationId, range) => api.get(`/snapshots/${locationId}?range=${range}`),
+
+  searchGeocoding: (query) => api.get(`/data/search?q=${encodeURIComponent(query)}`),
 
   getHistory: async (lat, lng, days) => {
     const response = await api.get('/environment/history', {
@@ -83,71 +88,55 @@ export const environmentService = {
     return response.data;
   },
 
-  compareCities: (cities) =>
-    api.get(`/environment/compare?cities=${cities}`),
+  compareCities: (cities) => api.get(`/environment/compare?cities=${cities}`),
 };
 
 export const profileAPI = {
-  getProfile: () =>
-    api.get('/v1/profile'),
+  getProfile: () => api.get('/v1/profile'),
 
-  updateBasicProfile: (data) =>
-    api.put('/v1/profile', data),
+  updateBasicProfile: (data) => api.put('/v1/profile', data),
 
-  getHealthProfile: () =>
-    api.get('/v1/profile/health'),
+  getHealthProfile: () => api.get('/v1/profile/health'),
 
-  updateHealthProfile: (data) =>
-    api.put('/v1/profile/health', data),
+  updateHealthProfile: (data) => api.put('/v1/profile/health', data),
 
-  getNotificationSettings: () =>
-    api.get('/v1/profile/notifications'),
+  getNotificationSettings: () => api.get('/v1/profile/notifications'),
 
-  updateNotificationSettings: (data) =>
-    api.put('/v1/profile/notifications', data),
+  updateNotificationSettings: (data) => api.put('/v1/profile/notifications', data),
 
-  getPreferences: () =>
-    api.get('/v1/profile/preferences'),
+  getPreferences: () => api.get('/v1/profile/preferences'),
 
-  updatePreferences: (data) =>
-    api.put('/v1/profile/preferences', data),
+  updatePreferences: (data) => api.put('/v1/profile/preferences', data),
 
-  getPrivacySettings: () =>
-    api.get('/v1/profile/privacy'),
+  getPrivacySettings: () => api.get('/v1/profile/privacy'),
 
-  updatePrivacySettings: (data) =>
-    api.put('/v1/profile/privacy', data),
+  updatePrivacySettings: (data) => api.put('/v1/profile/privacy', data),
 };
 
 export const aiService = {
-  ask: (data) =>
-    api.post('/ai/ask', data),
+  ask: (data) => api.post('/ai/ask', data),
 
-  getHistory: () =>
-    api.get('/ai/history'),
+  getHistory: () => api.get('/ai/history'),
 
-  clearHistory: () =>
-    api.delete('/ai/history'),
+  clearHistory: () => api.delete('/ai/history'),
 };
 
 // AG07 - Alerts
 export const alertService = {
-  getAlerts: () =>
-    api.get('/alerts'),
+  getAlerts: () => api.get('/alerts'),
 
-  markAsRead: (id) =>
-    api.put(`/alerts/${id}/read`),
+  markAsRead: (id) => api.put(`/alerts/${id}/read`),
 
-  deleteAlert: (id) =>
-    api.delete(`/alerts/${id}`),
+  deleteAlert: (id) => api.delete(`/alerts/${id}`),
 };
 
 // Master - Extended User Profile
 export const usersAPI = {
   updateExtendedProfile: (data) => api.patch('/users/profile', data),
-  uploadProfileImage: (formData) => api.post('/users/profile-image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }),
+  uploadProfileImage: (formData) =>
+    api.post('/users/profile-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
   deleteAccount: () => api.delete('/users/me'),
 };
 

@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Shield, Download, Trash2, CheckCircle2, Eye, Share2, Activity, AlertTriangle } from 'lucide-react';
+import {
+  Shield,
+  Download,
+  Trash2,
+  CheckCircle2,
+  Eye,
+  Share2,
+  Activity,
+  AlertTriangle,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -8,11 +17,13 @@ import useStore from '../../store/useStore';
 import { usersAPI, profileAPI } from '../../services/api';
 
 export const PrivacySettings = () => {
-  const user = useStore(state => state.user);
-  const updateUserProfile = useStore(state => state.updateUserProfile);
-  const logout = useStore(state => state.logout);
+  const user = useStore((state) => state.user);
+  const updateUserProfile = useStore((state) => state.updateUserProfile);
+  const logout = useStore((state) => state.logout);
 
-  const [profileVisibility, setProfileVisibility] = useState(user?.privacy?.profileVisibility || 'private');
+  const [profileVisibility, setProfileVisibility] = useState(
+    user?.privacy?.profileVisibility || 'private'
+  );
   const [dataSharing, setDataSharing] = useState(user?.privacy?.dataSharing || false);
   const [analytics, setAnalytics] = useState(user?.privacy?.analytics ?? true);
 
@@ -21,12 +32,12 @@ export const PrivacySettings = () => {
   const [exportStatus, setExportStatus] = useState('idle'); // idle | loading | done
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const navigate = useNavigate();
-  const location = useStore(state => state.location);
-  const weatherCondition = useStore(state => state.weatherCondition);
-  const currentAQI = useStore(state => state.currentAQI);
-  const currentTemp = useStore(state => state.currentTemp);
+  const location = useStore((state) => state.location);
+  const weatherCondition = useStore((state) => state.weatherCondition);
+  const currentAQI = useStore((state) => state.currentAQI);
+  const currentTemp = useStore((state) => state.currentTemp);
 
   const handleSavePrivacy = async () => {
     setIsSaving(true);
@@ -34,11 +45,11 @@ export const PrivacySettings = () => {
       await profileAPI.updatePrivacySettings({
         profileVisibility,
         dataSharing,
-        analytics
+        analytics,
       });
       const res = await profileAPI.getProfile();
       updateUserProfile(res.data.data);
-      
+
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
@@ -87,7 +98,7 @@ export const PrivacySettings = () => {
         });
 
         doc.save('VerdantX_Data_Export.pdf');
-        
+
         setExportStatus('done');
         setTimeout(() => setExportStatus('idle'), 3000);
       } catch (error) {
@@ -104,8 +115,8 @@ export const PrivacySettings = () => {
       logout();
       navigate('/');
     } catch (error) {
-      console.error("Failed to delete account", error);
-      alert("Failed to delete account. Please try again later.");
+      console.error('Failed to delete account', error);
+      alert('Failed to delete account. Please try again later.');
     } finally {
       setIsDeleting(false);
     }
@@ -124,18 +135,21 @@ export const PrivacySettings = () => {
       </div>
 
       <div className="space-y-8">
-        
         {/* Privacy Preferences */}
         <div className="space-y-6">
-          <h3 className="text-sm font-semibold text-white border-b border-white/[0.06] pb-2">Privacy Preferences</h3>
-          
+          <h3 className="text-sm font-semibold text-white border-b border-white/[0.06] pb-2">
+            Privacy Preferences
+          </h3>
+
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl gap-4">
               <div className="flex items-start gap-3">
                 <Eye size={20} className="text-green-400 mt-0.5" />
                 <div>
                   <h4 className="text-sm font-medium text-white">Profile Visibility</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">Control who can see your VerdantX profile.</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Control who can see your VerdantX profile.
+                  </p>
                 </div>
               </div>
               <select
@@ -143,9 +157,15 @@ export const PrivacySettings = () => {
                 onChange={(e) => setProfileVisibility(e.target.value)}
                 className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-green-500/50 text-sm appearance-none min-w-[140px]"
               >
-                <option value="private" className="bg-gray-900">Private</option>
-                <option value="friends" className="bg-gray-900">Friends Only</option>
-                <option value="public" className="bg-gray-900">Public</option>
+                <option value="private" className="bg-gray-900">
+                  Private
+                </option>
+                <option value="friends" className="bg-gray-900">
+                  Friends Only
+                </option>
+                <option value="public" className="bg-gray-900">
+                  Public
+                </option>
               </select>
             </div>
 
@@ -154,11 +174,18 @@ export const PrivacySettings = () => {
                 <Share2 size={20} className="text-green-400 mt-0.5" />
                 <div>
                   <h4 className="text-sm font-medium text-white">Data Sharing</h4>
-                  <p className="text-xs text-gray-400 mt-0.5 max-w-[250px]">Allow anonymous sharing of environmental data to help the community.</p>
+                  <p className="text-xs text-gray-400 mt-0.5 max-w-[250px]">
+                    Allow anonymous sharing of environmental data to help the community.
+                  </p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" className="sr-only peer" checked={dataSharing} onChange={(e) => setDataSharing(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={dataSharing}
+                  onChange={(e) => setDataSharing(e.target.checked)}
+                />
                 <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
               </label>
             </div>
@@ -168,29 +195,40 @@ export const PrivacySettings = () => {
                 <Activity size={20} className="text-green-400 mt-0.5" />
                 <div>
                   <h4 className="text-sm font-medium text-white">Analytics</h4>
-                  <p className="text-xs text-gray-400 mt-0.5 max-w-[250px]">Help us improve VerdantX by sharing crash reports and usage analytics.</p>
+                  <p className="text-xs text-gray-400 mt-0.5 max-w-[250px]">
+                    Help us improve VerdantX by sharing crash reports and usage analytics.
+                  </p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                <input type="checkbox" className="sr-only peer" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={analytics}
+                  onChange={(e) => setAnalytics(e.target.checked)}
+                />
                 <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
               </label>
             </div>
           </div>
-          
+
           <div className="flex justify-end pt-2">
-            <button 
+            <button
               onClick={handleSavePrivacy}
               disabled={isSaving}
               className={cn(
-                "flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all min-w-[140px]",
-                saveSuccess ? "bg-green-500/20 text-green-400 border border-green-500/30" : "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+                'flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all min-w-[140px]',
+                saveSuccess
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
               )}
             >
               {isSaving ? (
                 <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
               ) : saveSuccess ? (
-                <><CheckCircle2 size={16} /> Saved</>
+                <>
+                  <CheckCircle2 size={16} /> Saved
+                </>
               ) : (
                 'Save Preferences'
               )}
@@ -200,30 +238,40 @@ export const PrivacySettings = () => {
 
         {/* Data Management */}
         <div className="space-y-6">
-          <h3 className="text-sm font-semibold text-white border-b border-white/[0.06] pb-2">Data Management</h3>
-          
+          <h3 className="text-sm font-semibold text-white border-b border-white/[0.06] pb-2">
+            Data Management
+          </h3>
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl gap-4">
             <div className="flex items-start gap-3">
               <Download size={20} className="text-green-400 mt-0.5" />
               <div>
                 <h4 className="text-sm font-medium text-white">Export Your Data</h4>
-                <p className="text-xs text-gray-400 mt-0.5 max-w-sm">Download a JSON copy of your health profile, preferences, and account info.</p>
+                <p className="text-xs text-gray-400 mt-0.5 max-w-sm">
+                  Download a JSON copy of your health profile, preferences, and account info.
+                </p>
               </div>
             </div>
-            <button 
+            <button
               onClick={handleExport}
               disabled={exportStatus !== 'idle'}
               className={cn(
-                "flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all min-w-[140px] shrink-0",
-                exportStatus === 'done' ? "bg-green-500/20 text-green-400 border border-green-500/30" : "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+                'flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all min-w-[140px] shrink-0',
+                exportStatus === 'done'
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
               )}
             >
               {exportStatus === 'loading' ? (
                 <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
               ) : exportStatus === 'done' ? (
-                <><CheckCircle2 size={16} /> Exported</>
+                <>
+                  <CheckCircle2 size={16} /> Exported
+                </>
               ) : (
-                <><Download size={16} /> Request Data</>
+                <>
+                  <Download size={16} /> Request Data
+                </>
               )}
             </button>
           </div>
@@ -236,20 +284,23 @@ export const PrivacySettings = () => {
               <AlertTriangle size={20} className="text-red-400 mt-0.5" />
               <div>
                 <h4 className="text-sm font-medium text-red-400">Delete Account</h4>
-                <p className="text-xs text-red-400/70 mt-0.5 max-w-sm">Permanently delete your account and all associated data. This action cannot be undone.</p>
+                <p className="text-xs text-red-400/70 mt-0.5 max-w-sm">
+                  Permanently delete your account and all associated data. This action cannot be
+                  undone.
+                </p>
               </div>
             </div>
-            
+
             {showDeleteConfirm ? (
               <div className="flex items-center gap-2 shrink-0">
-                <button 
+                <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
                   className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={handleDeleteAccount}
                   disabled={isDeleting}
                   className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors min-w-[100px]"
@@ -262,7 +313,7 @@ export const PrivacySettings = () => {
                 </button>
               </div>
             ) : (
-              <button 
+              <button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-lg text-sm font-medium transition-colors shrink-0"
               >
@@ -272,9 +323,7 @@ export const PrivacySettings = () => {
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
 };
-

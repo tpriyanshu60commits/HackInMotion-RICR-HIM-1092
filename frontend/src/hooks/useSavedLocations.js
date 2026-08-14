@@ -32,52 +32,40 @@ export function useSavedLocations() {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const user = useStore((state) => state.user);
 
   useEffect(() => {
     if (!user?._id) return;
 
-    // API_BASE_URL normally contains something like:
-    // https://your-backend.onrender.com/api
-    // Socket.IO needs the backend root:
-    // https://your-backend.onrender.com
-    const socketUrl = API_BASE_URL
-      ? API_BASE_URL.replace(/\/api\/?$/, '')
-      : 'http://localhost:5000';
-
-    const socket = io(socketUrl, {
-      withCredentials: true,
-    });
+    const socket = io(
+      import.meta.env.VITE_API_BASE_URL
+        ? import.meta.env.VITE_API_BASE_URL.replace('/api', '')
+        : 'http://localhost:5000',
+      {
+        withCredentials: true,
+      }
+    );
 
     socket.emit('join', user._id);
 
     socket.on('location:update', ({ locationId, data }) => {
       setLocations((prevLocs) =>
         prevLocs.map((loc) => {
-          if (
-            loc.id === locationId ||
-            loc.id === locationId?.toString()
-          ) {
+          if (loc.id === locationId || loc.id === locationId.toString()) {
             return {
               ...loc,
               aqi: data.aqi,
               status: getAqiStatus(data.aqi),
-              temperature: data.temperature
-                ? Math.round(data.temperature)
-                : loc.temperature,
+              temperature: data.temperature ? Math.round(data.temperature) : loc.temperature,
               condition: data.weather || loc.condition,
             };
           }
-
           return loc;
         })
       );
     });
 
-    return () => {
-      socket.disconnect();
-    };
+    return () => socket.disconnect();
   }, [user?._id]);
 
   const fetchLocations = useCallback(async () => {
@@ -87,6 +75,8 @@ export function useSavedLocations() {
     try {
       // 1. Fetch saved locations from DB
       const dbRes = await locationService.getSaved();
+      // Handle standard response shapes: dbRes.data.data is used by our backend controllers
+      const savedLocs = dbRes.data?.data || dbRes.data || [];
 
       const savedLocs =
         dbRes.data?.data ||
@@ -97,20 +87,10 @@ export function useSavedLocations() {
       const enrichedLocs = await Promise.all(
         savedLocs.map(async (loc) => {
           try {
-            const envRes =
-              await environmentService.getCurrentByCoords(
-                loc.latitude,
-                loc.longitude
-              );
+            const envRes = await environmentService.getCurrentByCoords(loc.latitude, loc.longitude);
+            const envData = envRes.data?.data || envRes.data || {};
 
-            const envData =
-              envRes.data?.data ||
-              envRes.data ||
-              {};
-
-            const weather = getWeatherInfo(
-              envData.weatherCode || 0
-            );
+            const weather = getWeatherInfo(envData.weatherCode || 0);
 
             return {
               id: loc._id || loc.id,

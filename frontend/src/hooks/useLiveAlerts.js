@@ -5,20 +5,25 @@ import { alertRules } from '../data/alertRules';
 import { useAlertSound } from './useAlertSound';
 import { useVoiceAlert } from './useVoiceAlert';
 
+/**
+ * CLIENT-SIDE LIVE ALERTS
+ * Distinct Purpose: Evaluates environmental conditions for the currently active user session
+ * in real-time, triggering immediate toast notifications, sounds, and voice alerts in the browser.
+ */
 export const useLiveAlerts = () => {
   const [activeToast, setActiveToast] = useState(null);
   const [queue, setQueue] = useState([]);
 
   // Data sources from the store
-  const weatherCondition = useStore(state => state.weatherCondition);
-  const currentAQI = useStore(state => state.currentAQI);
-  const currentTemp = useStore(state => state.currentTemp);
-  const windSpeed = useStore(state => state.windSpeed || 0);
-  const uvIndex = useStore(state => state.uvIndex || 0);
-  const humidity = useStore(state => state.humidity || 0);
-  const pressure = useStore(state => state.pressure || 1013);
-  const language = useStore(state => state.language);
-  const location = useStore(state => state.location);
+  const weatherCondition = useStore((state) => state.weatherCondition);
+  const currentAQI = useStore((state) => state.currentAQI);
+  const currentTemp = useStore((state) => state.currentTemp);
+  const windSpeed = useStore((state) => state.windSpeed || 0);
+  const uvIndex = useStore((state) => state.uvIndex || 0);
+  const humidity = useStore((state) => state.humidity || 0);
+  const pressure = useStore((state) => state.pressure || 1013);
+  const language = useStore((state) => state.language);
+  const location = useStore((state) => state.location);
 
   const playSound = useAlertSound();
   const { speak } = useVoiceAlert();
@@ -28,7 +33,15 @@ export const useLiveAlerts = () => {
 
   // ─── Rule Evaluation ──────────────────────────────────────────────────────
   useEffect(() => {
-    const currentData = { weatherCondition, currentAQI, currentTemp, windSpeed, uvIndex, humidity, pressure };
+    const currentData = {
+      weatherCondition,
+      currentAQI,
+      currentTemp,
+      windSpeed,
+      uvIndex,
+      humidity,
+      pressure,
+    };
 
     if (!dataRef.current) {
       dataRef.current = currentData;
@@ -37,40 +50,47 @@ export const useLiveAlerts = () => {
     // Fire location change summary alert if data is loaded for the new location
     if (location && location.name !== locationRef.current && weatherCondition && currentAQI) {
       locationRef.current = location.name;
-      
-      const isBad = currentAQI > 100 || weatherCondition === 'rain' || weatherCondition === 'thunderstorm';
-      
+
+      const isBad =
+        currentAQI > 100 || weatherCondition === 'rain' || weatherCondition === 'thunderstorm';
+
       const locAlert = {
         id: `loc-change-${Date.now()}`,
         category: 'location',
         type: isBad ? 'bad' : 'good',
         icon: MapPin,
         messages: {
-          en: isBad 
+          en: isBad
             ? `${location.name} has ${weatherCondition === 'rain' || weatherCondition === 'thunderstorm' ? 'rain/storms' : 'poor air quality'} right now — check details before heading out.`
             : `Weather looks pleasant in ${location.name} right now.`,
-          hi: isBad 
+          hi: isBad
             ? `${location.name} में अभी मौसम/हवा खराब है — बाहर जाने से पहले जाँच लें।`
-            : `${location.name} में अभी मौसम सुहावना लग रहा है।`
-        }
+            : `${location.name} में अभी मौसम सुहावना लग रहा है।`,
+        },
       };
-      
-      setQueue(prev => [...prev, locAlert]);
+
+      setQueue((prev) => [...prev, locAlert]);
     }
 
     const interval = setInterval(() => {
-      const latestData = { weatherCondition, currentAQI, currentTemp, windSpeed, uvIndex, humidity, pressure };
-      
+      const latestData = {
+        weatherCondition,
+        currentAQI,
+        currentTemp,
+        windSpeed,
+        uvIndex,
+        humidity,
+        pressure,
+      };
+
       if (dataRef.current) {
         const prevData = dataRef.current;
         const todayDateStr = new Date().toDateString();
-        const shownAlerts = JSON.parse(
-          localStorage.getItem('shown_live_alerts') || '{}'
-        );
+        const shownAlerts = JSON.parse(localStorage.getItem('shown_live_alerts') || '{}');
 
         const newAlerts = [];
 
-        alertRules.forEach(rule => {
+        alertRules.forEach((rule) => {
           if (rule.condition(prevData, latestData)) {
             const cacheKey = `${rule.id}-${todayDateStr}`;
             if (!shownAlerts[cacheKey]) {
@@ -82,9 +102,9 @@ export const useLiveAlerts = () => {
 
         if (newAlerts.length > 0) {
           localStorage.setItem('shown_live_alerts', JSON.stringify(shownAlerts));
-          setQueue(prev => [...prev, ...newAlerts]);
+          setQueue((prev) => [...prev, ...newAlerts]);
 
-          newAlerts.forEach(alert => {
+          newAlerts.forEach((alert) => {
             useStore.getState().addAlert({
               title: 'Live Alert',
               message: alert.messages[language] || alert.messages.en,
@@ -101,7 +121,17 @@ export const useLiveAlerts = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [weatherCondition, currentAQI, currentTemp, windSpeed, uvIndex, humidity, pressure, language, location]);
+  }, [
+    weatherCondition,
+    currentAQI,
+    currentTemp,
+    windSpeed,
+    uvIndex,
+    humidity,
+    pressure,
+    language,
+    location,
+  ]);
 
   // ─── Queue Processor ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -110,7 +140,7 @@ export const useLiveAlerts = () => {
     const nextAlert = queue[0];
 
     const processTimeout = setTimeout(() => {
-      setQueue(prev => prev.slice(1));
+      setQueue((prev) => prev.slice(1));
 
       const toastData = {
         id: nextAlert.id + Date.now(),

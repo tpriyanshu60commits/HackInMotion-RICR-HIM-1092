@@ -13,7 +13,7 @@ const generateToken = (res, userId) => {
     sameSite: isProduction ? 'none' : 'strict', // Allow cross-domain in prod, strict in dev
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
-  
+
   return token; // also return it in case frontend prefers header approach
 };
 

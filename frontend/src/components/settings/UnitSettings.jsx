@@ -5,15 +5,15 @@ import { profileAPI } from '../../services/api';
 import { cn } from '../../utils/utils';
 
 export const UnitSettings = () => {
-  const user = useStore(state => state.user);
-  const updateUserProfile = useStore(state => state.updateUserProfile);
+  const user = useStore((state) => state.user);
+  const updateUserProfile = useStore((state) => state.updateUserProfile);
 
-  const [temperatureUnit, setTemperatureUnit] = useState(user?.preferences?.temperatureUnit || 'celsius');
+  const [temperatureUnit, setTemperatureUnit] = useState(
+    user?.preferences?.temperatureUnit || 'celsius'
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
-
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -21,7 +21,7 @@ export const UnitSettings = () => {
       await profileAPI.updatePreferences({ temperatureUnit });
       const fullProfile = await profileAPI.getProfile();
       updateUserProfile(fullProfile.data.data);
-      
+
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
@@ -44,9 +44,10 @@ export const UnitSettings = () => {
       </div>
 
       <div className="space-y-6">
-        
         <div className="space-y-3">
-          <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Temperature Unit</label>
+          <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            Temperature Unit
+          </label>
           <div className="flex bg-black/40 rounded-xl p-1 border border-white/10 w-full sm:w-64 relative">
             <button
               onClick={() => setTemperatureUnit('celsius')}
@@ -61,23 +62,26 @@ export const UnitSettings = () => {
               Fahrenheit (°F)
             </button>
             {/* Sliding highlight */}
-            <div 
+            <div
               className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white/10 rounded-lg shadow-sm transition-transform duration-300 ease-in-out"
-              style={{ transform: temperatureUnit === 'fahrenheit' ? 'translateX(100%)' : 'translateX(0)' }}
+              style={{
+                transform: temperatureUnit === 'fahrenheit' ? 'translateX(100%)' : 'translateX(0)',
+              }}
             ></div>
           </div>
         </div>
-
       </div>
       <div className="mt-8 flex justify-end">
         <button
           onClick={handleSave}
           disabled={isSaving}
           className={cn(
-            "flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm",
-            saveSuccess ? "bg-green-500/20 text-green-400 border border-green-500/30" :
-            isSaving ? "bg-white/10 text-gray-400 border border-white/10" :
-            "bg-white/10 hover:bg-white/20 text-white border border-white/10"
+            'flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium transition-all text-sm',
+            saveSuccess
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : isSaving
+                ? 'bg-white/10 text-gray-400 border border-white/10'
+                : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
           )}
         >
           {isSaving ? (
@@ -85,7 +89,7 @@ export const UnitSettings = () => {
           ) : saveSuccess ? (
             <CheckCircle2 size={18} />
           ) : null}
-          {isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save Changes"}
+          {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
     </div>

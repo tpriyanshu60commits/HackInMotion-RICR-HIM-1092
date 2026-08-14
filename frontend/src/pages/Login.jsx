@@ -35,10 +35,7 @@ export const Login = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4 transition-colors"
-      
-    >
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4 transition-colors">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-400/20 blur-[120px] pointer-events-none" />
 
       <GlassCard className="w-full max-w-md p-8 z-10 animate-fade-in-up">
@@ -97,8 +94,12 @@ export const Login = () => {
             disabled={loading}
             className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
           >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : (
-              <>Sign In <ArrowRight size={18} /></>
+            {loading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              <>
+                Sign In <ArrowRight size={18} />
+              </>
             )}
           </button>
         </form>

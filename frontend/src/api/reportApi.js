@@ -4,7 +4,7 @@ export async function createReport(formData) {
   const res = await api.post('/reports', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
-    }
+    },
   });
   return res.data;
 }

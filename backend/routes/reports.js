@@ -8,7 +8,7 @@ import {
   updateStatus,
   upvoteReport,
   escalateToCMHelp,
-  acceptEscalation
+  acceptEscalation,
 } from '../controllers/reportController.js';
 import { protect } from '../middleware/auth.js';
 

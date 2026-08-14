@@ -28,7 +28,7 @@ export const updateExtendedProfile = async (req, res, next) => {
         height: updatedUser.height,
         weight: updatedUser.weight,
         gender: updatedUser.gender,
-      }
+      },
     });
   } catch (error) {
     next(error);
@@ -64,7 +64,7 @@ export const uploadProfileImage = async (req, res, next) => {
       message: 'Profile image uploaded successfully',
       data: {
         profileImage: updatedUser.profileImage,
-      }
+      },
     });
   } catch (error) {
     next(error);

@@ -1,28 +1,82 @@
 import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/common/GlassCard';
 
-
 import { LocationSearch } from '../components/common/LocationSearch';
 import {
-  MapPin, Wind, Droplets, Thermometer, CloudRain, Activity,
-  CheckCircle2, Sunrise, Gauge, Sun, Search,
-  AlertTriangle, AlertCircle, AlertOctagon
+  MapPin,
+  Wind,
+  Droplets,
+  Thermometer,
+  CloudRain,
+  Activity,
+  CheckCircle2,
+  Sunrise,
+  Gauge,
+  Sun,
+  Search,
+  AlertTriangle,
+  AlertCircle,
+  AlertOctagon,
 } from 'lucide-react';
 import { NotificationDropdown } from '../components/common/NotificationDropdown';
 import { environmentService } from '../services/api';
 import useStore from '../store/useStore';
 import { resolveBackground } from '../utils/resolveBackground';
 
-import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
+import {
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import Skeleton from '../components/common/Skeleton';
 
 const getAqiStatus = (aqi) => {
-  if (aqi <= 50) return { label: 'Good', color: 'text-green-500', icon: CheckCircle2, desc: 'Air quality is satisfactory and poses little or no risk.' };
-  if (aqi <= 100) return { label: 'Moderate', color: 'text-yellow-500', icon: AlertTriangle, desc: 'Air quality is acceptable; however, there may be a moderate health concern for a very small number of people.' };
-  if (aqi <= 150) return { label: 'Unhealthy for Sensitive Groups', color: 'text-orange-500', icon: AlertCircle, desc: 'Members of sensitive groups may experience health effects. The general public is not likely to be affected.' };
-  if (aqi <= 200) return { label: 'Unhealthy', color: 'text-red-500', icon: AlertCircle, desc: 'Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.' };
-  if (aqi <= 300) return { label: 'Very Unhealthy', color: 'text-purple-500', icon: AlertOctagon, desc: 'Health warnings of emergency conditions. The entire population is more likely to be affected.' };
-  return { label: 'Hazardous', color: 'text-rose-900', icon: AlertOctagon, desc: 'Health alert: everyone may experience more serious health effects.' };
+  if (aqi <= 50)
+    return {
+      label: 'Good',
+      color: 'text-green-500',
+      icon: CheckCircle2,
+      desc: 'Air quality is satisfactory and poses little or no risk.',
+    };
+  if (aqi <= 100)
+    return {
+      label: 'Moderate',
+      color: 'text-yellow-500',
+      icon: AlertTriangle,
+      desc: 'Air quality is acceptable; however, there may be a moderate health concern for a very small number of people.',
+    };
+  if (aqi <= 150)
+    return {
+      label: 'Unhealthy for Sensitive Groups',
+      color: 'text-orange-500',
+      icon: AlertCircle,
+      desc: 'Members of sensitive groups may experience health effects. The general public is not likely to be affected.',
+    };
+  if (aqi <= 200)
+    return {
+      label: 'Unhealthy',
+      color: 'text-red-500',
+      icon: AlertCircle,
+      desc: 'Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.',
+    };
+  if (aqi <= 300)
+    return {
+      label: 'Very Unhealthy',
+      color: 'text-purple-500',
+      icon: AlertOctagon,
+      desc: 'Health warnings of emergency conditions. The entire population is more likely to be affected.',
+    };
+  return {
+    label: 'Hazardous',
+    color: 'text-rose-900',
+    icon: AlertOctagon,
+    desc: 'Health alert: everyone may experience more serious health effects.',
+  };
 };
 
 const getUvStatus = (uv) => {
@@ -44,7 +98,7 @@ export const Dashboard = () => {
   const setWeatherCondition = useStore((state) => state.setWeatherCondition);
   const setIsDay = useStore((state) => state.setIsDay);
   const setCurrentAQI = useStore((state) => state.setCurrentAQI);
-  const user = useStore(state => state.user);
+  const user = useStore((state) => state.user);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -60,12 +114,12 @@ export const Dashboard = () => {
       try {
         const [currentRes, forecastRes] = await Promise.all([
           environmentService.getCurrentByCoords(lat, lng),
-          fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=us_aqi,pm2_5&timezone=auto&forecast_days=2`).then(res => res.json())
+          environmentService.getForecast(lat, lng).then((res) => res.data),
         ]);
 
         const envData = currentRes.data.data;
         setData(envData);
-        
+
         // Update global derived states for backgrounds and overlays
         const resolvedBg = resolveBackground(envData.weatherCode, envData.isDay);
         setWeatherCondition(resolvedBg);
@@ -73,15 +127,19 @@ export const Dashboard = () => {
         if (envData.aqi) setCurrentAQI(envData.aqi);
 
         if (forecastRes.hourly) {
-          const chartData = forecastRes.hourly.time.map((time, idx) => ({
-            time: new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            aqi: forecastRes.hourly.us_aqi[idx],
-            pm25: forecastRes.hourly.pm2_5[idx]
-          })).slice(0, 24); // next 24 hours
+          const chartData = forecastRes.hourly.time
+            .map((time, idx) => ({
+              time: new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              aqi: forecastRes.hourly.us_aqi[idx],
+              pm25: forecastRes.hourly.pm2_5[idx],
+            }))
+            .slice(0, 24); // next 24 hours
           setForecast(chartData);
         }
       } catch (err) {
-        setError(err.response?.data?.message || err.message || 'Failed to fetch environmental data');
+        setError(
+          err.response?.data?.message || err.message || 'Failed to fetch environmental data'
+        );
       } finally {
         setLoading(false);
       }
@@ -108,23 +166,26 @@ export const Dashboard = () => {
     setLocation(loc);
   };
 
-  if (loading && !data) return (
-    <div className="space-y-6 pb-10 px-2 lg:px-4 min-h-full">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pt-2 md:pt-0">
-        <div>
-          <Skeleton width="300px" height="32px" className="mb-2" />
-          <Skeleton width="200px" height="16px" />
+  if (loading && !data)
+    return (
+      <div className="space-y-6 pb-10 px-2 lg:px-4 min-h-full">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pt-2 md:pt-0">
+          <div>
+            <Skeleton width="300px" height="32px" className="mb-2" />
+            <Skeleton width="200px" height="16px" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          <Skeleton width="150px" height="16px" />
+          <Skeleton width="100px" height="64px" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} width="100%" height="160px" borderRadius="20px" />
+          ))}
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <Skeleton width="150px" height="16px" />
-        <Skeleton width="100px" height="64px" />
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-        {[1,2,3,4].map(i => <Skeleton key={i} width="100%" height="160px" borderRadius="20px" />)}
-      </div>
-    </div>
-  );
+    );
 
   return (
     <div className="space-y-6 animate-fade-in pb-10 px-2 lg:px-4 min-h-full relative">
@@ -156,11 +217,12 @@ export const Dashboard = () => {
 
       {data && (
         <div className="space-y-6">
-
           {/* Main AQI Section (Plain text format) */}
           <div className="flex flex-col justify-start mb-2">
             <div className="flex items-center gap-3 mb-1.5">
-              <span className="text-sm font-semibold text-gray-300 tracking-wide uppercase">Air Quality Index</span>
+              <span className="text-sm font-semibold text-gray-300 tracking-wide uppercase">
+                Air Quality Index
+              </span>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-[10px] font-bold border border-green-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                 Live
@@ -170,7 +232,9 @@ export const Dashboard = () => {
             {data && (
               <div className="flex items-center gap-1.5 text-gray-400 text-sm font-medium mb-4">
                 <MapPin size={14} className="text-gray-500" />
-                {data.city && data.city !== 'Unknown Location' ? `${data.city}${data.country ? `, ${data.country}` : ''}` : (location?.name || 'Unknown Location')}
+                {data.city && data.city !== 'Unknown Location'
+                  ? `${data.city}${data.country ? `, ${data.country}` : ''}`
+                  : location?.name || 'Unknown Location'}
               </div>
             )}
 
@@ -178,25 +242,27 @@ export const Dashboard = () => {
               <div className="text-7xl md:text-8xl font-black text-white leading-none tracking-tighter drop-shadow-lg">
                 {data.aqi || '--'}
               </div>
-              {data.aqi !== undefined && (() => {
-                const aqiStatus = getAqiStatus(data.aqi);
-                const AqiIcon = aqiStatus.icon;
-                return (
-                  <div className="flex flex-col pb-2">
-                    <div className={`flex items-center gap-2 font-bold text-xl mb-1 ${aqiStatus.color}`}>
-                      <AqiIcon size={24} className={aqiStatus.color} />
-                      {aqiStatus.label}
+              {data.aqi !== undefined &&
+                (() => {
+                  const aqiStatus = getAqiStatus(data.aqi);
+                  const AqiIcon = aqiStatus.icon;
+                  return (
+                    <div className="flex flex-col pb-2">
+                      <div
+                        className={`flex items-center gap-2 font-bold text-xl mb-1 ${aqiStatus.color}`}
+                      >
+                        <AqiIcon size={24} className={aqiStatus.color} />
+                        {aqiStatus.label}
+                      </div>
+                      <p className="text-sm text-gray-400 font-medium">{aqiStatus.desc}</p>
                     </div>
-                    <p className="text-sm text-gray-400 font-medium">{aqiStatus.desc}</p>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
             </div>
           </div>
 
           {/* 4-Column Grid for Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
             {/* PM2.5 */}
             <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
@@ -294,7 +360,9 @@ export const Dashboard = () => {
               </div>
               <div className="mt-auto">
                 <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-3xl font-bold text-white">{data.pressure ? Math.round(data.pressure) : '--'}</span>
+                  <span className="text-3xl font-bold text-white">
+                    {data.pressure ? Math.round(data.pressure) : '--'}
+                  </span>
                   <span className="text-[10px] font-medium text-gray-400">hPa</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-green-400 font-bold text-[11px]">
@@ -314,15 +382,18 @@ export const Dashboard = () => {
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-3xl font-bold text-white">{data.uvIndex || '--'}</span>
                 </div>
-                {data.uvIndex !== undefined && (() => {
-                  const uvStatus = getUvStatus(data.uvIndex);
-                  return (
-                    <div className={`flex items-center gap-1.5 font-bold text-[11px] ${uvStatus.color}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${uvStatus.bg}`}></span>
-                      {uvStatus.label}
-                    </div>
-                  );
-                })()}
+                {data.uvIndex !== undefined &&
+                  (() => {
+                    const uvStatus = getUvStatus(data.uvIndex);
+                    return (
+                      <div
+                        className={`flex items-center gap-1.5 font-bold text-[11px] ${uvStatus.color}`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${uvStatus.bg}`}></span>
+                        {uvStatus.label}
+                      </div>
+                    );
+                  })()}
               </div>
             </GlassCard>
 
@@ -334,20 +405,27 @@ export const Dashboard = () => {
               </div>
               <div className="mt-auto">
                 <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-2xl font-bold text-white">{data.sunrise ? new Date(data.sunrise).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}</span>
+                  <span className="text-2xl font-bold text-white">
+                    {data.sunrise
+                      ? new Date(data.sunrise).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : '--'}
+                  </span>
                 </div>
                 <div className="text-[11px] font-medium text-gray-400">Local Time</div>
               </div>
             </GlassCard>
-
           </div>
 
           {/* Bottom Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
             {/* Trend Chart */}
             <GlassCard className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
-              <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">AQI Trend (24h)</h3>
+              <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">
+                AQI Trend (24h)
+              </h3>
               <div className="flex-1 w-full -ml-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={forecast}>
@@ -360,16 +438,29 @@ export const Dashboard = () => {
                     <XAxis
                       dataKey="time"
                       tick={{ fontSize: 10, fill: '#6B7280' }}
-                      tickFormatter={(val, i) => i % 6 === 0 ? val : ''}
+                      tickFormatter={(val, i) => (i % 6 === 0 ? val : '')}
                       axisLine={false}
                       tickLine={false}
                       dy={10}
                     />
                     <Tooltip
-                      contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(10,15,13,0.9)', backdropFilter: 'blur(8px)' }}
+                      contentStyle={{
+                        borderRadius: '12px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backgroundColor: 'rgba(10,15,13,0.9)',
+                        backdropFilter: 'blur(8px)',
+                      }}
                       itemStyle={{ color: '#22C55E' }}
                     />
-                    <Area type="monotone" dataKey="aqi" stroke="#22C55E" strokeWidth={2} fillOpacity={1} fill="url(#colorAqi)" activeDot={{ r: 4, fill: '#22C55E' }} />
+                    <Area
+                      type="monotone"
+                      dataKey="aqi"
+                      stroke="#22C55E"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorAqi)"
+                      activeDot={{ r: 4, fill: '#22C55E' }}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -377,7 +468,9 @@ export const Dashboard = () => {
 
             {/* Breakdown Chart */}
             <GlassCard className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
-              <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">Air Quality Breakdown</h3>
+              <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">
+                Air Quality Breakdown
+              </h3>
               <div className="flex-1 flex flex-col sm:flex-row items-center justify-between px-2 gap-6">
                 <div className="h-40 w-40 relative shrink-0">
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -391,7 +484,7 @@ export const Dashboard = () => {
                             { name: 'Good', value: 70, color: '#22c55e' },
                             { name: 'Moderate', value: 20, color: '#eab308' },
                             { name: 'Unhealthy', value: 8, color: '#f97316' },
-                            { name: 'Very Unhealthy', value: 2, color: '#ef4444' }
+                            { name: 'Very Unhealthy', value: 2, color: '#ef4444' },
                           ]}
                           cx="50%"
                           cy="50%"
@@ -406,12 +499,19 @@ export const Dashboard = () => {
                             { color: '#22c55e' },
                             { color: '#eab308' },
                             { color: '#f97316' },
-                            { color: '#ef4444' }
+                            { color: '#ef4444' },
                           ].map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Tooltip contentStyle={{ backgroundColor: 'rgba(10,15,13,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(10,15,13,0.9)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '8px',
+                            color: '#fff',
+                          }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -422,8 +522,8 @@ export const Dashboard = () => {
                     { label: 'Good (0-50)', pct: '70%', color: 'bg-green-500' },
                     { label: 'Moderate (51-100)', pct: '20%', color: 'bg-yellow-500' },
                     { label: 'Unhealthy (101-150)', pct: '8%', color: 'bg-orange-500' },
-                    { label: 'Very Unhealthy (150+)', pct: '2%', color: 'bg-red-500' }
-                  ].map(item => (
+                    { label: 'Very Unhealthy (150+)', pct: '2%', color: 'bg-red-500' },
+                  ].map((item) => (
                     <div key={item.label} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2 text-gray-300">
                         <span className={`w-2.5 h-2.5 rounded-sm ${item.color}`}></span>
@@ -435,9 +535,7 @@ export const Dashboard = () => {
                 </div>
               </div>
             </GlassCard>
-
           </div>
-
         </div>
       )}
     </div>

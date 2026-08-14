@@ -7,13 +7,13 @@ import { cn } from '../../utils/utils';
 export const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  
-  const alerts = useStore(state => state.alerts);
-  const markAllAlertsRead = useStore(state => state.markAllAlertsRead);
-  const markAlertRead = useStore(state => state.markAlertRead);
-  const clearAllAlerts = useStore(state => state.clearAllAlerts);
-  
-  const unreadCount = alerts.filter(a => !a.read).length;
+
+  const alerts = useStore((state) => state.alerts);
+  const markAllAlertsRead = useStore((state) => state.markAllAlertsRead);
+  const markAlertRead = useStore((state) => state.markAlertRead);
+  const clearAllAlerts = useStore((state) => state.clearAllAlerts);
+
+  const unreadCount = alerts.filter((a) => !a.read).length;
 
   // Handle clicking outside to close
   useEffect(() => {
@@ -36,23 +36,27 @@ export const NotificationDropdown = () => {
 
   const getIcon = (type) => {
     switch (type) {
-      case 'success': return <CheckCircle2 className="text-green-400" size={18} />;
-      case 'warning': return <AlertTriangle className="text-amber-400" size={18} />;
-      case 'danger': return <AlertCircle className="text-red-400" size={18} />;
-      default: return <Info className="text-blue-400" size={18} />;
+      case 'success':
+        return <CheckCircle2 className="text-green-400" size={18} />;
+      case 'warning':
+        return <AlertTriangle className="text-amber-400" size={18} />;
+      case 'danger':
+        return <AlertCircle className="text-red-400" size={18} />;
+      default:
+        return <Info className="text-blue-400" size={18} />;
     }
   };
 
   return (
     <div className="relative z-[100]" ref={dropdownRef}>
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.1] backdrop-blur-xl transition-colors relative",
-          unreadCount > 0 && "animate-pulse" // Subtle pulse when there are unread messages
+          'w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/[0.1] backdrop-blur-xl transition-colors relative',
+          unreadCount > 0 && 'animate-pulse' // Subtle pulse when there are unread messages
         )}
       >
-        <Bell size={18} className={unreadCount > 0 ? "animate-wiggle" : ""} />
+        <Bell size={18} className={unreadCount > 0 ? 'animate-wiggle' : ''} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-black/50">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -74,7 +78,7 @@ export const NotificationDropdown = () => {
               <h3 className="text-sm font-semibold text-white tracking-wide">Notifications</h3>
               <div className="flex items-center gap-2">
                 {alerts.length > 0 && (
-                  <button 
+                  <button
                     onClick={clearAllAlerts}
                     className="text-xs text-gray-400 hover:text-red-400 transition-colors flex items-center gap-1 bg-white/5 px-2 py-1 rounded-md"
                   >
@@ -94,22 +98,27 @@ export const NotificationDropdown = () => {
                 </div>
               ) : (
                 alerts.map((alert) => (
-                  <div 
+                  <div
                     key={alert.id}
                     className={cn(
-                      "flex items-start gap-3 p-3 rounded-xl transition-all duration-300 cursor-pointer",
-                      alert.read ? "bg-transparent opacity-70" : "bg-white/[0.04] border border-white/[0.05] hover:bg-white/[0.08]"
+                      'flex items-start gap-3 p-3 rounded-xl transition-all duration-300 cursor-pointer',
+                      alert.read
+                        ? 'bg-transparent opacity-70'
+                        : 'bg-white/[0.04] border border-white/[0.05] hover:bg-white/[0.08]'
                     )}
                     onClick={() => markAlertRead(alert.id)}
                   >
-                    <div className="shrink-0 mt-0.5">
-                      {getIcon(alert.type || 'info')}
-                    </div>
+                    <div className="shrink-0 mt-0.5">{getIcon(alert.type || 'info')}</div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-white mb-0.5">{alert.title}</p>
                       <p className="text-xs text-gray-400 leading-snug">{alert.message}</p>
                       <p className="text-[10px] text-gray-500 mt-1 font-medium">
-                        {alert.timestamp ? new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
+                        {alert.timestamp
+                          ? new Date(alert.timestamp).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : 'Just now'}
                       </p>
                     </div>
                   </div>

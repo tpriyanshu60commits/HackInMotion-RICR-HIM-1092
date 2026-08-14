@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-primary-50: var(--primary-50);
@@ -24,7 +24,7 @@
 
 @layer base {
   :root {
-    --background: #0A0F0D;
+    --background: #0a0f0d;
     --surface: rgba(0, 0, 0, 0.4);
     --surface-hover: rgba(0, 0, 0, 0.6);
     --border-color: rgba(255, 255, 255, 0.08);
@@ -50,10 +50,17 @@
     @apply bg-background text-text-main font-sans antialiased;
     background-image: var(--bg-image);
     background-attachment: fixed;
-    transition: background 0.5s ease, color 0.5s ease;
+    transition:
+      background 0.5s ease,
+      color 0.5s ease;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-bold tracking-tight text-white;
   }
 }
@@ -61,7 +68,9 @@
 @layer utilities {
   .glass {
     @apply bg-surface backdrop-blur-xl border border-border shadow-lg;
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition:
+      background 0.3s ease,
+      border-color 0.3s ease;
   }
 
   .glass-hover:hover {
@@ -71,47 +80,75 @@
 
 /* Water Drop Loader Keyframes */
 @keyframes fall {
-  0% { transform: translateY(-50px) scaleY(1.2); opacity: 0; }
-  20% { transform: translateY(-20px) scaleY(1.1); opacity: 1; }
-  100% { transform: translateY(0) scaleY(1); opacity: 1; }
+  0% {
+    transform: translateY(-50px) scaleY(1.2);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(-20px) scaleY(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
 }
 
 @keyframes ripple {
-  0% { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(3); opacity: 0; }
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .animate-fall {
     animation: fall 1s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   }
-  
+
   .animate-ripple {
     animation: ripple 1s ease-out infinite;
     animation-delay: 0.5s;
   }
-  
+
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
-  
+
   .animate-fade-in-up {
     animation: fadeInUp 0.5s ease-out forwards;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fall, .animate-ripple, .animate-fade-in, .animate-fade-in-up {
+  .animate-fall,
+  .animate-ripple,
+  .animate-fade-in,
+  .animate-fade-in-up {
     animation: none;
     opacity: 1;
     transform: none;
@@ -119,8 +156,12 @@
 }
 
 @keyframes rainBg {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 600px; }
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 600px;
+  }
 }
 
 .rain-layer-1 {
@@ -142,8 +183,13 @@
 }
 
 @keyframes wiggle {
-  0%, 100% { transform: rotate(-3deg); }
-  50% { transform: rotate(3deg); }
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
 }
 
 .animate-wiggle {
@@ -156,4 +202,3 @@
     display: none !important;
   }
 }
-

@@ -1,4 +1,5 @@
 import Location from '../models/Location.js';
+import User from '../models/User.js';
 
 // @desc    Get all saved locations for a user
 // @route   GET /api/locations
@@ -39,6 +40,12 @@ export const saveLocation = async (req, res, next) => {
       longitude,
       locationType,
     });
+
+    const user = await User.findById(req.user._id);
+    if (user) {
+      user.savedLocations.push(location._id);
+      await user.save();
+    }
 
     res.status(201).json({
       success: true,

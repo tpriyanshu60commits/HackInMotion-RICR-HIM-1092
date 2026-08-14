@@ -1,4 +1,3 @@
-
 import { MapPin, ThumbsUp, Calendar, Clock } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
 import { StatusBadge } from './StatusBadge';
@@ -20,23 +19,26 @@ export const ReportCard = ({ report, onUpvote, currentUserId, onClick }) => {
   const getTimeAgo = (dateStr) => {
     const seconds = Math.floor((new Date() - new Date(dateStr)) / 1000);
     let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + " years ago";
+    if (interval > 1) return Math.floor(interval) + ' years ago';
     interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + " months ago";
+    if (interval > 1) return Math.floor(interval) + ' months ago';
     interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + " days ago";
+    if (interval > 1) return Math.floor(interval) + ' days ago';
     interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + " hours ago";
+    if (interval > 1) return Math.floor(interval) + ' hours ago';
     interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + " minutes ago";
-    return Math.floor(seconds) + " seconds ago";
+    if (interval > 1) return Math.floor(interval) + ' minutes ago';
+    return Math.floor(seconds) + ' seconds ago';
   };
 
   const daysLeftText = getDaysLeft();
   const timeAgo = getTimeAgo(report.createdAt);
 
   return (
-    <GlassCard className="flex flex-col gap-4 p-4 hover:border-white/20 transition-all cursor-pointer group" onClick={onClick}>
+    <GlassCard
+      className="flex flex-col gap-4 p-4 hover:border-white/20 transition-all cursor-pointer group"
+      onClick={onClick}
+    >
       <div className="flex justify-between items-start gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -53,14 +55,12 @@ export const ReportCard = ({ report, onUpvote, currentUserId, onClick }) => {
           <h3 className="font-semibold text-lg text-white group-hover:text-green-400 transition-colors line-clamp-1">
             {report.title}
           </h3>
-          <p className="text-sm text-text-muted mt-1 line-clamp-2">
-            {report.description}
-          </p>
+          <p className="text-sm text-text-muted mt-1 line-clamp-2">{report.description}</p>
         </div>
         {report.photoUrl && (
-          <img 
-            src={report.photoUrl} 
-            alt="Report" 
+          <img
+            src={report.photoUrl}
+            alt="Report"
             className="w-20 h-20 rounded-lg object-cover shrink-0 border border-border"
           />
         )}
@@ -70,7 +70,9 @@ export const ReportCard = ({ report, onUpvote, currentUserId, onClick }) => {
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5 text-xs text-text-muted">
             <MapPin size={14} className="shrink-0" />
-            <span className="truncate max-w-[150px] sm:max-w-[200px]">{report.location?.address}</span>
+            <span className="truncate max-w-[150px] sm:max-w-[200px]">
+              {report.location?.address}
+            </span>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-text-muted">
             <Clock size={14} className="shrink-0" />
@@ -93,7 +95,10 @@ export const ReportCard = ({ report, onUpvote, currentUserId, onClick }) => {
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-hover text-sm font-medium transition-colors border border-border group/btn"
             >
-              <ThumbsUp size={14} className="group-hover/btn:text-green-400 group-hover/btn:-translate-y-0.5 transition-all" />
+              <ThumbsUp
+                size={14}
+                className="group-hover/btn:text-green-400 group-hover/btn:-translate-y-0.5 transition-all"
+              />
               {report.upvotes}
             </button>
           )}

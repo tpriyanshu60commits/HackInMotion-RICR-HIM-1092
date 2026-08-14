@@ -9,11 +9,7 @@ export const AlertToastContainer = () => {
     <div className="fixed top-[90px] right-4 md:right-6 z-[100] pointer-events-none flex flex-col gap-4 items-end">
       <AnimatePresence mode="popLayout">
         {activeToast && (
-          <AlertToast 
-            key={activeToast.id} 
-            toast={activeToast} 
-            onDismiss={dismissToast} 
-          />
+          <AlertToast key={activeToast.id} toast={activeToast} onDismiss={dismissToast} />
         )}
       </AnimatePresence>
     </div>

@@ -1,16 +1,19 @@
 # VerdantX API Documentation
 
 ## Authentication & Users (MOCK)
-*Currently using mock user ID `60d0fe4f5311236168a109ca` for device 3 demo integration.*
+
+_Currently using mock user ID `60d0fe4f5311236168a109ca` for device 3 demo integration._
 
 ---
 
 ## AI Assistant (`/api/ai`)
 
 ### `POST /api/ai/ask`
+
 Submits a prompt to the Groq AI Environmental Agent.
 
 **Request Body:**
+
 ```json
 {
   "message": "What is the air quality in my city?",
@@ -24,6 +27,7 @@ Submits a prompt to the Groq AI Environmental Agent.
 ```
 
 **Response:**
+
 ```json
 {
   "response": "The air quality in your city is currently Moderate with an AQI of 85..."
@@ -33,16 +37,20 @@ Submits a prompt to the Groq AI Environmental Agent.
 ---
 
 ## Environmental Data (`/api/data`)
-*Proxies requests to Open-Meteo free API.*
+
+_Proxies requests to Open-Meteo free API._
 
 ### `GET /api/data/current`
+
 Fetches current AQI, PM2.5, PM10, and Weather.
 
 **Query Parameters:**
+
 - `lat` (required): Latitude
 - `lng` (required): Longitude
 
 **Response:**
+
 ```json
 {
   "aqi": 110,
@@ -56,9 +64,11 @@ Fetches current AQI, PM2.5, PM10, and Weather.
 ```
 
 ### `GET /api/data/forecast`
+
 Fetches 48-hour forecast for AQI and PM2.5.
 
 **Query Parameters:**
+
 - `lat` (required): Latitude
 - `lng` (required): Longitude
 
@@ -67,23 +77,27 @@ Fetches 48-hour forecast for AQI and PM2.5.
 ## Community Reports (`/api/reports`)
 
 ### `POST /api/reports`
+
 Submit a new environmental hazard report.
 
 **Request Body:**
+
 ```json
 {
   "type": "Smoke",
   "severity": "High",
   "description": "Thick black smoke from factory.",
   "lat": 28.6139,
-  "lng": 77.2090
+  "lng": 77.209
 }
 ```
 
 ### `GET /api/reports`
+
 Fetch recent community reports.
 
 **Response:**
+
 ```json
 [
   {
@@ -92,7 +106,7 @@ Fetch recent community reports.
     "severity": "High",
     "description": "Thick black smoke from factory.",
     "lat": 28.6139,
-    "lng": 77.2090,
+    "lng": 77.209,
     "createdAt": "2026-08-12T12:00:00Z"
   }
 ]

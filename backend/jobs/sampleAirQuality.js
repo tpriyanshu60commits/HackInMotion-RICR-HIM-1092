@@ -5,19 +5,25 @@ import { getAirQualityByCoordinates } from '../services/airQualityService.js';
 
 import { getIO } from '../utils/socket.js';
 
+/**
+ * BACKEND ALERT CRON JOB
+ * Distinct Purpose: Periodically samples air quality for all users' saved locations in the background.
+ * It stores historical data snapshots and broadcasts critical updates via WebSockets, even when users are offline.
+ */
 export const startSampleAirQualityJob = () => {
   // Run every 6 hours: '0 */6 * * *'
   cron.schedule('0 */6 * * *', async () => {
     try {
       console.log('Running Air Quality Sampling Cron Job...');
 
-      const users = await User.find({ savedLocations: { $exists: true, $not: { $size: 0 } } })
-        .populate('savedLocations');
+      const users = await User.find({
+        savedLocations: { $exists: true, $not: { $size: 0 } },
+      }).populate('savedLocations');
 
       const uniqueLocations = new Map();
 
-      users.forEach(user => {
-        user.savedLocations.forEach(loc => {
+      users.forEach((user) => {
+        user.savedLocations.forEach((loc) => {
           if (loc.latitude && loc.longitude) {
             uniqueLocations.set(`${loc.latitude},${loc.longitude}`, loc);
           }
@@ -50,16 +56,16 @@ export const startSampleAirQualityJob = () => {
             });
 
             // Emit to all users that have this location saved
-            users.forEach(user => {
-              if (user.savedLocations.some(sl => sl._id.toString() === loc._id.toString())) {
+            users.forEach((user) => {
+              if (user.savedLocations.some((sl) => sl._id.toString() === loc._id.toString())) {
                 try {
                   getIO().to(user._id.toString()).emit('location:update', {
                     locationId: loc._id,
-                    data: snapshot
+                    data: snapshot,
                   });
                 } catch {
                   // Ignore if Socket.IO is not initialized.
-                } 
+                }
               }
             });
           }

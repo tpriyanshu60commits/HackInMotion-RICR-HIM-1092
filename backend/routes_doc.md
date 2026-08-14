@@ -1,6 +1,7 @@
 # BACKEND ROUTES AND APIS
 
 ## ai.js
+
 - Method: POST
   Endpoint: /ask
 - Method: GET
@@ -9,6 +10,7 @@
   Endpoint: /history
 
 ## aiHealthRoutes.js
+
 - Method: POST
   Endpoint: /report/generate
 - Method: GET
@@ -17,6 +19,7 @@
 ## alertRoutes.js
 
 ## authRoutes.js
+
 - Method: POST
   Endpoint: /register
 - Method: POST
@@ -41,12 +44,14 @@
 ## communityRoutes.js
 
 ## data.js
+
 - Method: GET
   Endpoint: /current
 - Method: GET
   Endpoint: /forecast
 
 ## environmentRoutes.js
+
 - Method: GET
   Endpoint: /current
 - Method: GET
@@ -59,6 +64,7 @@
 ## locationRoutes.js
 
 ## locations.js
+
 - Method: POST
   Endpoint: /
 - Method: GET
@@ -67,10 +73,12 @@
   Endpoint: /:id
 
 ## profileRoutes.js
+
 - Method: GET
   Endpoint: /export
 
 ## reports.js
+
 - Method: POST
   Endpoint: /
 - Method: GET
@@ -89,16 +97,18 @@
   Endpoint: /:id/accept-escalation
 
 ## routeRoutes.js
+
 - Method: POST
   Endpoint: /analyze
 
 ## snapshotRoutes.js
+
 - Method: GET
   Endpoint: /:locationId
 
 ## userRoutes.js
+
 - Method: PATCH
   Endpoint: /profile
 - Method: POST
   Endpoint: /profile-image
-
