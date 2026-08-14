@@ -14,8 +14,10 @@ const firebaseConfig = {
 let messaging;
 
 try {
-  const app = initializeApp(firebaseConfig);
-  messaging = getMessaging(app);
+  if (firebaseConfig.projectId) {
+    const app = initializeApp(firebaseConfig);
+    messaging = getMessaging(app);
+  }
 } catch (error) {
   console.log('Firebase initialization error', error);
 }

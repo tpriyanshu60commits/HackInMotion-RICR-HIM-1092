@@ -131,3 +131,11 @@
 .animate-wiggle {
   animation: wiggle 0.3s ease-in-out infinite;
 }
+
+/* Hide mobile bottom navigation when typing (keyboard open) */
+@media (max-width: 768px) {
+  body:has(input:focus, textarea:focus, select:focus) .bottom-nav-mobile {
+    display: none !important;
+  }
+}
+

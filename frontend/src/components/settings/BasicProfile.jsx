@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { User, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { profileAPI } from '../../services/api';
@@ -14,12 +14,7 @@ export const BasicProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setAge(user.healthProfile?.age || '');
-    }
-  }, [user]);
+
 
   const handleSave = async () => {
     setIsSaving(true);

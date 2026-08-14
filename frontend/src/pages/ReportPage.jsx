@@ -55,7 +55,9 @@ export const ReportPage = () => {
   }, [user, fetchAllReports, fetchMyReports]);
 
   const handleSubmitReport = async (formData) => {
-    formData.append('createdBy', user?._id || 'anonymous');
+    if (user?._id) {
+      formData.append('createdBy', user._id);
+    }
     const res = await createReport(formData, user?._id);
     if (res.success) {
       setActiveTab('mine');

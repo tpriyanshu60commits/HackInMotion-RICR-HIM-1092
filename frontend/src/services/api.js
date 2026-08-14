@@ -61,4 +61,10 @@ export const aiService = {
   clearHistory: () => api.delete('/ai/history'),
 };
 
+export const alertService = {
+  getAlerts: () => api.get('/alerts'),
+  markAsRead: (id) => api.put(`/alerts/${id}/read`),
+  deleteAlert: (id) => api.delete(`/alerts/${id}`),
+};
+
 export default api;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Watch, Heart, Activity } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { profileAPI } from '../../services/api';
@@ -10,23 +10,25 @@ export const ConnectedDeviceCard = () => {
   const updateUserProfile = useStore(state => state.updateUserProfile);
   const currentAQI = useStore(state => state.currentAQI);
   
-  const [wearableConnected, setWearableConnected] = useState(user?.healthProfile?.wearableConnected || false);
+  const isConnected = user?.healthProfile?.wearableConnected || false;
+  const [optimisticState, setOptimisticState] = useState(null);
 
-  useEffect(() => {
-    if (user && user.healthProfile) {
-      setWearableConnected(user.healthProfile.wearableConnected || false);
-    }
-  }, [user]);
+  const wearableConnected = optimisticState !== null ? optimisticState : isConnected;
 
   const handleToggle = async (e) => {
     const checked = e.target.checked;
-    setWearableConnected(checked);
+    setOptimisticState(checked);
     try {
       await profileAPI.updateHealthProfile({ wearableConnected: checked });
       const fullProfile = await profileAPI.getProfile();
       updateUserProfile(fullProfile.data.data);
     } catch (error) {
       console.error('Failed to update wearable connected state', error);
+      // Revert optimistic state on error
+      setOptimisticState(null);
+    } finally {
+      // Clear optimistic state once global store is updated
+      setOptimisticState(null);
     }
   };
 

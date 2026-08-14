@@ -33,7 +33,7 @@ export const HistoricalTrends = () => {
         const response = await environmentService.getHistory(selectedLocation.lat, selectedLocation.lng, days);
         if (response.success) {
           setChartData(response.data);
-          console.log('Real Chart Data:', response.data);
+
         }
       } catch (err) {
         console.error(err);

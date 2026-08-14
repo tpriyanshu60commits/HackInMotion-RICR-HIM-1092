@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { HeartPulse, Activity, FileText, Upload, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { HeartPulse, Activity, FileText, CheckCircle2 } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { profileAPI } from '../../services/api';
 import { cn } from '../../utils/utils';
@@ -10,19 +10,12 @@ export const ProfileCard = () => {
   
   const [diagnosedConditions, setDiagnosedConditions] = useState(user?.healthProfile?.diagnosedConditions || []);
   const [prescribedMedication, setPrescribedMedication] = useState(user?.healthProfile?.prescribedMedication || []);
-  
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [newMed, setNewMed] = useState("");
   
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  useEffect(() => {
-    if (user && user.healthProfile) {
-      setDiagnosedConditions(user.healthProfile.diagnosedConditions || []);
-      setPrescribedMedication(user.healthProfile.prescribedMedication || []);
-    }
-  }, [user]);
+
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -48,20 +41,15 @@ export const ProfileCard = () => {
     }
   };
 
-  const handleSimulatedUpload = () => {
-    setIsUploading(true);
-    // Simulate OCR processing time
-    setTimeout(() => {
-      setIsUploading(false);
-      setUploadSuccess(true);
-      // Auto-populate mock structured fields from "Doctor's Report"
-      const autoConditions = ["Asthma", "Hypertension"];
-      const newConditions = [...new Set([...diagnosedConditions, ...autoConditions])];
-      setDiagnosedConditions(newConditions);
-      setPrescribedMedication(["Inhaler - Salbutamol", "BP Medication"]);
-      
-      setTimeout(() => setUploadSuccess(false), 4000);
-    }, 1500);
+  const addMedication = () => {
+    if (newMed.trim() && !prescribedMedication.includes(newMed.trim())) {
+      setPrescribedMedication([...prescribedMedication, newMed.trim()]);
+      setNewMed("");
+    }
+  };
+
+  const removeMedication = (med) => {
+    setPrescribedMedication(prescribedMedication.filter(m => m !== med));
   };
 
   return (
@@ -79,33 +67,6 @@ export const ProfileCard = () => {
       </div>
 
       <div className="space-y-6 flex-1">
-        {/* Doctor's Report (Simulated Upload) */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-            <FileText size={14} /> Doctor's Report Upload
-          </h3>
-          
-          <button 
-            onClick={handleSimulatedUpload}
-            disabled={isUploading}
-            className={cn(
-              "w-full border border-dashed rounded-xl p-4 flex flex-col items-center justify-center transition-all",
-              isUploading ? "border-gray-500 bg-gray-500/10" : 
-              uploadSuccess ? "border-green-500 bg-green-500/10" : "border-white/20 bg-white/5 hover:bg-white/10"
-            )}
-          >
-            {isUploading ? (
-              <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-            ) : uploadSuccess ? (
-              <CheckCircle2 className="text-green-400 mb-1" size={20} />
-            ) : (
-              <Upload className="text-gray-400 mb-1" size={20} />
-            )}
-            <span className="text-sm font-medium text-gray-300 mt-2">
-              {isUploading ? "Scanning document..." : uploadSuccess ? "Data extracted!" : "Upload Medical Report (Simulated)"}
-            </span>
-          </button>
-        </div>
 
         {/* Conditions */}
         <div className="space-y-3">
@@ -141,17 +102,38 @@ export const ProfileCard = () => {
           </div>
         </div>
 
-        {/* Prescribed Meds (Read Only - Populated by Mock Upload) */}
-        {prescribedMedication.length > 0 && (
-          <div className="space-y-2">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Prescribed Medication</h3>
-            <div className="bg-black/20 rounded-xl p-3 border border-white/5">
-              <ul className="list-disc list-inside text-xs text-gray-300 space-y-1">
-                {prescribedMedication.map((med, i) => <li key={i}>{med}</li>)}
-              </ul>
-            </div>
+        {/* Prescribed Meds */}
+        <div className="space-y-3 mt-4">
+          <h3 className="font-semibold text-white border-b border-white/[0.06] pb-2 flex items-center gap-2 text-sm">
+            <FileText size={16} className="text-green-400" /> Prescribed Medication
+          </h3>
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              value={newMed}
+              onChange={(e) => setNewMed(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && addMedication()}
+              placeholder="e.g. Inhaler"
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-500/50"
+            />
+            <button 
+              onClick={addMedication}
+              className="bg-green-500/20 text-green-400 px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-500/30 transition-colors"
+            >
+              Add
+            </button>
           </div>
-        )}
+          {prescribedMedication.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {prescribedMedication.map((med, i) => (
+                <div key={i} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs text-gray-300">
+                  <span>{med}</span>
+                  <button onClick={() => removeMedication(med)} className="text-red-400 hover:text-red-300">&times;</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <div className="mt-6 flex justify-end">
         <button
