@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Sparkles, X, Trash2, User, Bot, AlertCircle, RefreshCw } from 'lucide-react';
 import { aiService } from '../../services/api';
 import useStore from '../../store/useStore';
-import { environmentService } from '../../services/api';
+import { environmentService, API_BASE_URL } from '../../services/api';
 import { cn } from '../../utils/utils';
 
 const QUICK_ACTIONS = [
@@ -78,7 +78,7 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
     try {
       // Setup SSE connection for streaming
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/ai/ask`, {
+      const response = await fetch(`${API_BASE_URL}/ai/ask`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { Map, Plus, X, Loader2 } from 'lucide-react';
 
@@ -27,7 +27,11 @@ export default function CityComparison() {
     setSearch('');
     
     try {
+<<<<<<< Updated upstream
       const res = await axios.get(`http://localhost:5000/api/data/current?lat=${city.lat}&lng=${city.lng}`);
+=======
+      const res = await api.get(`/data/current?lat=${city.lat}&lng=${city.lng}`);
+>>>>>>> Stashed changes
       setCityData(prev => [...prev, {
         name: city.name,
         AQI: res.data.aqi,

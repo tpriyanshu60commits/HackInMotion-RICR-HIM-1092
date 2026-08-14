@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { locationService, environmentService } from '../services/api';
+import { locationService, environmentService, API_BASE_URL } from '../services/api';
 import useStore from '../store/useStore';
 import { io } from 'socket.io-client';
 
@@ -31,7 +31,12 @@ export function useSavedLocations() {
   useEffect(() => {
     if (!user?._id) return;
     
+<<<<<<< Updated upstream
     const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+=======
+    const socketUrl = API_BASE_URL.replace(/\/api$/, '');
+    const socket = io(socketUrl, {
+>>>>>>> Stashed changes
       withCredentials: true
     });
     

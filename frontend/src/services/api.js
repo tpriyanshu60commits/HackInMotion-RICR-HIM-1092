@@ -1,9 +1,19 @@
 import axios from 'axios';
 
+export const getApiBaseUrl = () => {
+  const url = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+  // If the user set VITE_API_URL to the root domain, ensure it ends with /api
+  if (!url.endsWith('/api')) {
+    // Trim trailing slash if present before adding /api
+    return `${url.replace(/\/$/, '')}/api`;
+  }
+  return url;
+};
+
+export const API_BASE_URL = getApiBaseUrl();
+
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_BASE_URL ||
-    'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
