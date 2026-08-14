@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../services/api';
 import {
   AreaChart,
   Area,
@@ -20,6 +21,7 @@ const TrendChart = ({ locationId }) => {
     const fetchSnapshots = async () => {
       setLoading(true);
       try {
+<<<<<<< Updated upstream
         const token = localStorage.getItem('token');
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/snapshots/${locationId}?range=${range}`, {
           headers: {
@@ -27,6 +29,10 @@ const TrendChart = ({ locationId }) => {
           }
         });
         const result = await res.json();
+=======
+        const res = await api.get(`/snapshots/${locationId}?range=${range}`);
+        const result = res.data;
+>>>>>>> Stashed changes
         
         if (result.success) {
           const formatted = result.data.map(d => ({
