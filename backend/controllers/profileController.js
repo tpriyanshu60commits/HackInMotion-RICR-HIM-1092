@@ -236,3 +236,23 @@ export const updatePrivacySettings = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateFCMToken = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+
+    user.fcmToken = req.body.token;
+    await user.save();
+    
+    res.json({
+      success: true,
+      message: 'FCM token updated successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};

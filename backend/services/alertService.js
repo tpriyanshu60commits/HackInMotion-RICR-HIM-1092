@@ -36,7 +36,7 @@ export const checkLocationsAndAlert = async () => {
           if (user.alertPreferences.highRisk && risk.severity >= 4) {
             // UNHEALTHY or worse
             await createAlertIfNotExists(
-              user._id,
+              user,
               location._id,
               "high-risk",
               `High Risk Alert for ${location.name}`,
@@ -47,7 +47,7 @@ export const checkLocationsAndAlert = async () => {
           // Check for Moderate Risk
           else if (user.alertPreferences.moderateRisk && risk.severity === 3) {
             await createAlertIfNotExists(
-              user._id,
+              user,
               location._id,
               "moderate-risk",
               `Moderate Risk Warning for ${location.name}`,
@@ -68,8 +68,10 @@ export const checkLocationsAndAlert = async () => {
   }
 };
 
+import { sendPushNotification } from '../utils/firebaseAdmin.js';
+
 const createAlertIfNotExists = async (
-  userId,
+  user,
   locationId,
   type,
   title,
@@ -81,7 +83,7 @@ const createAlertIfNotExists = async (
   oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
   const existingAlert = await Alert.findOne({
-    user: userId,
+    user: user._id,
     location: locationId,
     type,
     createdAt: { $gte: oneDayAgo },
@@ -89,14 +91,23 @@ const createAlertIfNotExists = async (
 
   if (!existingAlert) {
     await Alert.create({
-      user: userId,
+      user: user._id,
       location: locationId,
       type,
       title,
       message,
       aqiValue,
     });
-    console.log(`Created alert for user ${userId} at location ${locationId}`);
+    console.log(`Created alert for user ${user._id} at location ${locationId}`);
+    
+    // Send Push Notification if token exists
+    if (user.fcmToken) {
+      await sendPushNotification(user.fcmToken, title, message, {
+        locationId: locationId.toString(),
+        type,
+        aqiValue: aqiValue.toString()
+      });
+    }
   }
 };
 

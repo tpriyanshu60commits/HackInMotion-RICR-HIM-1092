@@ -14,6 +14,7 @@ import useStore from '../store/useStore';
 import { resolveBackground } from '../utils/resolveBackground';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { XAxis, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
+import Skeleton from '../components/common/Skeleton';
 
 const getAqiStatus = (aqi) => {
   if (aqi <= 50) return { label: 'Good', color: 'text-green-500', icon: CheckCircle2, desc: 'Air quality is satisfactory and poses little or no risk.' };
@@ -108,8 +109,20 @@ export const Dashboard = () => {
   };
 
   if (loading && !data) return (
-    <div className="flex-1 flex items-center justify-center min-h-[80vh]">
-      <WaterDropLoader message="Analyzing atmosphere..." />
+    <div className="space-y-6 pb-10 px-2 lg:px-4 min-h-full">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pt-2 md:pt-0">
+        <div>
+          <Skeleton width="300px" height="32px" className="mb-2" />
+          <Skeleton width="200px" height="16px" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+        <Skeleton width="150px" height="16px" />
+        <Skeleton width="100px" height="64px" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        {[1,2,3,4].map(i => <Skeleton key={i} width="100%" height="160px" borderRadius="20px" />)}
+      </div>
     </div>
   );
 

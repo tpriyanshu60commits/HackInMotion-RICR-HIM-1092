@@ -81,15 +81,6 @@
   100% { transform: scale(3); opacity: 0; }
 }
 
-.animate-fall {
-  animation: fall 1s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-}
-
-.animate-ripple {
-  animation: ripple 1s ease-out infinite;
-  animation-delay: 0.5s;
-}
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -100,12 +91,31 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+@media (prefers-reduced-motion: no-preference) {
+  .animate-fall {
+    animation: fall 1s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  }
+  
+  .animate-ripple {
+    animation: ripple 1s ease-out infinite;
+    animation-delay: 0.5s;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out forwards;
+@media (prefers-reduced-motion: reduce) {
+  .animate-fall, .animate-ripple, .animate-fade-in, .animate-fade-in-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes rain {

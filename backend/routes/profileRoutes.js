@@ -10,6 +10,7 @@ import {
   updatePreferences,
   getPrivacySettings,
   updatePrivacySettings,
+  updateFCMToken,
 } from '../controllers/profileController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -37,5 +38,7 @@ router.route('/preferences')
 router.route('/privacy')
   .get(getPrivacySettings)
   .put(updatePrivacySettings);
+
+router.post('/fcm-token', updateFCMToken);
 
 export default router;

@@ -14,10 +14,14 @@ export const errorHandler = (err, req, res, next) => {
     message = 'Resource not found';
   }
 
+  // Standardized MNC-level error response
   res.status(statusCode).json({
     success: false,
-    message,
-    code: statusCode.toString(),
-    details: process.env.NODE_ENV === 'production' ? null : err.stack,
+    error: {
+      code: err.code || statusCode.toString(),
+      message,
+    },
+    // Keep stack trace in dev
+    details: process.env.NODE_ENV === 'production' ? undefined : err.stack,
   });
 };
