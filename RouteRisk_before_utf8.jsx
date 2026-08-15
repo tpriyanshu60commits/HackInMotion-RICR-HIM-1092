@@ -8,6 +8,9 @@ import {
   MapPin,
   ArrowRight,
   ShieldAlert,
+  Fuel,
+  Bed,
+  Activity,
 } from 'lucide-react';
 
 // Γ£à feature/SS06: Popup and Marker used for amenity markers
@@ -15,7 +18,6 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 
 // Γ£à feature/SS06: needed for custom div icons
 import L from 'leaflet';
-import { LocationSearch } from '../components/common/LocationSearch';
 
 // Γ£à feature/SS06: needed for route analysis API call
 import axios from 'axios';
@@ -86,10 +88,7 @@ export const RouteRisk = () => {
           <div className="flex-1 w-full relative group z-20">
             <LocationSearch
               initialQuery={origin}
-              onLocationSelect={(loc) => {
-                setOrigin(loc.name);
-                setOriginCoords({ lat: loc.lat, lng: loc.lng });
-              }}
+              onLocationSelect={(loc) => setOrigin(loc.name)}
               retainSelection={true}
               className="w-full"
             />
@@ -100,10 +99,7 @@ export const RouteRisk = () => {
           <div className="flex-1 w-full relative group z-10">
             <LocationSearch
               initialQuery={destination}
-              onLocationSelect={(loc) => {
-                setDestination(loc.name);
-                setDestCoords({ lat: loc.lat, lng: loc.lng });
-              }}
+              onLocationSelect={(loc) => setDestination(loc.name)}
               retainSelection={true}
               className="w-full"
             />
@@ -145,13 +141,13 @@ export const RouteRisk = () => {
                       <Marker position={routePositions[0]} />
                       <Marker position={routePositions[routePositions.length - 1]} />
                       <Polyline
-                         positions={routePositions}
-                         pathOptions={{
-                           color: '#F59E0B',
-                           weight: 4,
-                           opacity: 0.8,
-                           className: 'animate-pulse',
-                         }}
+                        positions={routePositions}
+                        pathOptions={{
+                          color: '#F59E0B',
+                          weight: 4,
+                          opacity: 0.8,
+                          className: 'animate-pulse',
+                        }}
                       />
                     </>
                   )}
@@ -192,7 +188,7 @@ export const RouteRisk = () => {
 
           {/* Risk Summary (30%) */}
           {result ? (
-            <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out flex flex-col shadow-2xl">
+            <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out hover:-translate-y-[2px] flex flex-col shadow-2xl">
               <h2 className="text-lg font-semibold text-white mb-8 pb-4 border-b border-white/[0.05]">
                 Route Risk
               </h2>
@@ -204,12 +200,12 @@ export const RouteRisk = () => {
                 </span>
                 <div className="flex items-baseline gap-4">
                   <span className="text-6xl font-black text-white leading-none tracking-tighter">
-                    {result.risk?.averageAQI}
+                    {result.risk.averageAQI}
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.4)]" />
                     <span className="text-base font-bold uppercase tracking-wider text-yellow-500">
-                      {result.risk?.label}
+                      {result.risk.label}
                     </span>
                   </div>
                 </div>
@@ -222,7 +218,7 @@ export const RouteRisk = () => {
                     Distance
                   </span>
                   <span className="text-2xl font-bold text-cyan-400">
-                    {result.route?.distanceKm} km
+                    {result.route.distanceKm} km
                   </span>
                 </div>
                 <div className="p-5 bg-cyan-500/5 border border-cyan-500/20 rounded-xl">
@@ -230,7 +226,7 @@ export const RouteRisk = () => {
                     Duration
                   </span>
                   <span className="text-2xl font-bold text-cyan-400">
-                    {result.route?.durationMin} min
+                    {result.route.durationMin} min
                   </span>
                 </div>
               </div>
@@ -265,21 +261,23 @@ export const RouteRisk = () => {
                     </div>
                   </div>
 
-              {result.risk?.worstPoint && (
-                <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                  <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-2">
-                    <ShieldAlert size={16} /> Worst Stretch
-                  </h4>
-                  <p className="text-sm text-gray-300">
-                    We detected a high risk zone with an AQI of{' '}
-                    <span className="font-bold text-orange-400">
-                      {result.risk.worstPoint.aqi}
-                    </span>{' '}
-                    along your route. Ensure your windows are rolled up and air recirculation is
-                    active.
-                  </p>
+                  {result.risk.worstPoint && (
+                    <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                      <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-2">
+                        <ShieldAlert size={16} /> Worst Stretch
+                      </h4>
+                      <p className="text-sm text-gray-300">
+                        We detected a high risk zone with an AQI of{' '}
+                        <span className="font-bold text-orange-400">
+                          {result.risk.worstPoint.aqi}
+                        </span>{' '}
+                        along your route. Ensure your windows are rolled up and air recirculation is
+                        active.
+                      </p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           ) : (
             <div className="col-span-1 bg-white/[0.02] backdrop-blur-[24px] border border-white/[0.04] rounded-2xl p-6 lg:p-8 flex flex-col items-center justify-center text-center shadow-2xl">
