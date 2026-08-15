@@ -83,7 +83,7 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
       // Setup SSE connection for streaming
       const token = localStorage.getItem('auth_token');
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/ai/ask`,
+        `${API_BASE_URL}/ai/ask`,
         {
           method: 'POST',
           headers: {

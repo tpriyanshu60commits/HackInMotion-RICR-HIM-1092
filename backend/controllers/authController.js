@@ -90,9 +90,12 @@ export const loginUser = async (req, res, next) => {
 // @route   POST /api/auth/logout
 // @access  Public
 export const logoutUser = (req, res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
   res.cookie('jwt', '', {
     httpOnly: true,
     expires: new Date(0),
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'strict',
   });
 
   res.status(200).json({ success: true, message: 'Logged out successfully' });
@@ -181,7 +184,8 @@ export const forgotPassword = async (req, res, next) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    const clientUrl = process.env.NODE_ENV === 'production' ? (process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app') : (process.env.CLIENT_URL || 'http://localhost:5173');
+    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     try {
       await sendEmail({
         to: user.email,
@@ -222,7 +226,8 @@ export const resetPassword = async (req, res, next) => {
 export const googleAuthCallback = async (req, res, next) => {
   try {
     const token = generateToken(res, req.user._id);
-    const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/login?token=${token}`;
+    const clientUrl = process.env.NODE_ENV === 'production' ? (process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app') : (process.env.CLIENT_URL || 'http://localhost:5173');
+    const redirectUrl = `${clientUrl}/login?token=${token}`;
     res.redirect(redirectUrl);
   } catch (err) {
     next(err);

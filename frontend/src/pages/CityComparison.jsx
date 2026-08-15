@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import {
   BarChart,
   Bar,
@@ -36,8 +36,8 @@ export default function CityComparison() {
     setSearch('');
 
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/data/current?lat=${city.lat}&lng=${city.lng}`
+      const res = await api.get(
+        `/environment/current?lat=${city.lat}&lng=${city.lng}`
       );
       setCityData((prev) => [
         ...prev,
