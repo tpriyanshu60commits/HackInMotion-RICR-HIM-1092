@@ -181,42 +181,42 @@ export const HistoricalTrends = () => {
     stats.trend > 0 ? 'Worsened AQI' : stats.trend < 0 ? 'Improved AQI' : 'Stable AQI';
 
   return (
-    <div className="min-h-full relative px-2 lg:px-4 pb-10">
+    <div className="min-h-full relative px-3 sm:px-4 lg:px-6 pb-8 sm:pb-10">
       {/* Header and Filters Container */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 pt-4">
-        <div className="flex-1 w-full md:w-auto">
-          <h1 className="text-3xl font-bold tracking-tight mb-2 text-white drop-shadow-md">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-5 sm:gap-6 mb-6 sm:mb-8 pt-4">
+        <div className="flex-1 w-full lg:w-auto min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-white drop-shadow-md">
             Historical Trends
           </h1>
-          <p className="text-sm text-gray-400 font-medium mb-3">
+          <p className="text-xs sm:text-sm text-gray-400 font-medium mb-3">
             Track environmental changes and patterns over time.
           </p>
-          <div className="flex items-center gap-2 mb-4 text-sm">
+          <div className="flex flex-wrap items-center gap-2 mb-4 text-xs sm:text-sm">
             <span className="text-gray-300 font-medium">Showing data for:</span>
-            <span className="text-green-400 font-bold">
+            <span className="text-green-400 font-bold truncate max-w-[220px] sm:max-w-none">
               {selectedLocation?.name || 'Select a location'}
             </span>
           </div>
-          <div className="max-w-md w-full relative z-50">
+          <div className="max-w-full sm:max-w-md w-full relative z-50">
             <LocationSearch onLocationSelect={setSelectedLocation} />
           </div>
         </div>
 
         {/* Compact Glass Controls */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full lg:w-auto">
           {/* Mock AQI dropdown for visual completeness as requested */}
-          <div className="flex items-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/[0.1] rounded-full px-4 py-2 text-sm text-gray-300 transition-all hover:bg-white/[0.06] cursor-pointer">
+          <div className="flex items-center justify-between sm:justify-center gap-2 bg-white/[0.04] backdrop-blur-xl border border-white/[0.1] rounded-full px-4 py-2 text-xs sm:text-sm text-gray-300 transition-all hover:bg-white/[0.06] cursor-pointer whitespace-nowrap">
             <span className="font-semibold text-gray-200">Metric:</span>
             <span className="text-gray-400">AQI</span>
             <span className="text-gray-500 text-[10px] ml-1">▼</span>
           </div>
 
-          <div className="flex bg-white/[0.04] backdrop-blur-xl border border-white/[0.1] rounded-full p-1 shadow-sm">
+          <div className="flex bg-white/[0.04] backdrop-blur-xl border border-white/[0.1] rounded-full p-1 shadow-sm overflow-x-auto no-scrollbar">
             {['7 Days', '30 Days', '90 Days'].map((r) => (
               <button
                 key={r}
                 onClick={() => setRange(r)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all duration-300 ${
+                className={`flex-1 sm:flex-none whitespace-nowrap px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all duration-300 ${
                   range === r
                     ? 'bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.15)]'
                     : 'text-gray-400 hover:text-white hover:bg-white/[0.05] border border-transparent'
@@ -230,30 +230,35 @@ export const HistoricalTrends = () => {
       </div>
 
       {/* Main Content Area: Chart and Summary Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
         {/* Main Chart Panel */}
         <div className="lg:col-span-2 mb-6 lg:mb-0">
           <GlassCard
             hover={false}
-            className="p-6 md:p-8 bg-white/[0.02] border-white/[0.06] backdrop-blur-[24px] h-full flex flex-col"
+            className="p-4 sm:p-6 md:p-8 bg-white/[0.02] border-white/[0.06] backdrop-blur-[24px] h-full flex flex-col"
           >
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-8 flex items-center gap-2">
-              <Calendar size={16} className="text-green-500" />
+            <h3 className="text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-wider mb-6 sm:mb-8 flex items-center gap-2">
+              <Calendar size={16} className="text-green-500 shrink-0" />
               AQI Trend ({range})
             </h3>
-            <div className="h-[400px] lg:h-[500px] w-full flex items-center justify-center flex-1">
+            <div className="min-h-[280px] sm:min-h-[360px] md:min-h-[420px] lg:min-h-[500px] w-full flex items-center justify-center flex-1 min-w-0">
               {loading ? (
-                <div className="text-green-500 flex flex-col items-center">
+                <div className="text-green-500 flex flex-col items-center text-center px-4">
                   <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p>Loading historical data...</p>
+                  <p className="text-sm sm:text-base">Loading historical data...</p>
                 </div>
               ) : error ? (
-                <div className="text-red-400">{error}</div>
+                <div className="text-red-400 text-sm sm:text-base text-center px-4">{error}</div>
               ) : chartData.length === 0 ? (
-                <div className="text-gray-400">No data available for this location.</div>
+                <div className="text-gray-400 text-sm sm:text-base text-center px-4">
+                  No data available for this location.
+                </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <AreaChart
+                    data={chartData}
+                    margin={{ top: 10, right: 5, left: -25, bottom: 0 }}
+                  >
                     <defs>
                       <linearGradient id="colorAqi" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#22C55E" stopOpacity={0.3} />
@@ -269,9 +274,10 @@ export const HistoricalTrends = () => {
                       dataKey="date"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#6B7280', fontSize: 12, fontWeight: 500 }}
+                      tick={{ fill: '#6B7280', fontSize: 11, fontWeight: 500 }}
                       dy={15}
                       interval="preserveStartEnd"
+                      minTickGap={20}
                       tickFormatter={(dateStr) => {
                         if (!dateStr) return '';
                         // Append a dummy time to parse the date in local timezone instead of UTC
@@ -284,8 +290,9 @@ export const HistoricalTrends = () => {
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#6B7280', fontSize: 12, fontWeight: 500 }}
+                      tick={{ fill: '#6B7280', fontSize: 11, fontWeight: 500 }}
                       dx={-10}
+                      width={40}
                     />
                     <Tooltip
                       contentStyle={{
@@ -295,6 +302,7 @@ export const HistoricalTrends = () => {
                         backdropFilter: 'blur(16px)',
                         boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
                         padding: '12px 16px',
+                        fontSize: '12px',
                       }}
                       itemStyle={{ color: '#22C55E', fontWeight: 'bold' }}
                       labelStyle={{ color: '#9CA3AF', fontWeight: '600', marginBottom: '8px' }}
@@ -326,24 +334,24 @@ export const HistoricalTrends = () => {
         </div>
 
         {/* Summary Stat Cards */}
-        <div className="lg:col-span-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-6">
+        <div className="lg:col-span-1 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-5 sm:gap-6">
           {/* Trend Analysis Card */}
-          <GlassCard className="flex flex-col p-6 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.15] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out cursor-default">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Activity size={14} className="text-gray-500" />
+          <GlassCard className="flex flex-col p-5 sm:p-6 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.15] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out cursor-default">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
+              <Activity size={14} className="text-gray-500 shrink-0" />
               Trend Analysis
             </h3>
             <div className="flex-1 flex flex-col justify-center">
               {loading ? (
-                <div className="animate-pulse h-10 w-24 bg-white/10 rounded mb-3"></div>
+                <div className="animate-pulse h-9 sm:h-10 w-20 sm:w-24 bg-white/10 rounded mb-3"></div>
               ) : (
                 <>
-                  <div className="text-4xl font-black text-white mb-3 tracking-tighter">
+                  <div className="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tighter">
                     {trendSign}
                     {stats.trend}%
                   </div>
                   <div className={`flex items-center gap-1.5 text-xs font-bold ${trendColor}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${trendBg} ${trendShadow}`}></span>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${trendBg} ${trendShadow}`}></span>
                     {trendText}
                   </div>
                 </>
@@ -352,17 +360,17 @@ export const HistoricalTrends = () => {
           </GlassCard>
 
           {/* PM2.5 Average Card */}
-          <GlassCard className="flex flex-col p-6 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.15] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out cursor-default">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Wind size={14} className="text-gray-500" />
+          <GlassCard className="flex flex-col p-5 sm:p-6 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.15] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out cursor-default">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
+              <Wind size={14} className="text-gray-500 shrink-0" />
               Average PM2.5 ({range})
             </h3>
             <div className="flex-1 flex flex-col justify-center">
               {loading ? (
-                <div className="animate-pulse h-10 w-32 bg-white/10 rounded mb-3"></div>
+                <div className="animate-pulse h-9 sm:h-10 w-28 sm:w-32 bg-white/10 rounded mb-3"></div>
               ) : (
                 <>
-                  <div className="text-4xl font-black text-white mb-3 tracking-tighter flex items-baseline gap-1">
+                  <div className="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tighter flex items-baseline gap-1 flex-wrap">
                     {stats.pm25}{' '}
                     <span className="text-sm font-semibold text-gray-500 tracking-normal">
                       µg/m³
@@ -372,7 +380,7 @@ export const HistoricalTrends = () => {
                     className={`flex items-center gap-1.5 text-xs font-bold ${pm25Status.color}`}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${pm25Status.bg} ${pm25Status.shadow}`}
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${pm25Status.bg} ${pm25Status.shadow}`}
                     ></span>
                     {pm25Status.text}
                   </div>
@@ -382,17 +390,17 @@ export const HistoricalTrends = () => {
           </GlassCard>
 
           {/* PM10 Average Card */}
-          <GlassCard className="flex flex-col p-6 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.15] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out cursor-default">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Wind size={14} className="text-gray-500" />
+          <GlassCard className="flex flex-col p-5 sm:p-6 border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.15] hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 ease-out cursor-default">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-2">
+              <Wind size={14} className="text-gray-500 shrink-0" />
               Average PM10 ({range})
             </h3>
             <div className="flex-1 flex flex-col justify-center">
               {loading ? (
-                <div className="animate-pulse h-10 w-32 bg-white/10 rounded mb-3"></div>
+                <div className="animate-pulse h-9 sm:h-10 w-28 sm:w-32 bg-white/10 rounded mb-3"></div>
               ) : (
                 <>
-                  <div className="text-4xl font-black text-white mb-3 tracking-tighter flex items-baseline gap-1">
+                  <div className="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tighter flex items-baseline gap-1 flex-wrap">
                     {stats.pm10}{' '}
                     <span className="text-sm font-semibold text-gray-500 tracking-normal">
                       µg/m³
@@ -402,7 +410,7 @@ export const HistoricalTrends = () => {
                     className={`flex items-center gap-1.5 text-xs font-bold ${pm10Status.color}`}
                   >
                     <span
-                      className={`w-1.5 h-1.5 rounded-full ${pm10Status.bg} ${pm10Status.shadow}`}
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${pm10Status.bg} ${pm10Status.shadow}`}
                     ></span>
                     {pm10Status.text}
                   </div>

@@ -53,7 +53,7 @@ export const MainLayout = () => {
         {/* =====================================================
             TOP NAVBAR
         ====================================================== */}
-        <header className="glass border-b border-border fixed top-2 z-[90] w-19/20 h-16 hidden md:flex items-center justify-between ms-10 mt-5 px-4 md:px-8 rounded-full">
+        <header className="glass border-b border-border fixed top-2 z-[90] w-19/20 h-16 hidden md:flex items-center justify-between ms-10 mt-1 px-4 md:px-8 rounded-full">
           {/* Logo Section */}
           <Link
             to="/dashboard"
