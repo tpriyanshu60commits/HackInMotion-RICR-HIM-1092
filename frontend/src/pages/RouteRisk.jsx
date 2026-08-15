@@ -1,20 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import api from '../services/api';
 import {
   Navigation as NavIcon,
   MapPin,
   ArrowRight,
   ShieldAlert,
-  Fuel,
-  Bed,
-  Activity,
 } from 'lucide-react';
 
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
-import axios from 'axios';
 import { LocationSearch } from '../components/common/LocationSearch';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts';
 
 const createIcon = (color, emoji) =>
   L.divIcon({
@@ -31,26 +26,17 @@ const hospitalIcon = createIcon('#EF4444', '🏥');
 
 export const RouteRisk = () => {
   const [analyzing, setAnalyzing] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [origin, setOrigin] = useState('');
   const [originCoords, setOriginCoords] = useState(null);
   const [destination, setDestination] = useState('');
   const [destCoords, setDestCoords] = useState(null);
   const [result, setResult] = useState(null);
-  const [mapCenter, setMapCenter] = useState([20.5937, 78.9629]);
-  const [routePositions, setRoutePositions] = useState([]);
-  const [cityData, setCityData] = useState([]);
-
-  useEffect(() => {
-    if (result && result.route && result.route.coordinates) {
-      setRoutePositions(result.route.coordinates);
-    }
-  }, [result]);
+  const mapCenter = [20.5937, 78.9629];
+  const routePositions = result?.route?.coordinates || [];
 
   const handleAnalyze = async () => {
     if (!origin || !destination) return;
     setAnalyzing(true);
-    setLoading(true);
     try {
       const response = await api.post(
         '/route/analyze',
@@ -65,7 +51,6 @@ export const RouteRisk = () => {
       alert(errorMessage);
     } finally {
       setAnalyzing(false);
-      setLoading(false);
     }
   };
 
@@ -258,48 +243,6 @@ export const RouteRisk = () => {
           )}
         </div>
 
-        {cityData.length > 0 ? (
-          <div className="h-96 w-full mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={cityData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 5
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="name" stroke="var(--muted-foreground)" />
-                <YAxis stroke="var(--muted-foreground)" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--card)',
-                    borderColor: 'var(--border)',
-                    borderRadius: '12px',
-                    boxShadow: 'var(--shadow)'
-                  }}
-                  itemStyle={{
-                    color: 'var(--foreground)',
-                    fontWeight: 500
-                  }}
-                  cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
-                />
-                <Legend />
-                <Bar dataKey="AQI" fill="var(--destructive)" radius={[4, 4, 0, 0]} name="US AQI" />
-                <Bar dataKey="PM25" fill="var(--warning)" radius={[4, 4, 0, 0]} name="PM2.5 (µg/m³)" />
-                <Bar dataKey="temp" fill="var(--primary)" radius={[4, 4, 0, 0]} name="Temp (°C)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <div className="text-center py-20 border-2 border-dashed border-border rounded-2xl">
-            <p className="text-muted-foreground">
-              Add cities to begin comparison
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
