@@ -1,4 +1,4 @@
-﻿// Γ£à master: React default import not needed in modern React (17+)
+// Γ£à master: React default import not needed in modern React (17+)
 import { useState } from 'react';
 import { LocationSearch } from '../components/common/LocationSearch';
 
@@ -8,6 +8,9 @@ import {
   MapPin,
   ArrowRight,
   ShieldAlert,
+  Fuel,
+  Bed,
+  Activity,
 } from 'lucide-react';
 
 // Γ£à feature/SS06: Popup and Marker used for amenity markers
@@ -15,7 +18,6 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 
 // Γ£à feature/SS06: needed for custom div icons
 import L from 'leaflet';
-import { LocationSearch } from '../components/common/LocationSearch';
 
 // Γ£à feature/SS06: needed for route analysis API call
 import axios from 'axios';
@@ -264,6 +266,8 @@ export const RouteRisk = () => {
                       <span className="text-xs text-gray-400">Hospitals</span>
                     </div>
                   </div>
+                </div>
+              </div>
 
               {result.risk?.worstPoint && (
                 <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
