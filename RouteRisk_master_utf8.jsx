@@ -1,13 +1,13 @@
-﻿// Γ£à master: React default import not needed in modern React (17+)
-import { useState } from 'react';
-import { LocationSearch } from '../components/common/LocationSearch';
-
-// Γ£à feature/SS06: all icons used in the component body
+﻿import { useState } from 'react';
+import api from '../services/api';
 import {
   Navigation as NavIcon,
   MapPin,
   ArrowRight,
   ShieldAlert,
+  Fuel,
+  Bed,
+  Activity,
 } from 'lucide-react';
 
 // Γ£à feature/SS06: Popup and Marker used for amenity markers
@@ -15,7 +15,6 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 
 // Γ£à feature/SS06: needed for custom div icons
 import L from 'leaflet';
-import { LocationSearch } from '../components/common/LocationSearch';
 
 // Γ£à feature/SS06: needed for route analysis API call
 import axios from 'axios';
@@ -34,39 +33,41 @@ const fuelIcon = createIcon('#F59E0B', 'Γ¢╜');
 const hotelIcon = createIcon('#3B82F6', '≡ƒÅ¿');
 const hospitalIcon = createIcon('#EF4444', '≡ƒÅÑ');
 
-export const RouteRisk = () => {
-  const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState(null);
-
-  const [origin, setOrigin] = useState('New Delhi, India');
-  const [destination, setDestination] = useState('Gurgaon, India');
-
-  const handleAnalyze = async () => {
-    setAnalyzing(true);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/route/analyze`,
-        { origin, destination }
+      const res = await api.get(
+        `/data/current?lat=${city.lat}&lng=${city.lng}`
       );
-      if (response.data.success) {
-        setResult(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error analyzing route:', error);
-      alert('Failed to analyze route. Please try again.');
+
+      setCityData(prev => [
+        ...prev,
+        {
+          name: city.name,
+          AQI: res.data.aqi,
+          PM25: res.data.pm2_5,
+          temp: res.data.temperature
+        }
+      ]);
+    } catch (err) {
+      console.error(`Failed to fetch data for ${city.name}:`, err);
+
+      // Remove city if API request fails
+      setSelectedCities(prev =>
+        prev.filter(c => c.name !== city.name)
+      );
     } finally {
-      setAnalyzing(false);
+      setLoading(false);
     }
   };
 
-  // Dynamically generated route positions from API response
-  const routePositions = result?.route?.geometry || [];
+  const removeCity = (cityName) => {
+    setSelectedCities(prev =>
+      prev.filter(c => c.name !== cityName)
+    );
 
-  // Center map dynamically
-  const mapCenter =
-    routePositions.length > 0
-      ? routePositions[Math.floor(routePositions.length / 2)]
-      : [28.6139, 77.209];
+    setCityData(prev =>
+      prev.filter(c => c.name !== cityName)
+    );
+  };
 
   return (
     <div className="min-h-full relative px-4 lg:px-8 py-8 animate-fade-in flex flex-col">
@@ -86,10 +87,7 @@ export const RouteRisk = () => {
           <div className="flex-1 w-full relative group z-20">
             <LocationSearch
               initialQuery={origin}
-              onLocationSelect={(loc) => {
-                setOrigin(loc.name);
-                setOriginCoords({ lat: loc.lat, lng: loc.lng });
-              }}
+              onLocationSelect={(loc) => setOrigin(loc.name)}
               retainSelection={true}
               className="w-full"
             />
@@ -100,29 +98,17 @@ export const RouteRisk = () => {
           <div className="flex-1 w-full relative group z-10">
             <LocationSearch
               initialQuery={destination}
-              onLocationSelect={(loc) => {
-                setDestination(loc.name);
-                setDestCoords({ lat: loc.lat, lng: loc.lng });
-              }}
+              onLocationSelect={(loc) => setDestination(loc.name)}
               retainSelection={true}
               className="w-full"
             />
           </div>
 
-          <button
-            onClick={handleAnalyze}
-            disabled={analyzing}
-            className="w-full lg:w-auto px-8 py-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl font-bold hover:bg-green-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {analyzing ? (
-              <span className="flex items-center gap-2">
-                Analyzing <span className="animate-spin">Γå╗</span>
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">Analyze</span>
-            )}
-          </button>
+          <p className="text-muted-foreground text-sm">
+            Compare environmental risk across multiple locations
+          </p>
         </div>
+      </div>
 
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 flex-1">
@@ -145,13 +131,13 @@ export const RouteRisk = () => {
                       <Marker position={routePositions[0]} />
                       <Marker position={routePositions[routePositions.length - 1]} />
                       <Polyline
-                         positions={routePositions}
-                         pathOptions={{
-                           color: '#F59E0B',
-                           weight: 4,
-                           opacity: 0.8,
-                           className: 'animate-pulse',
-                         }}
+                        positions={routePositions}
+                        pathOptions={{
+                          color: '#F59E0B',
+                          weight: 4,
+                          opacity: 0.8,
+                          className: 'animate-pulse',
+                        }}
                       />
                     </>
                   )}
@@ -192,7 +178,7 @@ export const RouteRisk = () => {
 
           {/* Risk Summary (30%) */}
           {result ? (
-            <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out flex flex-col shadow-2xl">
+            <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out hover:-translate-y-[2px] flex flex-col shadow-2xl">
               <h2 className="text-lg font-semibold text-white mb-8 pb-4 border-b border-white/[0.05]">
                 Route Risk
               </h2>
@@ -204,12 +190,12 @@ export const RouteRisk = () => {
                 </span>
                 <div className="flex items-baseline gap-4">
                   <span className="text-6xl font-black text-white leading-none tracking-tighter">
-                    {result.risk?.averageAQI}
+                    {result.risk.averageAQI}
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.4)]" />
                     <span className="text-base font-bold uppercase tracking-wider text-yellow-500">
-                      {result.risk?.label}
+                      {result.risk.label}
                     </span>
                   </div>
                 </div>
@@ -222,7 +208,7 @@ export const RouteRisk = () => {
                     Distance
                   </span>
                   <span className="text-2xl font-bold text-cyan-400">
-                    {result.route?.distanceKm} km
+                    {result.route.distanceKm} km
                   </span>
                 </div>
                 <div className="p-5 bg-cyan-500/5 border border-cyan-500/20 rounded-xl">
@@ -230,56 +216,31 @@ export const RouteRisk = () => {
                     Duration
                   </span>
                   <span className="text-2xl font-bold text-cyan-400">
-                    {result.route?.durationMin} min
+                    {result.route.durationMin} min
                   </span>
                 </div>
-              </div>
-
-              {/* Amenities */}
-              <div className="space-y-8 flex-1 flex flex-col">
-                <div>
-                  <h4 className="text-sm font-semibold text-white uppercase tracking-widest flex items-center gap-2 mb-4">
-                    Amenities Along Route
-                  </h4>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Fuel className="text-orange-400 mb-2" size={20} />
-                      <span className="text-xl font-bold text-white">
-                        {result.amenities.fuelStations.count}
-                      </span>
-                      <span className="text-xs text-gray-400">Pumps</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Bed className="text-blue-400 mb-2" size={20} />
-                      <span className="text-xl font-bold text-white">
-                        {result.amenities.hotels.count}
-                      </span>
-                      <span className="text-xs text-gray-400">Hotels</span>
-                    </div>
-                    <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Activity className="text-red-400 mb-2" size={20} />
-                      <span className="text-xl font-bold text-white">
-                        {result.amenities.hospitals.count}
-                      </span>
-                      <span className="text-xs text-gray-400">Hospitals</span>
-                    </div>
-                  </div>
-
-              {result.risk?.worstPoint && (
-                <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                  <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-2">
-                    <ShieldAlert size={16} /> Worst Stretch
-                  </h4>
-                  <p className="text-sm text-gray-300">
-                    We detected a high risk zone with an AQI of{' '}
-                    <span className="font-bold text-orange-400">
-                      {result.risk.worstPoint.aqi}
-                    </span>{' '}
-                    along your route. Ensure your windows are rolled up and air recirculation is
-                    active.
-                  </p>
-                </div>
               )}
+            </div>
+          )}
+        </div>
+
+                  {result.risk.worstPoint && (
+                    <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                      <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-2">
+                        <ShieldAlert size={16} /> Worst Stretch
+                      </h4>
+                      <p className="text-sm text-gray-300">
+                        We detected a high risk zone with an AQI of{' '}
+                        <span className="font-bold text-orange-400">
+                          {result.risk.worstPoint.aqi}
+                        </span>{' '}
+                        along your route. Ensure your windows are rolled up and air recirculation is
+                        active.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="col-span-1 bg-white/[0.02] backdrop-blur-[24px] border border-white/[0.04] rounded-2xl p-6 lg:p-8 flex flex-col items-center justify-center text-center shadow-2xl">
@@ -292,6 +253,83 @@ export const RouteRisk = () => {
             </div>
           )}
         </div>
+
+        {cityData.length > 0 ? (
+          <div className="h-96 w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={cityData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5
+                }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--border)"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--muted-foreground)"
+                />
+
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--card)',
+                    borderColor: 'var(--border)',
+                    borderRadius: '12px',
+                    boxShadow: 'var(--shadow)'
+                  }}
+                  itemStyle={{
+                    color: 'var(--foreground)',
+                    fontWeight: 500
+                  }}
+                  cursor={{
+                    fill: 'var(--muted)',
+                    opacity: 0.4
+                  }}
+                />
+
+                <Legend />
+
+                <Bar
+                  dataKey="AQI"
+                  fill="var(--destructive)"
+                  radius={[4, 4, 0, 0]}
+                  name="US AQI"
+                />
+
+                <Bar
+                  dataKey="PM25"
+                  fill="var(--warning)"
+                  radius={[4, 4, 0, 0]}
+                  name="PM2.5 (┬╡g/m┬│)"
+                />
+
+                <Bar
+                  dataKey="temp"
+                  fill="var(--primary)"
+                  radius={[4, 4, 0, 0]}
+                  name="Temp (┬░C)"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="text-center py-20 border-2 border-dashed border-border rounded-2xl">
+            <p className="text-muted-foreground">
+              Add cities to begin comparison
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
