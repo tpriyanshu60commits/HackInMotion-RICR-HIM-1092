@@ -78,11 +78,6 @@ export function useSavedLocations() {
       // Handle standard response shapes: dbRes.data.data is used by our backend controllers
       const savedLocs = dbRes.data?.data || dbRes.data || [];
 
-      const savedLocs =
-        dbRes.data?.data ||
-        dbRes.data ||
-        [];
-
       // 2. Fetch live environment data
       const enrichedLocs = await Promise.all(
         savedLocs.map(async (loc) => {
