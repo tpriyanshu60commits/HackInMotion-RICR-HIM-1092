@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState } from 'react';
 import api from '../services/api';
 import {
   Navigation as NavIcon,
@@ -10,12 +10,16 @@ import {
   Activity,
 } from 'lucide-react';
 
+// Γ£à feature/SS06: Popup and Marker used for amenity markers
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import L from 'leaflet';
-import axios from 'axios';
-import { LocationSearch } from '../components/common/LocationSearch';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts';
 
+// Γ£à feature/SS06: needed for custom div icons
+import L from 'leaflet';
+
+// Γ£à feature/SS06: needed for route analysis API call
+import axios from 'axios';
+
+// Γ£à feature/SS06: custom icons used for amenity markers on the map
 const createIcon = (color, emoji) =>
   L.divIcon({
     className: 'custom-div-icon',
@@ -25,48 +29,44 @@ const createIcon = (color, emoji) =>
     popupAnchor: [0, -12],
   });
 
-const fuelIcon = createIcon('#F59E0B', '⛽');
-const hotelIcon = createIcon('#3B82F6', '🏨');
-const hospitalIcon = createIcon('#EF4444', '🏥');
+const fuelIcon = createIcon('#F59E0B', 'Γ¢╜');
+const hotelIcon = createIcon('#3B82F6', '≡ƒÅ¿');
+const hospitalIcon = createIcon('#EF4444', '≡ƒÅÑ');
 
-export const RouteRisk = () => {
-  const [analyzing, setAnalyzing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [origin, setOrigin] = useState('');
-  const [originCoords, setOriginCoords] = useState(null);
-  const [destination, setDestination] = useState('');
-  const [destCoords, setDestCoords] = useState(null);
-  const [result, setResult] = useState(null);
-  const [mapCenter, setMapCenter] = useState([20.5937, 78.9629]);
-  const [routePositions, setRoutePositions] = useState([]);
-  const [cityData, setCityData] = useState([]);
-
-  useEffect(() => {
-    if (result && result.route && result.route.coordinates) {
-      setRoutePositions(result.route.coordinates);
-    }
-  }, [result]);
-
-  const handleAnalyze = async () => {
-    if (!origin || !destination) return;
-    setAnalyzing(true);
-    setLoading(true);
     try {
-      const response = await api.post(
-        '/route/analyze',
-        { origin, destination, originCoords, destCoords }
+      const res = await api.get(
+        `/data/current?lat=${city.lat}&lng=${city.lng}`
       );
-      if (response.data.success) {
-        setResult(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error analyzing route:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to analyze route. Please try again.';
-      alert(errorMessage);
+
+      setCityData(prev => [
+        ...prev,
+        {
+          name: city.name,
+          AQI: res.data.aqi,
+          PM25: res.data.pm2_5,
+          temp: res.data.temperature
+        }
+      ]);
+    } catch (err) {
+      console.error(`Failed to fetch data for ${city.name}:`, err);
+
+      // Remove city if API request fails
+      setSelectedCities(prev =>
+        prev.filter(c => c.name !== city.name)
+      );
     } finally {
-      setAnalyzing(false);
       setLoading(false);
     }
+  };
+
+  const removeCity = (cityName) => {
+    setSelectedCities(prev =>
+      prev.filter(c => c.name !== cityName)
+    );
+
+    setCityData(prev =>
+      prev.filter(c => c.name !== cityName)
+    );
   };
 
   return (
@@ -87,10 +87,7 @@ export const RouteRisk = () => {
           <div className="flex-1 w-full relative group z-20">
             <LocationSearch
               initialQuery={origin}
-              onLocationSelect={(loc) => {
-                setOrigin(loc.name);
-                setOriginCoords({ lat: loc.lat, lng: loc.lng });
-              }}
+              onLocationSelect={(loc) => setOrigin(loc.name)}
               retainSelection={true}
               className="w-full"
             />
@@ -101,23 +98,17 @@ export const RouteRisk = () => {
           <div className="flex-1 w-full relative group z-10">
             <LocationSearch
               initialQuery={destination}
-              onLocationSelect={(loc) => {
-                setDestination(loc.name);
-                setDestCoords({ lat: loc.lat, lng: loc.lng });
-              }}
+              onLocationSelect={(loc) => setDestination(loc.name)}
               retainSelection={true}
               className="w-full"
             />
           </div>
 
-          <button 
-            onClick={handleAnalyze} 
-            disabled={analyzing || !origin || !destination}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50"
-          >
-            {analyzing ? 'Analyzing...' : 'Analyze Route'}
-          </button>
+          <p className="text-muted-foreground text-sm">
+            Compare environmental risk across multiple locations
+          </p>
         </div>
+      </div>
 
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 flex-1">
@@ -140,13 +131,13 @@ export const RouteRisk = () => {
                       <Marker position={routePositions[0]} />
                       <Marker position={routePositions[routePositions.length - 1]} />
                       <Polyline
-                         positions={routePositions}
-                         pathOptions={{
-                           color: '#F59E0B',
-                           weight: 4,
-                           opacity: 0.8,
-                           className: 'animate-pulse',
-                         }}
+                        positions={routePositions}
+                        pathOptions={{
+                          color: '#F59E0B',
+                          weight: 4,
+                          opacity: 0.8,
+                          className: 'animate-pulse',
+                        }}
                       />
                     </>
                   )}
@@ -187,7 +178,7 @@ export const RouteRisk = () => {
 
           {/* Risk Summary (30%) */}
           {result ? (
-            <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out flex flex-col shadow-2xl">
+            <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out hover:-translate-y-[2px] flex flex-col shadow-2xl">
               <h2 className="text-lg font-semibold text-white mb-8 pb-4 border-b border-white/[0.05]">
                 Route Risk
               </h2>
@@ -199,12 +190,12 @@ export const RouteRisk = () => {
                 </span>
                 <div className="flex items-baseline gap-4">
                   <span className="text-6xl font-black text-white leading-none tracking-tighter">
-                    {result.risk?.averageAQI}
+                    {result.risk.averageAQI}
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.4)]" />
                     <span className="text-base font-bold uppercase tracking-wider text-yellow-500">
-                      {result.risk?.label}
+                      {result.risk.label}
                     </span>
                   </div>
                 </div>
@@ -217,7 +208,7 @@ export const RouteRisk = () => {
                     Distance
                   </span>
                   <span className="text-2xl font-bold text-cyan-400">
-                    {result.route?.distanceKm} km
+                    {result.route.distanceKm} km
                   </span>
                 </div>
                 <div className="p-5 bg-cyan-500/5 border border-cyan-500/20 rounded-xl">
@@ -225,26 +216,31 @@ export const RouteRisk = () => {
                     Duration
                   </span>
                   <span className="text-2xl font-bold text-cyan-400">
-                    {result.route?.durationMin} min
+                    {result.route.durationMin} min
                   </span>
                 </div>
-              </div>
-
-              {result.risk?.worstPoint && (
-                <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                  <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-2">
-                    <ShieldAlert size={16} /> Worst Stretch
-                  </h4>
-                  <p className="text-sm text-gray-300">
-                    We detected a high risk zone with an AQI of{' '}
-                    <span className="font-bold text-orange-400">
-                      {result.risk.worstPoint.aqi}
-                    </span>{' '}
-                    along your route. Ensure your windows are rolled up and air recirculation is
-                    active.
-                  </p>
-                </div>
               )}
+            </div>
+          )}
+        </div>
+
+                  {result.risk.worstPoint && (
+                    <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
+                      <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-2">
+                        <ShieldAlert size={16} /> Worst Stretch
+                      </h4>
+                      <p className="text-sm text-gray-300">
+                        We detected a high risk zone with an AQI of{' '}
+                        <span className="font-bold text-orange-400">
+                          {result.risk.worstPoint.aqi}
+                        </span>{' '}
+                        along your route. Ensure your windows are rolled up and air recirculation is
+                        active.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="col-span-1 bg-white/[0.02] backdrop-blur-[24px] border border-white/[0.04] rounded-2xl p-6 lg:p-8 flex flex-col items-center justify-center text-center shadow-2xl">
@@ -270,9 +266,21 @@ export const RouteRisk = () => {
                   bottom: 5
                 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="name" stroke="var(--muted-foreground)" />
-                <YAxis stroke="var(--muted-foreground)" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--border)"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--muted-foreground)"
+                />
+
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                />
+
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'var(--card)',
@@ -284,12 +292,34 @@ export const RouteRisk = () => {
                     color: 'var(--foreground)',
                     fontWeight: 500
                   }}
-                  cursor={{ fill: 'var(--muted)', opacity: 0.4 }}
+                  cursor={{
+                    fill: 'var(--muted)',
+                    opacity: 0.4
+                  }}
                 />
+
                 <Legend />
-                <Bar dataKey="AQI" fill="var(--destructive)" radius={[4, 4, 0, 0]} name="US AQI" />
-                <Bar dataKey="PM25" fill="var(--warning)" radius={[4, 4, 0, 0]} name="PM2.5 (µg/m³)" />
-                <Bar dataKey="temp" fill="var(--primary)" radius={[4, 4, 0, 0]} name="Temp (°C)" />
+
+                <Bar
+                  dataKey="AQI"
+                  fill="var(--destructive)"
+                  radius={[4, 4, 0, 0]}
+                  name="US AQI"
+                />
+
+                <Bar
+                  dataKey="PM25"
+                  fill="var(--warning)"
+                  radius={[4, 4, 0, 0]}
+                  name="PM2.5 (┬╡g/m┬│)"
+                />
+
+                <Bar
+                  dataKey="temp"
+                  fill="var(--primary)"
+                  radius={[4, 4, 0, 0]}
+                  name="Temp (┬░C)"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
