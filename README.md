@@ -1,6 +1,6 @@
-Visit Website - https://hack-in-motion-ricr-him-1092.vercel.app/
-dummy data = 
-email = example123@gmail.com
+Visit Website - https://hack-in-motion-ricr-him-1092.vercel.app/ ||
+[dummy data]
+email = example123@gmail.com ||
 password = example@123
 
 
