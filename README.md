@@ -1,3 +1,10 @@
+Visit Website - https://hack-in-motion-ricr-him-1092.vercel.app/
+dummy data = 
+email = example123@gmail.com
+password = example@123
+
+
+
 # HackInMotion: AI-Powered Environmental & Health Monitoring
 
 HackInMotion is a comprehensive full-stack application that monitors environmental conditions (AQI, weather) in real-time and uses AI to provide personalized health risk assessments, travel route analysis, and actionable insights.
