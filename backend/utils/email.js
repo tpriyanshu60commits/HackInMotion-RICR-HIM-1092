@@ -1,6 +1,7 @@
 export const sendEscalationEmail = async (report) => {
   try {
-    const acceptLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/report?acceptEscalation=${report._id}`;
+    const clientUrl = process.env.NODE_ENV === 'production' ? (process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app') : (process.env.CLIENT_URL || 'http://localhost:5173');
+    const acceptLink = `${clientUrl}/report?acceptEscalation=${report._id}`;
 
     // The user requested to send it to this specific email
     const targetEmail = 'sonishivanshu7898163335@gmail.com';

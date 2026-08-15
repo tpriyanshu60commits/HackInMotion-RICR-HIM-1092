@@ -38,9 +38,7 @@ export function useSavedLocations() {
     if (!user?._id) return;
 
     const socket = io(
-      import.meta.env.VITE_API_BASE_URL
-        ? import.meta.env.VITE_API_BASE_URL.replace('/api', '')
-        : 'http://localhost:5000',
+      API_BASE_URL.replace('/api', ''),
       {
         withCredentials: true,
       }
