@@ -16,7 +16,6 @@ const TrendChart = ({ locationId }) => {
 
   useEffect(() => {
     if (!locationId) {
-      setData([]);
       return;
     }
 
