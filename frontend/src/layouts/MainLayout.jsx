@@ -282,6 +282,19 @@ export const MainLayout = () => {
         </main>
 
         {/* =====================================================
+            GLOBAL FOOTER
+        ====================================================== */}
+        <footer className="relative z-10  backdrop-blur-full border-t border-white/5 px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-4 mb-16 md:mb-0">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+            <p>© 2026 VerdantX. All rights reserved.</p>
+
+            <p>
+              Made with <span className="text-red-500">❤</span> for a VerdantX Team 🌱
+            </p>
+          </div>
+        </footer>
+
+        {/* =====================================================
             LIVE ALERTS TOAST
         ====================================================== */}
         <AlertToastContainer />

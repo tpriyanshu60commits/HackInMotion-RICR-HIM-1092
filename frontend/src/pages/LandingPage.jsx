@@ -682,7 +682,7 @@ export default function LandingPage() {
           <p>© 2026 VerdantX. All rights reserved.</p>
 
           <p>
-            Made with <span className="text-red-500">❤</span> for a greener planet 🌱
+            Made with <span className="text-red-500">❤</span> for a VerdantX Team 🌱
           </p>
         </div>
       </footer>
