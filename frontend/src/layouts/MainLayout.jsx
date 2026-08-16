@@ -53,9 +53,12 @@ export const MainLayout = () => {
     <WeatherBackground>
       <div className="min-h-screen  w-full flex flex-col text-text-main overflow-x-hidden">
         {/* =====================================================
-            TOP NAVBAR
+            TOP NAVBAR (Progressive Blur + Pill Navbar)
         ====================================================== */}
-        <header className="glass border-b border-border fixed top-2 z-[90] w-19/20 h-16 hidden md:flex items-center justify-between ms-10 mt-1 px-4 md:px-8 rounded-full">
+        {/* Progressive Blur Mask for smooth scrolling */}
+        <div className="fixed top-0 left-0 right-0 h-28 z-[85] hidden md:block pointer-events-none  backdrop-blur-[12px] [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"></div>
+
+        <header className="bg-[#0A0F0D]/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] fixed top-2 z-[90] w-19/20 h-16 hidden md:flex items-center justify-between ms-10 mt-1 px-4 md:px-8 rounded-full transition-all duration-300">
           {/* Logo Section */}
           <Link
             to="/dashboard"
@@ -74,18 +77,31 @@ export const MainLayout = () => {
                   to={item.to}
                   className={({ isActive }) =>
                     cn(
-                      'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 group border border-transparent',
+                      'flex items-center px-3 py-2 rounded-full font-medium transition-all duration-300 group border border-transparent',
                       isActive
-                        ? 'bg-green-500/10 text-green-400 border-green-500/20'
-                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                        ? 'bg-green-500/10 text-green-400 border-green-500/20 gap-2'
+                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white gap-0 hover:gap-2'
                     )
                   }
                 >
-                  <item.icon
-                    size={18}
-                    className="transition-transform group-hover:scale-110 shrink-0"
-                  />
-                  <span className="text-xs">{t(`nav.${item.tKey}`, item.label)}</span>
+                  {({ isActive }) => (
+                    <>
+                      <item.icon
+                        size={18}
+                        className="transition-transform group-hover:scale-110 shrink-0"
+                      />
+                      <span
+                        className={cn(
+                          'text-xs whitespace-nowrap overflow-hidden transition-all duration-300',
+                          isActive
+                            ? 'max-w-[100px] opacity-100'
+                            : 'max-w-0 opacity-0 group-hover:max-w-[100px] group-hover:opacity-100'
+                        )}
+                      >
+                        {t(`nav.${item.tKey}`, item.label)}
+                      </span>
+                    </>
+                  )}
                 </NavLink>
               ))}
             </nav>
