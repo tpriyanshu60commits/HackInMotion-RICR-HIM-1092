@@ -23,6 +23,18 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
   const location = useStore((state) => state.location);
   const [contextData, setContextData] = useState(null);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   // Fetch Context
   useEffect(() => {
     if (location) {
@@ -191,12 +203,19 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 50, scale: 0.95 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-[80px] md:bottom-24 right-4 md:right-8 w-[calc(100vw-32px)] md:w-[400px] h-[calc(100dvh-160px)] md:h-[600px] max-h-[800px] glass rounded-3xl border border-border shadow-2xl flex flex-col z-[99] overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-8 bg-black/60 backdrop-blur-sm"
         >
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="w-full h-[100dvh] md:w-[900px] md:h-[85vh] md:max-h-[850px] bg-background/80 backdrop-blur-3xl flex flex-col overflow-hidden md:rounded-[2rem] border-0 md:border md:border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+          >
           {/* Header */}
           <div className="p-4 border-b border-border flex items-center justify-between bg-surface-inner">
             <div className="flex items-center gap-3">
@@ -350,6 +369,7 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
               </button>
             </form>
           </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
