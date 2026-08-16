@@ -61,9 +61,12 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F0D]/90 via-[#0A0F0D]/20 to-transparent"></div>
       </div>
 
-      {/* SECTION 1 - Navbar */}
+      {/* SECTION 1 - Navbar (Progressive Blur + Pill Navbar) */}
+      {/* Progressive Blur Mask for smooth scrolling */}
+      <div className="fixed top-0 left-0 right-0 h-32 z-[45] pointer-events-none  backdrop-blur-[12px] [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"></div>
+
       <nav className="fixed top-6 left-0 right-0 z-50 px-4 flex justify-center">
-        <div className="w-full max-w-7xl flex items-center justify-between px-6 py-4 bg-[#0A0F0D]/70 backdrop-blur-xl border border-white/10 rounded-full shadow-lg">
+        <div className="w-full max-w-7xl flex items-center justify-between px-6 py-4 bg-[#0A0F0D]/60 backdrop-blur-2xl border border-white/10 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300">
           <div className="flex items-center gap-2">
           <img src="/favicon.svg" className='w-7' alt="" />
             <div className="flex flex-col">
