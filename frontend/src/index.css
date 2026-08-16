@@ -1,5 +1,25 @@
 @import 'tailwindcss';
 
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
 @theme {
   --color-primary-50: var(--primary-50);
   --color-primary-100: var(--primary-100);

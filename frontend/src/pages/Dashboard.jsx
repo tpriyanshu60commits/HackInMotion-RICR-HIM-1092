@@ -1,5 +1,19 @@
 import { useState, useEffect } from 'react';
 import { GlassCard } from '../components/common/GlassCard';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+};
 
 import { LocationSearch } from '../components/common/LocationSearch';
 import {
@@ -98,6 +112,7 @@ export const Dashboard = () => {
   const setWeatherCondition = useStore((state) => state.setWeatherCondition);
   const setIsDay = useStore((state) => state.setIsDay);
   const setCurrentAQI = useStore((state) => state.setCurrentAQI);
+  const setUvIndex = useStore((state) => state.setUvIndex);
   const user = useStore((state) => state.user);
 
   const getGreeting = () => {
@@ -125,6 +140,7 @@ export const Dashboard = () => {
         setWeatherCondition(resolvedBg);
         setIsDay(envData.isDay);
         if (envData.aqi) setCurrentAQI(envData.aqi);
+        if (envData.uvIndex !== null && envData.uvIndex !== undefined) setUvIndex(envData.uvIndex);
 
         if (forecastRes.hourly) {
           const chartData = forecastRes.hourly.time
@@ -160,7 +176,7 @@ export const Dashboard = () => {
     } else {
       setLocation({ lat: 51.5072, lng: 0.1276, name: 'London' });
     }
-  }, [location, setLocation, setWeatherCondition, setCurrentAQI, setIsDay]);
+  }, [location, setLocation, setWeatherCondition, setCurrentAQI, setIsDay, setUvIndex]);
 
   const handleLocationSelect = (loc) => {
     setLocation(loc);
@@ -216,9 +232,9 @@ export const Dashboard = () => {
       )}
 
       {data && (
-        <div className="space-y-6">
+        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6 transform-gpu">
           {/* Main AQI Section (Plain text format) */}
-          <div className="flex flex-col justify-start mb-2">
+          <motion.div variants={itemVariants} className="flex flex-col justify-start mb-2">
             <div className="flex items-center gap-3 mb-1.5">
               <span className="text-sm font-semibold text-gray-300 tracking-wide uppercase">
                 Air Quality Index
@@ -259,12 +275,12 @@ export const Dashboard = () => {
                   );
                 })()}
             </div>
-          </div>
+          </motion.div>
 
           {/* 4-Column Grid for Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* PM2.5 */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">PM2.5</span>
                 <Activity className="w-4 h-4 text-gray-500" />
@@ -282,7 +298,7 @@ export const Dashboard = () => {
             </GlassCard>
 
             {/* PM10 */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">PM10</span>
                 <CloudRain className="w-4 h-4 text-gray-500" />
@@ -300,7 +316,7 @@ export const Dashboard = () => {
             </GlassCard>
 
             {/* Temperature */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">Temperature</span>
                 <Thermometer className="w-4 h-4 text-gray-500" />
@@ -317,7 +333,7 @@ export const Dashboard = () => {
             </GlassCard>
 
             {/* Humidity */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">Humidity</span>
                 <Droplets className="w-4 h-4 text-gray-500" />
@@ -335,7 +351,7 @@ export const Dashboard = () => {
             </GlassCard>
 
             {/* Wind Speed */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">Wind Speed</span>
                 <Wind className="w-4 h-4 text-gray-500" />
@@ -353,7 +369,7 @@ export const Dashboard = () => {
             </GlassCard>
 
             {/* Pressure */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">Pressure</span>
                 <Gauge className="w-4 h-4 text-gray-500" />
@@ -373,32 +389,44 @@ export const Dashboard = () => {
             </GlassCard>
 
             {/* UV Index */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">UV Index</span>
                 <Sun className="w-4 h-4 text-gray-500" />
               </div>
               <div className="mt-auto">
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-3xl font-bold text-white">{data.uvIndex || '--'}</span>
-                </div>
-                {data.uvIndex !== undefined &&
-                  (() => {
-                    const uvStatus = getUvStatus(data.uvIndex);
-                    return (
-                      <div
-                        className={`flex items-center gap-1.5 font-bold text-[11px] ${uvStatus.color}`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${uvStatus.bg}`}></span>
-                        {uvStatus.label}
-                      </div>
-                    );
-                  })()}
+                {data.uvIndex !== undefined && data.uvIndex !== null ? (
+                  <>
+                    <div className="flex items-baseline gap-1 mb-2">
+                      <span className="text-3xl font-bold text-white">{data.uvIndex}</span>
+                    </div>
+                    {(() => {
+                      const uvStatus = getUvStatus(data.uvIndex);
+                      return (
+                        <div className="flex flex-col gap-1.5">
+                          <div className={`flex items-center gap-1.5 font-bold text-[11px] ${uvStatus.color}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${uvStatus.bg}`}></span>
+                            {uvStatus.label}
+                          </div>
+                          {data.timestamp && (
+                            <div className="text-[9px] text-gray-500 font-medium">
+                              Live · {new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </>
+                ) : (
+                  <div className="flex items-center text-sm font-medium text-gray-400">
+                    UV Index unavailable
+                  </div>
+                )}
               </div>
             </GlassCard>
 
             {/* Sunrise */}
-            <GlassCard className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-5 flex flex-col justify-between min-h-[160px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs font-semibold text-gray-400 uppercase">Sunrise</span>
                 <Sunrise className="w-4 h-4 text-gray-500" />
@@ -408,9 +436,9 @@ export const Dashboard = () => {
                   <span className="text-2xl font-bold text-white">
                     {data.sunrise
                       ? new Date(data.sunrise).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
                       : '--'}
                   </span>
                 </div>
@@ -422,7 +450,7 @@ export const Dashboard = () => {
           {/* Bottom Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Trend Chart */}
-            <GlassCard className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">
                 AQI Trend (24h)
               </h3>
@@ -467,7 +495,7 @@ export const Dashboard = () => {
             </GlassCard>
 
             {/* Breakdown Chart */}
-            <GlassCard className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
+            <GlassCard variants={itemVariants} className="p-6 flex flex-col min-h-[280px] border border-white/[0.12] bg-white/[0.06] backdrop-blur-[16px] rounded-[20px]">
               <h3 className="text-sm font-semibold text-white mb-6 uppercase tracking-wide">
                 Air Quality Breakdown
               </h3>
@@ -536,7 +564,7 @@ export const Dashboard = () => {
               </div>
             </GlassCard>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

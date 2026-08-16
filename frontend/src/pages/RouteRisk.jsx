@@ -20,7 +20,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 
 // Γ£à feature/SS06: needed for route analysis API call
-import axios from 'axios';
+import api from '../services/api';
 
 // Γ£à feature/SS06: custom icons used for amenity markers on the map
 const createIcon = (color, emoji) =>
@@ -42,14 +42,18 @@ export const RouteRisk = () => {
 
   const [origin, setOrigin] = useState('New Delhi, India');
   const [destination, setDestination] = useState('Gurgaon, India');
+  const [originCoords, setOriginCoords] = useState(null);
+  const [destCoords, setDestCoords] = useState(null);
 
   const handleAnalyze = async () => {
     setAnalyzing(true);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/route/analyze`,
-        { origin, destination }
-      );
+      const response = await api.post('/route/analyze', { 
+        origin, 
+        destination,
+        originCoords,
+        destCoords
+      });
       if (response.data.success) {
         setResult(response.data.data);
       }

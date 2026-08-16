@@ -1,8 +1,9 @@
 import { cn } from '../../utils/utils';
+import { motion } from 'framer-motion';
 
 export const GlassCard = ({ children, className, hover = false, ...props }) => {
   return (
-    <div
+    <motion.div
       className={cn(
         ' liquid rounded-2xl p-6',
         'transition-all duration-300 ease-in-out',
@@ -16,6 +17,6 @@ export const GlassCard = ({ children, className, hover = false, ...props }) => {
       {...props}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };

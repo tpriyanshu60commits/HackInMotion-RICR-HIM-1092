@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import useStore from '../../store/useStore';
 import { cn } from '../../utils/utils';
 
@@ -22,6 +23,19 @@ export const WeatherBackground = ({ children }) => {
 
   // Fallback to clear-day if somehow an invalid condition gets in
   const activeBg = allBackgrounds.includes(weatherCondition) ? weatherCondition : 'clear-day';
+
+  useEffect(() => {
+    const isDark = [
+      'clear-night',
+      'cloudy-night',
+      'rainy-night',
+      'stormy-night',
+      'foggy-night',
+      'snowy-night',
+      'stormy-day'
+    ].includes(activeBg);
+    document.body.setAttribute('data-bg-theme', isDark ? 'dark' : 'light');
+  }, [activeBg]);
 
   return (
     <div className="relative min-h-screen w-full transition-colors duration-1000 overflow-hidden">

@@ -41,6 +41,8 @@ const useStore = create(
 
       currentTemp: null,
       setCurrentTemp: (temp) => set({ currentTemp: temp }),
+      uvIndex: null,
+      setUvIndex: (uv) => set({ uvIndex: uv }),
 
       // Health Profile State
       userName: '',

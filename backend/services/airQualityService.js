@@ -3,7 +3,7 @@ import { calculateBaseRisk, getPersonalizedRisk } from './riskEngine.js';
 import AirQualitySnapshot from '../models/AirQualitySnapshot.js';
 import { geocodeCity, reverseGeocode } from './geocodingService.js';
 
-const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null) => {
+const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null, uvData = null) => {
   const currentAirQuality = data.airQuality.current;
   const currentWeather = data.weather.current;
   const dailyWeather = data.weather.daily;
@@ -33,7 +33,7 @@ const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null) => {
     precipitation: currentWeather.precipitation,
     weatherCode: currentWeather.weather_code,
     isDay: currentWeather.is_day === 1,
-    uvIndex: dailyWeather?.uv_index_max?.[0] || 0,
+    uvIndex: uvData?.now?.uvi !== undefined ? uvData.now.uvi : (currentWeather.uv_index !== undefined ? currentWeather.uv_index : null),
     sunrise: dailyWeather?.sunrise?.[0] || null,
     sunset: dailyWeather?.sunset?.[0] || null,
     risk: personalizedRisk,
@@ -49,13 +49,16 @@ export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null)
   try {
     const locationInfo = await reverseGeocode(lat, lng);
 
-    const [airQualityResponse, weatherResponse] = await Promise.all([
+    const [airQualityResponse, weatherResponse, uvResponse] = await Promise.all([
       axios.get(
         `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`
       ),
       axios.get(
         `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,is_day&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`
       ),
+      axios.get(
+        `https://currentuvindex.com/api/v1/uvi?latitude=${lat}&longitude=${lng}`
+      ).catch(() => ({ data: null })), // Fallback gracefully if UV API fails
     ]);
 
     const data = {
@@ -63,7 +66,7 @@ export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null)
       weather: weatherResponse.data,
     };
 
-    const normalizedData = normalizeOpenMeteoData(data, locationInfo, healthProfile);
+    const normalizedData = normalizeOpenMeteoData(data, locationInfo, healthProfile, uvResponse.data);
     saveSnapshot(normalizedData).catch(console.error);
     return normalizedData;
   } catch (error) {
