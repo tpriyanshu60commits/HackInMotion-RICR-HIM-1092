@@ -43,6 +43,9 @@ export const saveLocation = async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
     if (user) {
+      if (!user.savedLocations) {
+        user.savedLocations = [];
+      }
       user.savedLocations.push(location._id);
       await user.save();
     }
