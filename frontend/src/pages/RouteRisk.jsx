@@ -1,5 +1,5 @@
 // Γ£à master: React default import not needed in modern React (17+)
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LocationSearch } from '../components/common/LocationSearch';
 
 // Γ£à feature/SS06: all icons used in the component body
@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 // Γ£à feature/SS06: Popup and Marker used for amenity markers
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 
 // Γ£à feature/SS06: needed for custom div icons
 import L from 'leaflet';
@@ -36,19 +36,31 @@ const fuelIcon = createIcon('#F59E0B', 'Γ¢╜');
 const hotelIcon = createIcon('#3B82F6', '≡ƒÅ¿');
 const hospitalIcon = createIcon('#EF4444', '≡ƒÅÑ');
 
+const MapUpdater = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.setView(center, map.getZoom());
+    }
+  }, [center, map]);
+  return null;
+};
+
 export const RouteRisk = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
 
   const [origin, setOrigin] = useState('New Delhi, India');
   const [destination, setDestination] = useState('Gurgaon, India');
+  const [originCoords, setOriginCoords] = useState(null);
+  const [destCoords, setDestCoords] = useState(null);
 
   const handleAnalyze = async () => {
     setAnalyzing(true);
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/route/analyze`,
-        { origin, destination }
+        { origin, destination, originCoords, destCoords }
       );
       if (response.data.success) {
         setResult(response.data.data);
@@ -136,48 +148,58 @@ export const RouteRisk = () => {
                   center={mapCenter}
                   zoom={9}
                   style={{ height: '100%', width: '100%' }}
-                  key={mapCenter.join(',')}
                 >
+                  <MapUpdater center={mapCenter} />
                   <TileLayer
                     url={`https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${import.meta.env.VITE_GEOAPIFY_MAP_KEY}`}
                     attribution="&copy; Geoapify &copy; OpenStreetMap"
                   />
                   {routePositions.length > 0 && (
                     <>
-                      <Marker position={routePositions[0]} />
-                      <Marker position={routePositions[routePositions.length - 1]} />
+                      <Marker
+                        key={`start-${routePositions[0].join(',')}`}
+                        position={routePositions[0]}
+                      />
+                      <Marker
+                        key={`end-${routePositions[routePositions.length - 1].join(',')}`}
+                        position={routePositions[routePositions.length - 1]}
+                      />
                       <Polyline
-                         positions={routePositions}
-                         pathOptions={{
-                           color: '#F59E0B',
-                           weight: 4,
-                           opacity: 0.8,
-                           className: 'animate-pulse',
-                         }}
+                        key={`route-${routePositions.length}`}
+                        positions={routePositions}
+                        pathOptions={{
+                          color: '#F59E0B',
+                          weight: 4,
+                          opacity: 0.8,
+                          className: 'animate-pulse',
+                        }}
                       />
                     </>
                   )}
 
                   {/* High Risk Point */}
                   {result?.risk?.worstPoint && (
-                    <Marker position={[result.risk.worstPoint.lat, result.risk.worstPoint.lng]}>
+                    <Marker
+                      key={`worst-${result.risk.worstPoint.lat}-${result.risk.worstPoint.lng}`}
+                      position={[result.risk.worstPoint.lat, result.risk.worstPoint.lng]}
+                    >
                       <Popup>Worst AQI: {result.risk.worstPoint.aqi}</Popup>
                     </Marker>
                   )}
 
                   {/* Amenity Markers */}
-                  {result?.amenities?.fuelStations?.list?.map((p, i) => (
-                    <Marker key={`fuel-${i}`} position={[p.lat, p.lng]} icon={fuelIcon}>
+                  {result?.amenities?.fuelStations?.list?.map((p) => (
+                    <Marker key={`fuel-${p.place_id}`} position={[p.lat, p.lng]} icon={fuelIcon}>
                       <Popup>{p.name || 'Fuel Station'}</Popup>
                     </Marker>
                   ))}
-                  {result?.amenities?.hotels?.list?.map((p, i) => (
-                    <Marker key={`hotel-${i}`} position={[p.lat, p.lng]} icon={hotelIcon}>
+                  {result?.amenities?.hotels?.list?.map((p) => (
+                    <Marker key={`hotel-${p.place_id}`} position={[p.lat, p.lng]} icon={hotelIcon}>
                       <Popup>{p.name || 'Hotel'}</Popup>
                     </Marker>
                   ))}
-                  {result?.amenities?.hospitals?.list?.map((p, i) => (
-                    <Marker key={`hospital-${i}`} position={[p.lat, p.lng]} icon={hospitalIcon}>
+                  {result?.amenities?.hospitals?.list?.map((p) => (
+                    <Marker key={`hospital-${p.place_id}`} position={[p.lat, p.lng]} icon={hospitalIcon}>
                       <Popup>{p.name || 'Hospital'}</Popup>
                     </Marker>
                   ))}

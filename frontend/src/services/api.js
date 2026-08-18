@@ -162,7 +162,12 @@ export const healthAPI = {
 export const aiHealthAPI = {
   saveHealthProfile: (data) => api.post('/ai-health/profile', data),
   getHealthProfile: () => api.get('/ai-health/profile'),
-  generateHealthReport: (data) => api.post('/ai-health/report/generate', data),
+  generateHealthReport: (data) =>
+    api.post('/ai-health/report/generate', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
   getLatestHealthReport: () => api.get('/ai-health/report/latest'),
 };
 
