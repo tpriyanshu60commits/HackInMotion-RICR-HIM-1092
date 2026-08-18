@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Leaf, Mail, Lock, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { Leaf, Mail, Lock, AlertCircle, ArrowRight, Loader2, User } from 'lucide-react';
 import { GlassCard } from '../components/common/GlassCard';
 import useStore from '../store/useStore';
 import api from '../services/api';
@@ -101,6 +101,24 @@ export const Login = () => {
                 Sign In <ArrowRight size={18} />
               </>
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('auth_token', 'guest_token');
+              setUser({
+                _id: 'guest_id',
+                name: 'Guest User',
+                email: 'guest@verdantx.com',
+                role: 'guest',
+                isGuest: true
+              });
+              navigate('/dashboard', { replace: true });
+            }}
+            className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-border text-text-main font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-4"
+          >
+            <User size={18} className="text-text-muted" /> Login as Guest
           </button>
         </form>
 
