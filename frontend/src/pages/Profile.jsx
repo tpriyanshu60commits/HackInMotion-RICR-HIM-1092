@@ -122,7 +122,7 @@ export const Profile = () => {
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-sm text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 w-fit md:w-full"
+              className="guest-allow-click flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-sm text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 w-fit md:w-full"
             >
               <LogOut size={18} className="shrink-0 text-red-400" />
               <span className="hidden md:inline">Logout</span>

@@ -46,6 +46,9 @@ if (process.env.NODE_ENV !== 'production') {
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  skip: (req) => {
+    return req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1';
+  },
   standardHeaders: true,
   legacyHeaders: false,
   message: {
