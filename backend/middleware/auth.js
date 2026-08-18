@@ -16,6 +16,18 @@ export const protect = async (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Not authorized, no token' });
   }
 
+  // ALLOW GUEST ACCESS
+  if (token === 'guest_token') {
+    req.user = {
+      _id: 'guest_id',
+      name: 'Guest User',
+      email: 'guest@verdantx.com',
+      role: 'guest',
+      isGuest: true
+    };
+    return next();
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 

@@ -5,6 +5,7 @@ import { MainLayout } from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
+import { GuestInteractionBlocker } from './components/auth/GuestInteractionBlocker';
 
 // Lazy Loaded Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -71,6 +72,18 @@ function App() {
           return;
         }
 
+        if (token === 'guest_token') {
+          setUser({
+            _id: 'guest_id',
+            name: 'Guest User',
+            email: 'guest@verdantx.com',
+            role: 'guest',
+            isGuest: true
+          });
+          setInitializing(false);
+          return;
+        }
+
         const res = await api.get('/auth/me');
         if (res.data?.success && res.data?.data) {
           setUser(res.data.data);
@@ -126,14 +139,14 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/locations" element={<Locations />} />
-            <Route path="/history" element={<HistoricalTrends />} />
+            <Route path="/locations" element={<GuestInteractionBlocker><Locations /></GuestInteractionBlocker>} />
+            <Route path="/history" element={<GuestInteractionBlocker><HistoricalTrends /></GuestInteractionBlocker>} />
             <Route path="/alerts" element={<Alerts />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/compare" element={<Compare />} />
-            <Route path="/route" element={<RouteRisk />} />
+            <Route path="/profile" element={<GuestInteractionBlocker><Profile /></GuestInteractionBlocker>} />
+            <Route path="/compare" element={<GuestInteractionBlocker><Compare /></GuestInteractionBlocker>} />
+            <Route path="/route" element={<GuestInteractionBlocker><RouteRisk /></GuestInteractionBlocker>} />
             <Route path="/education" element={<Education />} />
-            <Route path="/report" element={<ReportPage />} />
+            <Route path="/report" element={<GuestInteractionBlocker><ReportPage /></GuestInteractionBlocker>} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
