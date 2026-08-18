@@ -134,11 +134,12 @@ export const generateReport = async (req, res, next) => {
   } catch (error) {
     console.error(
       `[generateReport] Caught an exception at stage: ${currentStage}. Full error:`,
-      error
+      error?.response?.data || error?.message || error
     );
     // Explicitly return 400 if it was an API/Parsing issue from Groq, else 500
+    const errorMessage = error?.message || '';
     const statusCode =
-      error.message.includes('Groq') || error.message.includes('validation') ? 400 : 500;
+      errorMessage.includes('Groq') || errorMessage.includes('validation') ? 400 : 500;
     res.status(statusCode);
     return next(error);
   }

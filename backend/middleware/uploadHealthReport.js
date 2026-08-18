@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'airsense/health-reports',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
+    allowed_formats: ['jpg', 'png', 'jpeg', 'pdf', 'webp'],
   },
 });
 
