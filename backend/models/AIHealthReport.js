@@ -40,10 +40,6 @@ const aiHealthReportSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    reportImageUrls: {
-      type: [String],
-      default: [],
-    },
     rawModelResponse: {
       type: String, // Store for debugging/history
       default: '',

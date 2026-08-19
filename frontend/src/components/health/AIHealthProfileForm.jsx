@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { aiHealthAPI } from '../../services/api';
-import { Save, RefreshCw, UploadCloud, X, ChevronDown } from 'lucide-react';
+import { Save, RefreshCw, ChevronDown } from 'lucide-react';
 import ConditionSelector from './ConditionSelector';
 
 export const AIHealthProfileForm = () => {
@@ -13,7 +13,6 @@ export const AIHealthProfileForm = () => {
     medicationReminder: false,
     primaryCity: '',
   });
-  const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -50,17 +49,6 @@ export const AIHealthProfileForm = () => {
     setProfile((prev) => ({ ...prev, conditions: selectedConditions }));
   };
 
-  const handleImageChange = (e) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setImages((prev) => [...prev, ...newFiles]);
-    }
-  };
-
-  const removeImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -80,15 +68,8 @@ export const AIHealthProfileForm = () => {
     setGenerating(true);
     try {
       await aiHealthAPI.saveHealthProfile(profile);
-
-      let payload = new FormData();
-      if (images.length > 0) {
-        images.forEach((img) => payload.append('images', img));
-      }
-
-      await aiHealthAPI.generateHealthReport(payload);
+      await aiHealthAPI.generateHealthReport();
       window.dispatchEvent(new Event('healthReportGenerated'));
-      setImages([]); // Clear images after successful generation
     } catch (error) {
       console.error('Failed to generate report:', error);
     } finally {
@@ -230,52 +211,6 @@ export const AIHealthProfileForm = () => {
             Medication Reminder (e.g. carry inhaler)
           </label>
         </div>
-
-        {/* Medical Report Upload Section */}
-        <div className="pt-2 border-t border-white/10">
-          <label className="block text-xs font-semibold text-gray-400 mb-2">
-            Medical Reports (Optional)
-          </label>
-          <p className="text-xs text-gray-500 mb-3">
-            Upload recent blood tests, prescriptions, or doctor notes. AI will extract relevant
-            findings to refine your health risk analysis.
-          </p>
-
-          <div className="w-full relative border-2 border-dashed border-white/10 hover:border-white/30 rounded-xl bg-black/20 hover:bg-black/40 transition-colors p-6 text-center cursor-pointer flex flex-col items-center justify-center">
-            <input
-              type="file"
-              multiple
-              accept="image/*,application/pdf"
-              onChange={handleImageChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            <UploadCloud className="text-gray-400 mb-2" size={24} />
-            <span className="text-sm text-gray-300 font-medium">
-              Click or drag images/PDFs here to upload
-            </span>
-          </div>
-
-          {images.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {images.map((img, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-lg"
-                >
-                  <span className="text-xs text-blue-200 truncate max-w-[150px]">{img.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeImage(idx)}
-                    className="text-blue-400 hover:text-red-400"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
         <div className="flex flex-col md:flex-row items-center justify-between pt-6 gap-4">
           <button
             type="submit"
@@ -292,11 +227,7 @@ export const AIHealthProfileForm = () => {
             className="w-full md:w-auto flex justify-center items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50"
           >
             <RefreshCw size={18} className={generating ? 'animate-spin' : ''} />
-            {generating && images.length > 0
-              ? 'Analyzing & Generating...'
-              : generating
-                ? 'Generating...'
-                : 'Generate AI Report'}
+            {generating ? 'Generating...' : 'Generate AI Report'}
           </button>
         </div>
       </form>

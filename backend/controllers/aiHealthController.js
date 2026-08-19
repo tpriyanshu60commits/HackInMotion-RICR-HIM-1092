@@ -1,7 +1,7 @@
 import AIHealthProfile from '../models/AIHealthProfile.js';
 import AIHealthReport from '../models/AIHealthReport.js';
 import { getAirQualityByCity } from '../services/airQualityService.js';
-import { generateAIReport, analyzeMedicalImages } from '../services/healthReportService.js';
+import { generateAIReport } from '../services/healthReportService.js';
 
 // @desc    Save or update user's AI health profile
 // @route   POST /api/ai-health/profile
@@ -99,20 +99,11 @@ export const generateReport = async (req, res, next) => {
       return next(new Error('Could not fetch environmental data for the specified city.'));
     }
 
-    // 3. Process uploaded medical images via OCR/Vision if any
-    currentStage = 'process_images_ocr';
-    let extractedMedicalContext = '';
-    const imageUrls = req.files ? req.files.map((file) => file.path) : [];
-
-    if (imageUrls.length > 0) {
-      extractedMedicalContext = await analyzeMedicalImages(imageUrls);
-    }
-
-    // 4. Generate AI report using healthReportService
+    // 3. Generate AI report using healthReportService
     currentStage = 'generate_ai_report';
-    const aiReportJson = await generateAIReport(profile, environmentData, extractedMedicalContext);
+    const aiReportJson = await generateAIReport(profile, environmentData);
 
-    // 5. Persist the returned report in MongoDB
+    // 4. Persist the returned report in MongoDB
     currentStage = 'save_report_mongo';
     const report = new AIHealthReport({
       userId,
@@ -124,7 +115,6 @@ export const generateReport = async (req, res, next) => {
       symptomWatch: aiReportJson.symptomWatch || [],
       bestTimeWindow: aiReportJson.bestTimeWindow || '',
       cityComparisonNote: aiReportJson.cityComparisonNote || null,
-      reportImageUrls: imageUrls,
       rawModelResponse: JSON.stringify(aiReportJson),
     });
 
