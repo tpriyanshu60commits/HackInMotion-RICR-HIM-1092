@@ -57,9 +57,7 @@ const calculatePM25_AQI = (pm25) => {
     return 500;
   }
 
-  return Math.round(
-    ((IHigh - ILow) / (CHigh - CLow)) * (c - CLow) + ILow
-  );
+  return Math.round(((IHigh - ILow) / (CHigh - CLow)) * (c - CLow) + ILow);
 };
 
 /**
@@ -116,20 +114,13 @@ const calculatePM10_AQI = (pm10) => {
     return 500;
   }
 
-  return Math.round(
-    ((IHigh - ILow) / (CHigh - CLow)) * (c - CLow) + ILow
-  );
+  return Math.round(((IHigh - ILow) / (CHigh - CLow)) * (c - CLow) + ILow);
 };
 
 /**
  * Normalize Open-Meteo environmental data into the application's format.
  */
-const normalizeOpenMeteoData = (
-  data,
-  locationInfo,
-  healthProfile = null,
-  uvData = null
-) => {
+const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null, uvData = null) => {
   const currentAirQuality = data?.airQuality?.current;
   const currentWeather = data?.weather?.current;
   const dailyWeather = data?.weather?.daily;
@@ -239,11 +230,7 @@ const axiosGetWithRetry = async (url, options = {}, retries = 2) => {
 /**
  * Get current environmental data using latitude and longitude.
  */
-export const getAirQualityByCoordinates = async (
-  lat,
-  lng,
-  healthProfile = null
-) => {
+export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null) => {
   try {
     const latitude = Number(lat);
     const longitude = Number(lng);
@@ -277,15 +264,13 @@ export const getAirQualityByCoordinates = async (
       `&timezone=auto`;
 
     const uvUrl =
-      `https://currentuvindex.com/api/v1/uvi` +
-      `?latitude=${latitude}&longitude=${longitude}`;
+      `https://currentuvindex.com/api/v1/uvi` + `?latitude=${latitude}&longitude=${longitude}`;
 
-    const [airQualityResult, weatherResult, uvResult] =
-      await Promise.allSettled([
-        axiosGetWithRetry(airQualityUrl),
-        axiosGetWithRetry(weatherUrl),
-        axiosGetWithRetry(uvUrl, {}, 1),
-      ]);
+    const [airQualityResult, weatherResult, uvResult] = await Promise.allSettled([
+      axiosGetWithRetry(airQualityUrl),
+      axiosGetWithRetry(weatherUrl),
+      axiosGetWithRetry(uvUrl, {}, 1),
+    ]);
 
     if (airQualityResult.status === 'rejected') {
       throw airQualityResult.reason;
@@ -298,20 +283,14 @@ export const getAirQualityByCoordinates = async (
     const airQualityResponse = airQualityResult.value;
     const weatherResponse = weatherResult.value;
 
-    const uvData =
-      uvResult.status === 'fulfilled' ? uvResult.value?.data : null;
+    const uvData = uvResult.status === 'fulfilled' ? uvResult.value?.data : null;
 
     const data = {
       airQuality: airQualityResponse.data,
       weather: weatherResponse.data,
     };
 
-    const normalizedData = normalizeOpenMeteoData(
-      data,
-      locationInfo,
-      healthProfile,
-      uvData
-    );
+    const normalizedData = normalizeOpenMeteoData(data, locationInfo, healthProfile, uvData);
 
     saveSnapshot(normalizedData).catch((error) => {
       console.error('Snapshot save error:', error.message);
@@ -321,9 +300,7 @@ export const getAirQualityByCoordinates = async (
   } catch (error) {
     console.error('Open-Meteo API Error:', error.message);
 
-    throw new Error(
-      'Environmental data currently unavailable for this location.'
-    );
+    throw new Error('Environmental data currently unavailable for this location.');
   }
 };
 
@@ -342,16 +319,9 @@ export const getAirQualityByCity = async (city, healthProfile = null) => {
       throw new Error(`Unable to locate city: ${city}`);
     }
 
-    const data = await getAirQualityByCoordinates(
-      geo.lat,
-      geo.lng,
-      healthProfile
-    );
+    const data = await getAirQualityByCoordinates(geo.lat, geo.lng, healthProfile);
 
-    data.city =
-      geo.city ||
-      geo.name?.split(',')?.[0]?.trim() ||
-      city.trim();
+    data.city = geo.city || geo.name?.split(',')?.[0]?.trim() || city.trim();
 
     if (geo.country) {
       data.country = geo.country;
@@ -361,9 +331,7 @@ export const getAirQualityByCity = async (city, healthProfile = null) => {
   } catch (error) {
     console.error('City lookup error:', error.message);
 
-    throw new Error(
-      `Environmental data currently unavailable for "${city}".`
-    );
+    throw new Error(`Environmental data currently unavailable for "${city}".`);
   }
 };
 
@@ -497,29 +465,17 @@ export const getHistoricalData = async (lat, lng, days = 7) => {
           name,
           date: dateStr,
 
-          aqi:
-            daily.aqiCount > 0
-              ? Math.round(daily.aqiSum / daily.aqiCount)
-              : 0,
+          aqi: daily.aqiCount > 0 ? Math.round(daily.aqiSum / daily.aqiCount) : 0,
 
-          pm25:
-            daily.pm25Count > 0
-              ? Math.round((daily.pm25Sum / daily.pm25Count) * 10) / 10
-              : 0,
+          pm25: daily.pm25Count > 0 ? Math.round((daily.pm25Sum / daily.pm25Count) * 10) / 10 : 0,
 
-          pm10:
-            daily.pm10Count > 0
-              ? Math.round((daily.pm10Sum / daily.pm10Count) * 10) / 10
-              : 0,
+          pm10: daily.pm10Count > 0 ? Math.round((daily.pm10Sum / daily.pm10Count) * 10) / 10 : 0,
         };
       });
 
     return result;
   } catch (error) {
-    console.error(
-      'Failed to fetch historical air quality data:',
-      error.message
-    );
+    console.error('Failed to fetch historical air quality data:', error.message);
 
     throw new Error('Failed to fetch historical air quality data.');
   }

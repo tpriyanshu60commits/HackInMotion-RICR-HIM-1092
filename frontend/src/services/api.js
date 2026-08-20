@@ -10,7 +10,7 @@ export const getApiBaseUrl = () => {
       "⚠️ VITE_API_URL or VITE_API_BASE_URL is not set. API calls will default to the relative path '/api'."
     );
     console.warn(
-      "If your backend is hosted separately, you MUST set this environment variable in your deployment settings (e.g., Vercel) to point to your backend URL."
+      'If your backend is hosted separately, you MUST set this environment variable in your deployment settings (e.g., Vercel) to point to your backend URL.'
     );
   }
 
