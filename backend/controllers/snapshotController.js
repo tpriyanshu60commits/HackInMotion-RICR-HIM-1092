@@ -3,6 +3,13 @@ import Location from '../models/Location.js';
 
 export const getSnapshots = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: [],
+      });
+    }
+
     const { locationId } = req.params;
 
     const location = await Location.findOne({ _id: locationId, user: req.user._id });

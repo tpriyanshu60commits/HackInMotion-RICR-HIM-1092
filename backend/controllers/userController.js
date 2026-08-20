@@ -6,6 +6,20 @@ import User from '../models/User.js';
 export const updateExtendedProfile = async (req, res, next) => {
   try {
     const { phone, height, weight, gender } = req.body;
+
+    if (req.user?.isGuest) {
+      return res.status(200).json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: {
+          phone: phone !== undefined ? phone : '',
+          height: height !== undefined ? height : 0,
+          weight: weight !== undefined ? weight : 0,
+          gender: gender !== undefined ? gender : 'Prefer not to say',
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -45,6 +59,19 @@ export const uploadProfileImage = async (req, res, next) => {
       throw new Error('Please upload an image file');
     }
 
+    if (req.user?.isGuest) {
+      return res.status(200).json({
+        success: true,
+        message: 'Profile image uploaded successfully',
+        data: {
+          profileImage: {
+            url: req.file.path,
+            publicId: req.file.filename || '',
+          },
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -76,6 +103,13 @@ export const uploadProfileImage = async (req, res, next) => {
 // @access  Private
 export const deleteAccount = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot delete accounts',
+      });
+    }
+
     const user = await User.findById(req.user._id);
 
     if (!user) {

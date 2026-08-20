@@ -122,6 +122,27 @@ export const PrivacySettings = () => {
     }
   };
 
+  if (user?.isGuest) {
+    return (
+      <div className="w-full bg-black/40 backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">
+        <div className="flex flex-col mb-6">
+          <h2 className="text-xl font-semibold text-white tracking-tight mb-1 flex items-center gap-2">
+            <Shield size={24} className="text-gray-400" />
+            Privacy & Data
+          </h2>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            Privacy and account management settings.
+          </p>
+        </div>
+        <div className="p-6 bg-white/5 border border-white/10 rounded-xl text-center">
+          <p className="text-gray-300 text-sm">
+            This feature is unavailable for guest accounts. Please create a registered account to manage privacy settings and personal data.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-black/40 backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">
       <div className="flex flex-col mb-8">

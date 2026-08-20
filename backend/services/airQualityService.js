@@ -113,10 +113,15 @@ export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null)
 export const getAirQualityByCity = async (city, healthProfile = null) => {
   try {
     const geo = await geocodeCity(city);
-    return await getAirQualityByCoordinates(geo.lat, geo.lng, healthProfile);
+    const data = await getAirQualityByCoordinates(geo.lat, geo.lng, healthProfile);
+    data.city = geo.city || geo.name?.split(',')?.[0]?.trim() || city;
+    if (geo.country) {
+      data.country = geo.country;
+    }
+    return data;
   } catch (error) {
     console.error('City lookup error:', error.message);
-    throw new Error('Environmental data currently unavailable for this city.');
+    throw new Error(`Environmental data currently unavailable for "${city}".`);
   }
 };
 

@@ -5,7 +5,6 @@ import { MainLayout } from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
-import { GuestInteractionBlocker } from './components/auth/GuestInteractionBlocker';
 
 // Lazy Loaded Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -139,14 +138,14 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/locations" element={<GuestInteractionBlocker><Locations /></GuestInteractionBlocker>} />
-            <Route path="/history" element={<GuestInteractionBlocker><HistoricalTrends /></GuestInteractionBlocker>} />
+            <Route path="/locations" element={<Locations />} />
+            <Route path="/history" element={<HistoricalTrends />} />
             <Route path="/alerts" element={<Alerts />} />
-            <Route path="/profile" element={<GuestInteractionBlocker><Profile /></GuestInteractionBlocker>} />
-            <Route path="/compare" element={<GuestInteractionBlocker><Compare /></GuestInteractionBlocker>} />
-            <Route path="/route" element={<GuestInteractionBlocker><RouteRisk /></GuestInteractionBlocker>} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/route" element={<RouteRisk />} />
             <Route path="/education" element={<Education />} />
-            <Route path="/report" element={<GuestInteractionBlocker><ReportPage /></GuestInteractionBlocker>} />
+            <Route path="/report" element={<ReportPage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

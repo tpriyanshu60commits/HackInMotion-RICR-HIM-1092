@@ -20,10 +20,34 @@ export const protect = async (req, res, next) => {
   if (token === 'guest_token') {
     req.user = {
       _id: 'guest_id',
+      id: 'guest_id',
       name: 'Guest User',
       email: 'guest@verdantx.com',
       role: 'guest',
-      isGuest: true
+      isGuest: true,
+      healthProfile: {},
+      preferences: {
+        language: 'en',
+        alertVoiceLanguage: 'en',
+        temperatureUnit: 'celsius',
+        distanceUnit: 'km',
+        weightUnit: 'kg',
+        heightUnit: 'cm',
+      },
+      notificationSettings: {
+        emailNotifications: false,
+        pushNotifications: false,
+        healthAlerts: true,
+        airQualityAlerts: true,
+        weatherAlerts: true,
+        isMuted: false,
+        voiceAlertsEnabled: false,
+      },
+      privacy: {
+        profileVisibility: 'private',
+        dataSharing: false,
+        analytics: true,
+      },
     };
     return next();
   }

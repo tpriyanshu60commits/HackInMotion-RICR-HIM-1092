@@ -66,6 +66,7 @@ app.get('/', (req, res) => {
 import { authLimiter } from './middleware/authLimiter.js';
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/location', locationRoutes);
 app.use('/api/environment', environmentRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/community', communityRoutes);

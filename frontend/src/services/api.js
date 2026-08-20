@@ -143,31 +143,11 @@ export const usersAPI = {
   deleteAccount: () => api.delete('/users/me'),
 };
 
-// Master - Health Reports
-export const healthAPI = {
-  uploadHealthReport: (formData) =>
-    api.post('/health/report', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }),
-
-  downloadReportPDF: () =>
-    api.get('/health/report/pdf', {
-      responseType: 'blob',
-    }),
-};
-
 // Master - AI Health Reports
 export const aiHealthAPI = {
   saveHealthProfile: (data) => api.post('/ai-health/profile', data),
   getHealthProfile: () => api.get('/ai-health/profile'),
-  generateHealthReport: (data) =>
-    api.post('/ai-health/report/generate', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }),
+  generateHealthReport: (data) => api.post('/ai-health/report/generate', data),
   getLatestHealthReport: () => api.get('/ai-health/report/latest'),
 };
 

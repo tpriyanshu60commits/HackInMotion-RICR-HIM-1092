@@ -124,6 +124,16 @@ export const getUserProfile = async (req, res, next) => {
 // @access  Private
 export const updateUserProfile = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: {
+          ...req.user,
+          ...req.body,
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
 
     if (user) {
@@ -239,6 +249,13 @@ export const googleAuthCallback = async (req, res, next) => {
 // @access  Private
 export const updatePassword = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot update passwords',
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);

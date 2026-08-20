@@ -248,9 +248,23 @@ export const Dashboard = () => {
             {data && (
               <div className="flex items-center gap-1.5 text-gray-400 text-sm font-medium mb-4">
                 <MapPin size={14} className="text-gray-500" />
-                {data.city && data.city !== 'Unknown Location'
-                  ? `${data.city}${data.country ? `, ${data.country}` : ''}`
-                  : location?.name || 'Unknown Location'}
+                {(() => {
+                  const cityName =
+                    data.city && data.city !== 'Unknown' && data.city !== 'Unknown Location'
+                      ? data.city
+                      : data.location?.city || data.location?.name || location?.name || location?.city;
+                  const countryName =
+                    data.country && data.country !== 'Unknown'
+                      ? data.country
+                      : data.location?.country || location?.country;
+
+                  if (cityName) {
+                    return countryName && !cityName.includes(countryName)
+                      ? `${cityName}, ${countryName}`
+                      : cityName;
+                  }
+                  return 'Current Location';
+                })()}
               </div>
             )}
 

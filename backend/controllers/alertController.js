@@ -5,6 +5,13 @@ import Alert from '../models/Alert.js';
 // @access  Private
 export const getAlerts = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: [],
+      });
+    }
+
     const alerts = await Alert.find({ user: req.user._id })
       .populate('location', 'name city')
       .sort({ createdAt: -1 });
@@ -23,6 +30,13 @@ export const getAlerts = async (req, res, next) => {
 // @access  Private
 export const markAlertAsRead = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: { _id: req.params.id, read: true },
+      });
+    }
+
     const alert = await Alert.findById(req.params.id);
 
     if (!alert) {
@@ -52,6 +66,13 @@ export const markAlertAsRead = async (req, res, next) => {
 // @access  Private
 export const deleteAlert = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        message: 'Alert removed',
+      });
+    }
+
     const alert = await Alert.findById(req.params.id);
 
     if (!alert) {

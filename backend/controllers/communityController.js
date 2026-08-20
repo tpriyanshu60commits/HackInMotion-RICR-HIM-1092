@@ -42,6 +42,22 @@ export const createReport = async (req, res, next) => {
   try {
     const { category, description, latitude, longitude, city } = req.body;
 
+    if (req.user?.isGuest) {
+      return res.status(201).json({
+        success: true,
+        data: {
+          _id: 'guest_comm_report_' + Date.now(),
+          category,
+          description,
+          latitude,
+          longitude,
+          city,
+          status: 'active',
+          user: { name: req.user.name || 'Guest User' },
+        },
+      });
+    }
+
     const report = await CommunityReport.create({
       user: req.user._id,
       category,
@@ -70,6 +86,13 @@ export const upvoteReport = async (req, res, next) => {
     if (!report) {
       res.status(404);
       throw new Error('Report not found');
+    }
+
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: report,
+      });
     }
 
     // Check if user already upvoted
@@ -101,6 +124,13 @@ export const updateReportStatus = async (req, res, next) => {
     if (!report) {
       res.status(404);
       throw new Error('Report not found');
+    }
+
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: report,
+      });
     }
 
     if (report.user.toString() !== req.user._id.toString()) {
