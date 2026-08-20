@@ -13,12 +13,18 @@ export const checkLocationsAndAlert = async () => {
       $or: [{ 'alertPreferences.highRisk': true }, { 'alertPreferences.moderateRisk': true }],
     });
 
+    // Helper to pace API calls and avoid Open-Meteo rate limits
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     for (const user of users) {
       // Get user's saved locations
       const locations = await Location.find({ user: user._id });
 
       for (const location of locations) {
         try {
+          // Pause 1.5s between each location to respect Open-Meteo rate limits
+          await delay(1500);
+
           const envData = await getAirQualityByCoordinates(
             location.latitude,
             location.longitude,

@@ -200,7 +200,9 @@ const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null, uvData
 };
 
 /**
- * Axios GET request with retry support.
+ * Axios GET request with retry support and exponential backoff.
+ * - Does NOT retry on 429 (Too Many Requests) — retrying makes it worse.
+ * - Uses exponential backoff with jitter for other transient errors.
  */
 const axiosGetWithRetry = async (url, options = {}, retries = 2) => {
   let lastError;
@@ -214,12 +216,17 @@ const axiosGetWithRetry = async (url, options = {}, retries = 2) => {
     } catch (error) {
       lastError = error;
 
-      if (attempt < retries) {
-        const delay = 500 * (attempt + 1);
+      // Do NOT retry on rate-limit errors — it only makes things worse
+      const status = error?.response?.status;
+      if (status === 429) {
+        console.warn(`Open-Meteo rate limit hit (429). Skipping retries for: ${url.split('?')[0]}`);
+        throw error;
+      }
 
-        await new Promise((resolve) => {
-          setTimeout(resolve, delay);
-        });
+      if (attempt < retries) {
+        // Exponential backoff with jitter: base * 2^attempt + random ms
+        const backoff = 600 * Math.pow(2, attempt) + Math.random() * 300;
+        await new Promise((resolve) => setTimeout(resolve, backoff));
       }
     }
   }
