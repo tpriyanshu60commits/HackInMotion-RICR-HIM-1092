@@ -26,16 +26,21 @@ const TABS = [
 
 export const Profile = () => {
   const [activeTab, setActiveTab] = useState('profile');
+  const user = useStore((state) => state.user);
   const logout = useStore((state) => state.logout);
   const updateUserProfile = useStore((state) => state.updateUserProfile);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
+  const visibleTabs = user?.isGuest
+    ? TABS.filter((tab) => tab.id !== 'privacy' && tab.id !== 'security')
+    : TABS;
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await profileAPI.getProfile();
-        if (res.data.success) {
+        if (res.data.success && res.data.data) {
           updateUserProfile(res.data.data);
         }
       } catch (err) {
@@ -58,6 +63,11 @@ export const Profile = () => {
   };
 
   const renderActiveTab = () => {
+    // Restrict privacy and security tabs for guest users
+    if (user?.isGuest && (activeTab === 'privacy' || activeTab === 'security')) {
+      return <BasicProfile />;
+    }
+
     switch (activeTab) {
       case 'profile':
         return <BasicProfile />;
@@ -95,7 +105,7 @@ export const Profile = () => {
           {/* Sidebar */}
           <div className="w-full md:w-64 shrink-0 flex flex-col gap-2">
             <div className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-hide">
-              {TABS.map((tab) => (
+              {visibleTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -122,7 +132,7 @@ export const Profile = () => {
 
             <button
               onClick={handleLogout}
-              className="guest-allow-click flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-sm text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 w-fit md:w-full"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-sm text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 w-fit md:w-full"
             >
               <LogOut size={18} className="shrink-0 text-red-400" />
               <span className="hidden md:inline">Logout</span>

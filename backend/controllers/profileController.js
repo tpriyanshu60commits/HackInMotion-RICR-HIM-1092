@@ -5,6 +5,46 @@ import User from '../models/User.js';
 // @access  Private
 export const getProfile = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: {
+          _id: 'guest_id',
+          name: req.user.name || 'Guest User',
+          email: req.user.email || 'guest@verdantx.com',
+          role: 'guest',
+          isGuest: true,
+          phone: '',
+          height: 0,
+          weight: 0,
+          gender: 'Prefer not to say',
+          healthProfile: {},
+          preferences: {
+            language: 'en',
+            alertVoiceLanguage: 'en',
+            temperatureUnit: 'celsius',
+            distanceUnit: 'km',
+            weightUnit: 'kg',
+            heightUnit: 'cm',
+          },
+          notificationSettings: {
+            emailNotifications: false,
+            pushNotifications: false,
+            healthAlerts: true,
+            airQualityAlerts: true,
+            weatherAlerts: true,
+            isMuted: false,
+            voiceAlertsEnabled: false,
+          },
+          privacy: {
+            profileVisibility: 'private',
+            dataSharing: false,
+            analytics: true,
+          },
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
       res.status(404);
@@ -24,6 +64,19 @@ export const getProfile = async (req, res, next) => {
 // @access  Private
 export const updateBasicProfile = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        message: 'Basic profile updated successfully',
+        data: {
+          name: req.body.name !== undefined ? req.body.name : req.user.name || 'Guest User',
+          phone: req.body.phone !== undefined ? req.body.phone : '',
+          avatar: req.body.avatar !== undefined ? req.body.avatar : '',
+          bio: req.body.bio !== undefined ? req.body.bio : '',
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -58,6 +111,13 @@ export const updateBasicProfile = async (req, res, next) => {
 // @access  Private
 export const getHealthProfile = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: req.user.healthProfile || {},
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -77,6 +137,14 @@ export const getHealthProfile = async (req, res, next) => {
 // @access  Private
 export const updateHealthProfile = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        message: 'Health profile updated successfully',
+        data: req.body || {},
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -104,6 +172,21 @@ export const updateHealthProfile = async (req, res, next) => {
 // @access  Private
 export const getNotificationSettings = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: {
+          emailNotifications: false,
+          pushNotifications: false,
+          healthAlerts: true,
+          airQualityAlerts: true,
+          weatherAlerts: true,
+          isMuted: false,
+          voiceAlertsEnabled: false,
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -123,6 +206,14 @@ export const getNotificationSettings = async (req, res, next) => {
 // @access  Private
 export const updateNotificationSettings = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        message: 'Notification settings updated successfully',
+        data: req.body || {},
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -150,6 +241,20 @@ export const updateNotificationSettings = async (req, res, next) => {
 // @access  Private
 export const getPreferences = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: {
+          language: 'en',
+          alertVoiceLanguage: 'en',
+          temperatureUnit: 'celsius',
+          distanceUnit: 'km',
+          weightUnit: 'kg',
+          heightUnit: 'cm',
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -169,6 +274,14 @@ export const getPreferences = async (req, res, next) => {
 // @access  Private
 export const updatePreferences = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        message: 'Preferences updated successfully',
+        data: req.body || {},
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -196,6 +309,13 @@ export const updatePreferences = async (req, res, next) => {
 // @access  Private
 export const getPrivacySettings = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot access privacy settings',
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -215,6 +335,13 @@ export const getPrivacySettings = async (req, res, next) => {
 // @access  Private
 export const updatePrivacySettings = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot update privacy settings',
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -242,6 +369,13 @@ export const updatePrivacySettings = async (req, res, next) => {
 // @access  Private
 export const exportData = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot export personal data',
+      });
+    }
+
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
       res.status(404);
@@ -267,6 +401,13 @@ export const exportData = async (req, res, next) => {
 // @access  Private
 export const deleteAccount = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot delete accounts',
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);

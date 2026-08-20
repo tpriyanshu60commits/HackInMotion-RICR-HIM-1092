@@ -124,6 +124,16 @@ export const getUserProfile = async (req, res, next) => {
 // @access  Private
 export const updateUserProfile = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: {
+          ...req.user,
+          ...req.body,
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
 
     if (user) {
@@ -184,7 +194,10 @@ export const forgotPassword = async (req, res, next) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    const clientUrl = process.env.NODE_ENV === 'production' ? (process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app') : (process.env.CLIENT_URL || 'http://localhost:5173');
+    const clientUrl =
+      process.env.NODE_ENV === 'production'
+        ? process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app'
+        : process.env.CLIENT_URL || 'http://localhost:5173';
     const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     try {
       await sendEmail({
@@ -226,7 +239,10 @@ export const resetPassword = async (req, res, next) => {
 export const googleAuthCallback = async (req, res, next) => {
   try {
     const token = generateToken(res, req.user._id);
-    const clientUrl = process.env.NODE_ENV === 'production' ? (process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app') : (process.env.CLIENT_URL || 'http://localhost:5173');
+    const clientUrl =
+      process.env.NODE_ENV === 'production'
+        ? process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app'
+        : process.env.CLIENT_URL || 'http://localhost:5173';
     const redirectUrl = `${clientUrl}/login?token=${token}`;
     res.redirect(redirectUrl);
   } catch (err) {
@@ -239,6 +255,13 @@ export const googleAuthCallback = async (req, res, next) => {
 // @access  Private
 export const updatePassword = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot update passwords',
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);

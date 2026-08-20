@@ -1,5 +1,6 @@
 import { Groq } from 'groq-sdk';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const groq = new Groq({
@@ -7,11 +8,22 @@ const groq = new Groq({
 });
 
 const validateReportSchema = (data) => {
-  if (!data.riskLevel || !['Good', 'Moderate', 'Unhealthy', 'Hazardous'].includes(data.riskLevel))
+  if (!data.riskLevel || !['Good', 'Moderate', 'Unhealthy', 'Hazardous'].includes(data.riskLevel)) {
     return false;
-  if (!data.summary || typeof data.summary !== 'string') return false;
-  if (!data.keyConcern || typeof data.keyConcern !== 'string') return false;
-  if (!Array.isArray(data.dosAndDonts) || !Array.isArray(data.symptomWatch)) return false;
+  }
+
+  if (!data.summary || typeof data.summary !== 'string') {
+    return false;
+  }
+
+  if (!data.keyConcern || typeof data.keyConcern !== 'string') {
+    return false;
+  }
+
+  if (!Array.isArray(data.dosAndDonts) || !Array.isArray(data.symptomWatch)) {
+    return false;
+  }
+
   return true;
 };
 
@@ -45,8 +57,14 @@ STRICT RESPONSE RULES:
     const userContent = JSON.stringify(userContentObj);
 
     const messages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: userContent },
+      {
+        role: 'system',
+        content: SYSTEM_PROMPT,
+      },
+      {
+        role: 'user',
+        content: userContent,
+      },
     ];
 
     const chatCompletion = await groq.chat.completions.create({
@@ -54,10 +72,13 @@ STRICT RESPONSE RULES:
       model: 'openai/gpt-oss-20b',
       temperature: 0.3,
       max_tokens: 1024,
-      response_format: { type: 'json_object' },
+      response_format: {
+        type: 'json_object',
+      },
     });
 
     const responseText = chatCompletion.choices[0]?.message?.content || '{}';
+
     const parsed = JSON.parse(responseText);
 
     if (!validateReportSchema(parsed)) {
@@ -71,6 +92,7 @@ STRICT RESPONSE RULES:
     if (attempts < 1) {
       // Retry once (max 2 total attempts)
       console.log('Retrying AI report generation due to schema or parsing error...');
+
       return generateAIReport(profile, environmentData, attempts + 1);
     }
 

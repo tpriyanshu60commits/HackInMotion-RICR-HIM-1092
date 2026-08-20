@@ -28,9 +28,16 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production'
-      ? [process.env.CLIENT_URL, process.env.FRONTEND_URL, 'https://hack-in-motion-ricr-him-1092.vercel.app'].filter(Boolean)
-      : [process.env.CLIENT_URL, process.env.FRONTEND_URL, 'http://localhost:5173'].filter(Boolean),
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? [
+            process.env.CLIENT_URL,
+            process.env.FRONTEND_URL,
+            'https://hack-in-motion-ricr-him-1092.vercel.app',
+          ].filter(Boolean)
+        : [process.env.CLIENT_URL, process.env.FRONTEND_URL, 'http://localhost:5173'].filter(
+            Boolean
+          ),
     credentials: true,
   })
 );
@@ -66,6 +73,7 @@ app.get('/', (req, res) => {
 import { authLimiter } from './middleware/authLimiter.js';
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/location', locationRoutes);
 app.use('/api/environment', environmentRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/community', communityRoutes);

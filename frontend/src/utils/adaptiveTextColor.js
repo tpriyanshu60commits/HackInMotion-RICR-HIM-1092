@@ -1,7 +1,7 @@
 /**
  * Adaptive Text Color Utility
- * 
- * Automatically adjusts text color to black or white if the contrast against its 
+ *
+ * Automatically adjusts text color to black or white if the contrast against its
  * computed background falls below an acceptable threshold.
  */
 
@@ -28,7 +28,7 @@ function parseRGB(rgbString) {
     r: parseInt(match[1], 10),
     g: parseInt(match[2], 10),
     b: parseInt(match[3], 10),
-    a: match[4] ? parseFloat(match[4]) : 1
+    a: match[4] ? parseFloat(match[4]) : 1,
   };
 }
 
@@ -45,12 +45,12 @@ function getEffectiveBackgroundColor(el) {
     }
     current = current.parentElement;
   }
-  
+
   // Fallback to checking a global theme attribute (set by dynamic image backgrounds)
   const globalTheme = document.body.getAttribute('data-bg-theme');
   if (globalTheme === 'dark') return { r: 0, g: 0, b: 0, a: 1 };
   if (globalTheme === 'light') return { r: 255, g: 255, b: 255, a: 1 };
-  
+
   // Default to a darkish background due to the scrim layer in WeatherBackground
   return { r: 40, g: 40, b: 40, a: 1 };
 }
@@ -74,17 +74,18 @@ function processPendingElements() {
     if (!document.body.contains(el)) continue;
 
     const style = window.getComputedStyle(el);
-    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') continue;
+    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0')
+      continue;
 
     // Remove any current override to read the true default color
     const currentOverride = el.style.color;
     if (currentOverride === 'rgb(0, 0, 0)' || currentOverride === 'rgb(255, 255, 255)') {
-      el.style.color = ''; 
+      el.style.color = '';
     }
-    
+
     const defaultColorStr = window.getComputedStyle(el).color;
     const defaultColor = parseRGB(defaultColorStr);
-    
+
     // Restore override temporarily if needed
     if (currentOverride === 'rgb(0, 0, 0)' || currentOverride === 'rgb(255, 255, 255)') {
       el.style.color = currentOverride;
@@ -95,9 +96,9 @@ function processPendingElements() {
     const effectiveBg = getEffectiveBackgroundColor(el);
     const textLum = getLuminance(defaultColor.r, defaultColor.g, defaultColor.b);
     const bgLum = getLuminance(effectiveBg.r, effectiveBg.g, effectiveBg.b);
-    
+
     const contrast = getContrast(textLum, bgLum);
-    
+
     // WCAG AA contrast ratio threshold is 4.5 for normal text
     if (contrast < 4.5) {
       // Background luminance threshold for light vs dark is around 0.179
@@ -117,7 +118,12 @@ function processPendingElements() {
         el.style.transition = 'color 0.4s ease-in-out';
       }
     } else {
-      if (el.style.color === 'rgb(0, 0, 0)' || el.style.color === 'rgb(255, 255, 255)' || el.style.color === '#000000' || el.style.color === '#ffffff') {
+      if (
+        el.style.color === 'rgb(0, 0, 0)' ||
+        el.style.color === 'rgb(255, 255, 255)' ||
+        el.style.color === '#000000' ||
+        el.style.color === '#ffffff'
+      ) {
         el.style.color = '';
       }
     }
@@ -140,20 +146,35 @@ function scheduleProcessing() {
 export function initAdaptiveTextColor() {
   if (observer) return; // Already initialized
 
-  const targetTags = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'SPAN', 'A', 'LABEL', 'BUTTON', 'LI', 'TH', 'TD'];
-  const selector = targetTags.map(tag => tag.toLowerCase()).join(', ') + ', .adaptive-text';
+  const targetTags = [
+    'H1',
+    'H2',
+    'H3',
+    'H4',
+    'H5',
+    'H6',
+    'P',
+    'SPAN',
+    'A',
+    'LABEL',
+    'BUTTON',
+    'LI',
+    'TH',
+    'TD',
+  ];
+  const selector = targetTags.map((tag) => tag.toLowerCase()).join(', ') + ', .adaptive-text';
 
   // Initial scan
-  document.querySelectorAll(selector).forEach(el => pendingElements.add(el));
+  document.querySelectorAll(selector).forEach((el) => pendingElements.add(el));
   scheduleProcessing();
 
   observer = new MutationObserver((mutations) => {
-    mutations.forEach(mutation => {
+    mutations.forEach((mutation) => {
       if (mutation.type === 'childList') {
-        mutation.addedNodes.forEach(node => {
+        mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const textElements = node.querySelectorAll(selector);
-            textElements.forEach(el => pendingElements.add(el));
+            textElements.forEach((el) => pendingElements.add(el));
             if (targetTags.includes(node.tagName) || node.classList?.contains('adaptive-text')) {
               pendingElements.add(node);
             }
@@ -166,12 +187,15 @@ export function initAdaptiveTextColor() {
       } else if (mutation.type === 'attributes') {
         // If style/class changes, re-evaluate contrast
         if (mutation.target.nodeType === Node.ELEMENT_NODE) {
-          if (targetTags.includes(mutation.target.tagName) || mutation.target.classList?.contains('adaptive-text')) {
+          if (
+            targetTags.includes(mutation.target.tagName) ||
+            mutation.target.classList?.contains('adaptive-text')
+          ) {
             pendingElements.add(mutation.target);
           }
           // Also re-evaluate children in case background changed
           const textElements = mutation.target.querySelectorAll(selector);
-          textElements.forEach(el => pendingElements.add(el));
+          textElements.forEach((el) => pendingElements.add(el));
         }
       }
     });
@@ -183,6 +207,6 @@ export function initAdaptiveTextColor() {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['class', 'style', 'data-bg-theme']
+    attributeFilter: ['class', 'style', 'data-bg-theme'],
   });
 }

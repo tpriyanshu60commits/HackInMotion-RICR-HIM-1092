@@ -5,21 +5,38 @@ import { MainLayout } from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
-import { GuestInteractionBlocker } from './components/auth/GuestInteractionBlocker';
 
 // Lazy Loaded Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
-const Login = lazy(() => import('./pages/Login').then(module => ({ default: module.Login })));
-const Register = lazy(() => import('./pages/Register').then(module => ({ default: module.Register })));
-const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
-const Locations = lazy(() => import('./pages/Locations').then(module => ({ default: module.Locations })));
-const Alerts = lazy(() => import('./pages/Alerts').then(module => ({ default: module.Alerts })));
-const Profile = lazy(() => import('./pages/Profile').then(module => ({ default: module.Profile })));
-const Compare = lazy(() => import('./pages/Compare').then(module => ({ default: module.Compare })));
-const RouteRisk = lazy(() => import('./pages/RouteRisk').then(module => ({ default: module.RouteRisk })));
-const HistoricalTrends = lazy(() => import('./pages/HistoricalTrends').then(module => ({ default: module.HistoricalTrends })));
-const Education = lazy(() => import('./pages/Education').then(module => ({ default: module.Education })));
-const ReportPage = lazy(() => import('./pages/ReportPage').then(module => ({ default: module.ReportPage })));
+const Login = lazy(() => import('./pages/Login').then((module) => ({ default: module.Login })));
+const Register = lazy(() =>
+  import('./pages/Register').then((module) => ({ default: module.Register }))
+);
+const Dashboard = lazy(() =>
+  import('./pages/Dashboard').then((module) => ({ default: module.Dashboard }))
+);
+const Locations = lazy(() =>
+  import('./pages/Locations').then((module) => ({ default: module.Locations }))
+);
+const Alerts = lazy(() => import('./pages/Alerts').then((module) => ({ default: module.Alerts })));
+const Profile = lazy(() =>
+  import('./pages/Profile').then((module) => ({ default: module.Profile }))
+);
+const Compare = lazy(() =>
+  import('./pages/Compare').then((module) => ({ default: module.Compare }))
+);
+const RouteRisk = lazy(() =>
+  import('./pages/RouteRisk').then((module) => ({ default: module.RouteRisk }))
+);
+const HistoricalTrends = lazy(() =>
+  import('./pages/HistoricalTrends').then((module) => ({ default: module.HistoricalTrends }))
+);
+const Education = lazy(() =>
+  import('./pages/Education').then((module) => ({ default: module.Education }))
+);
+const ReportPage = lazy(() =>
+  import('./pages/ReportPage').then((module) => ({ default: module.ReportPage }))
+);
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Public Route Wrapper (Redirects to dashboard if already logged in)
@@ -78,7 +95,7 @@ function App() {
             name: 'Guest User',
             email: 'guest@verdantx.com',
             role: 'guest',
-            isGuest: true
+            isGuest: true,
           });
           setInitializing(false);
           return;
@@ -104,16 +121,15 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <WaterDropLoader message="Loading App..." />
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center">
+            <WaterDropLoader message="Loading App..." />
+          </div>
+        }
+      >
         <Routes>
-          <Route
-            path="/"
-            element={<LandingPage />}
-          />
+          <Route path="/" element={<LandingPage />} />
           <Route
             path="/login"
             element={
@@ -139,14 +155,14 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/locations" element={<GuestInteractionBlocker><Locations /></GuestInteractionBlocker>} />
-            <Route path="/history" element={<GuestInteractionBlocker><HistoricalTrends /></GuestInteractionBlocker>} />
+            <Route path="/locations" element={<Locations />} />
+            <Route path="/history" element={<HistoricalTrends />} />
             <Route path="/alerts" element={<Alerts />} />
-            <Route path="/profile" element={<GuestInteractionBlocker><Profile /></GuestInteractionBlocker>} />
-            <Route path="/compare" element={<GuestInteractionBlocker><Compare /></GuestInteractionBlocker>} />
-            <Route path="/route" element={<GuestInteractionBlocker><RouteRisk /></GuestInteractionBlocker>} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/route" element={<RouteRisk />} />
             <Route path="/education" element={<Education />} />
-            <Route path="/report" element={<GuestInteractionBlocker><ReportPage /></GuestInteractionBlocker>} />
+            <Route path="/report" element={<ReportPage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

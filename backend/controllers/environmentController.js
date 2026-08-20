@@ -35,19 +35,30 @@ export const getCurrentEnvironmentByCity = async (req, res, next) => {
   try {
     const { city } = req.query;
 
-    if (!city) {
-      res.status(400);
-      throw new Error('City is required');
+    if (!city || typeof city !== 'string' || !city.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'City parameter is required',
+      });
     }
 
     const healthProfile = req.user?.healthProfile || null;
-    const data = await getAirQualityByCity(city, healthProfile);
+    const data = await getAirQualityByCity(city.trim(), healthProfile);
 
     res.json({
       success: true,
       data,
     });
   } catch (error) {
+    if (
+      error.message &&
+      (error.message.includes('Could not resolve') || error.message.includes('unavailable'))
+    ) {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    }
     next(error);
   }
 };

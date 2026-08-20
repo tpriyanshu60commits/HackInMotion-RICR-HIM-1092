@@ -32,7 +32,7 @@ export const WeatherBackground = ({ children }) => {
       'stormy-night',
       'foggy-night',
       'snowy-night',
-      'stormy-day'
+      'stormy-day',
     ].includes(activeBg);
     document.body.setAttribute('data-bg-theme', isDark ? 'dark' : 'light');
   }, [activeBg]);

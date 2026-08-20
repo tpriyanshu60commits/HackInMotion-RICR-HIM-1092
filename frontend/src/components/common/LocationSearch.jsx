@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, MapPin, X, Loader2 } from 'lucide-react';
-
+import { locationService } from '../../services/api';
 import { cn } from '../../utils/utils';
 
 export const LocationSearch = ({
@@ -31,11 +31,9 @@ export const LocationSearch = ({
       if (query.length > 2 && isTyping) {
         setLoading(true);
         try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1&accept-language=en`
-          );
-          const data = await res.json();
-          setResults(data);
+          const res = await locationService.search(query);
+          const data = res.data?.data || res.data || [];
+          setResults(Array.isArray(data) ? data : []);
           setIsOpen(true);
         } catch (error) {
           console.error('Location search failed', error);

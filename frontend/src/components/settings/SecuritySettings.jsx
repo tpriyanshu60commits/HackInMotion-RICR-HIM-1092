@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Key, CheckCircle2, AlertCircle } from 'lucide-react';
 import api from '../../services/api';
+import useStore from '../../store/useStore';
 import { cn } from '../../utils/utils';
 
 export const SecuritySettings = () => {
+  const user = useStore((state) => state.user);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -44,6 +46,25 @@ export const SecuritySettings = () => {
       setIsSaving(false);
     }
   };
+
+  if (user?.isGuest) {
+    return (
+      <div className="w-full bg-black/40 backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">
+        <div className="flex flex-col mb-6">
+          <h2 className="text-xl font-semibold text-white tracking-tight mb-1 flex items-center gap-2">
+            <Key size={24} className="text-gray-400" />
+            Security & Password
+          </h2>
+          <p className="text-sm text-gray-400 leading-relaxed">Password management settings.</p>
+        </div>
+        <div className="p-6 bg-white/5 border border-white/10 rounded-xl text-center">
+          <p className="text-gray-300 text-sm">
+            Password management is unavailable for guest accounts.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-black/40 backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">

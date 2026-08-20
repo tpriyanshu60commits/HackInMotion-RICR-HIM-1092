@@ -4,7 +4,7 @@ export const getApiBaseUrl = () => {
   const isProd = import.meta.env.PROD;
   const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
   const url = envUrl || (isProd ? '/api' : 'http://localhost:5000/api');
-  
+
   // If the user set VITE_API_URL to the root domain, ensure it ends with /api
   if (!url.endsWith('/api')) {
     // Trim trailing slash if present before adding /api
@@ -141,21 +141,6 @@ export const usersAPI = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
   deleteAccount: () => api.delete('/users/me'),
-};
-
-// Master - Health Reports
-export const healthAPI = {
-  uploadHealthReport: (formData) =>
-    api.post('/health/report', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }),
-
-  downloadReportPDF: () =>
-    api.get('/health/report/pdf', {
-      responseType: 'blob',
-    }),
 };
 
 // Master - AI Health Reports

@@ -220,65 +220,65 @@ export const MainLayout = () => {
             MAIN CONTENT
         ====================================================== */}
         <main className="flex-1 w-full relative mt-0 md:mt-20 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
-      <AnimatePresence mode="wait">
-  <motion.div
-    key={location.pathname}
-    initial={{
-      opacity: 0,
-      scale: 0.88,
-      rotateY: -18,
-      rotateX: 5,
-      x: 45,
-      filter: 'blur(12px)',
-    }}
-    animate={{
-      opacity: 1,
-      scale: 1,
-      rotateY: 0,
-      rotateX: 0,
-      x: 0,
-      filter: 'blur(0px)',
-    }}
-    exit={{
-      opacity: 0,
-      scale: 0.92,
-      rotateY: 18,
-      rotateX: -5,
-      x: -45,
-      filter: 'blur(12px)',
-    }}
-    transition={{
-      duration: 0.65,
-      ease: [0.16, 1, 0.3, 1],
-    }}
-    style={{
-      perspective: 1400,
-      transformStyle: 'preserve-3d',
-      transformOrigin: 'center center',
-      willChange: 'transform, opacity, filter',
-    }}
-    className="relative w-full h-full"
-  >
-    {/* Butterfly Glow */}
-    <motion.div
-      initial={{
-        opacity: 0,
-        scale: 0.5,
-      }}
-      animate={{
-        opacity: [0, 0.8, 0],
-        scale: [0.5, 1.2, 1.5],
-      }}
-      transition={{
-        duration: 0.8,
-        ease: 'easeOut',
-      }}
-      className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-primary-400/10 blur-3xl"
-    />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{
+                opacity: 0,
+                scale: 0.88,
+                rotateY: -18,
+                rotateX: 5,
+                x: 45,
+                filter: 'blur(12px)',
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                rotateY: 0,
+                rotateX: 0,
+                x: 0,
+                filter: 'blur(0px)',
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.92,
+                rotateY: 18,
+                rotateX: -5,
+                x: -45,
+                filter: 'blur(12px)',
+              }}
+              transition={{
+                duration: 0.65,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              style={{
+                perspective: 1400,
+                transformStyle: 'preserve-3d',
+                transformOrigin: 'center center',
+                willChange: 'transform, opacity, filter',
+              }}
+              className="relative w-full h-full"
+            >
+              {/* Butterfly Glow */}
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.5,
+                }}
+                animate={{
+                  opacity: [0, 0.8, 0],
+                  scale: [0.5, 1.2, 1.5],
+                }}
+                transition={{
+                  duration: 0.8,
+                  ease: 'easeOut',
+                }}
+                className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-primary-400/10 blur-3xl"
+              />
 
-    <Outlet />
-  </motion.div>
-</AnimatePresence>
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         {/* =====================================================

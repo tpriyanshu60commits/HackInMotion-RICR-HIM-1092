@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Camera, MapPin, Upload, X } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
+import { environmentService } from '../../services/api';
 
 const CATEGORIES = [
   { id: 'garbage', label: 'Garbage Dump' },
@@ -46,15 +47,17 @@ export const ReportForm = ({ onSubmit, loading }) => {
           const lng = position.coords.longitude;
 
           try {
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-            );
-            const data = await res.json();
+            const res = await environmentService.getCurrentByCoords(lat, lng);
+            const envData = res.data?.data;
+            const address = envData?.city
+              ? `${envData.city}${envData.country ? ', ' + envData.country : ''}`
+              : `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
             setFormData((prev) => ({
               ...prev,
               lat,
               lng,
-              address: data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+              address,
             }));
           } catch {
             setFormData((prev) => ({
