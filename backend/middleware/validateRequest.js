@@ -8,11 +8,12 @@ const validateRequest = (schema) => async (req, res, next) => {
     return next();
   } catch (error) {
     // Format Zod errors
-    const errors = error.errors.map((e) => ({
-      path: e.path.join('.'),
+    const rawErrors = error.errors || error.issues || [];
+    const errors = rawErrors.map((e) => ({
+      path: Array.isArray(e.path) ? e.path.join('.') : String(e.path || ''),
       message: e.message,
     }));
-    
+
     return res.status(400).json({
       success: false,
       message: 'Validation failed',

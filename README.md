@@ -1,60 +1,86 @@
-# VerdantX - Environmental Risk & Air Quality Monitoring Platform
+Visit Website - https://hack-in-motion-ricr-him-1092.vercel.app/ ||
+[dummy data]
+email = example123@gmail.com ||
+password = example@123
 
-## Project Overview
-VerdantX is a premium, modern, and data-driven platform designed to provide Environmental Intelligence rather than just raw numbers. It helps users understand real-time environmental hazards, plan safer routes, compare city conditions, and query a specialized AI assistant.
 
-### Problem
-As urbanization and industrialization increase, communities are exposed to fluctuating environmental risks (high AQI, PM2.5, extreme weather). Traditional weather apps just provide raw numbers without context, leaving users unsure of how it affects their daily lives, health, or outdoor activities.
 
-### Solution
-VerdantX provides contextual, actionable environmental intelligence. Through intuitive visualizations, a strict-scoped AI Assistant, and community-driven hazard reporting, users can make informed decisions to protect their health and reduce exposure to pollutants.
+# HackInMotion: AI-Powered Environmental & Health Monitoring
 
-## Features
-- **Real-Time Environmental Dashboard**: Displays AQI, PM2.5, Temperature, and Wind using user geolocation.
-- **Verdant AI Assistant**: A specialized Llama-powered AI agent focused *strictly* on environmental topics, CleanTech, and risk mitigation.
-- **City Comparison**: Compare environmental data across multiple cities simultaneously.
-- **Route Risk Planner**: Estimate the environmental exposure along a planned journey.
-- **Community Reports**: View and submit local hazards (smoke, dust, waste burning).
-- **Theming System**: 4 immersive visual modes (Light, Dark, Nature, Ocean).
+HackInMotion is a comprehensive full-stack application that monitors environmental conditions (AQI, weather) in real-time and uses AI to provide personalized health risk assessments, travel route analysis, and actionable insights.
 
-## Tech Stack & Architecture
-- **Frontend (Device 2 & 3)**: React 19, Tailwind CSS v4, Zustand (State), Recharts, React Router.
-- **Backend (Device 1 & 3)**: Node.js, Express.js.
-- **Database**: MongoDB (Mongoose ORM).
-- **AI Integration**: Groq SDK (Llama 3 8B model).
-- **External Data APIs**: Open-Meteo (Free, no-auth weather & AQI).
+## Project Architecture
 
-### Architecture Diagram
-*See `docs/architecture-diagram.png` (Placeholder for real diagram).*
+The project is structured as a monorepo containing a React frontend and a Node.js/Express backend.
 
-## Environment Variables
-
-### Backend (`backend/.env`)
-```
-PORT=5000
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/verdantx
-GROQ_API_KEY=gsk_your_groq_api_key
-FRONTEND_URL=http://localhost:5173
+```text
+HackInMotion-RICR-HIM-1092/
+├── frontend/   # React + Vite + Tailwind CSS + Zustand
+└── backend/    # Node.js + Express + MongoDB + AI Integration
 ```
 
-## Setup Instructions
+### Tech Stack
 
-### Local Backend Setup
-1. `cd backend`
-2. `npm install`
-3. Create `.env` file and populate it with `MONGODB_URI` and `GROQ_API_KEY`.
-4. `npm start` (Runs on http://localhost:5000)
+- **Frontend**: React, Vite, Tailwind CSS, Zustand, Recharts, Leaflet, Framer Motion
+- **Backend**: Node.js, Express, MongoDB, Mongoose, Passport (OAuth), Socket.io
+- **AI Integration**: Groq SDK for fast LLM inference (health reports, chatbot)
+- **Data Sources**: WAQI (World Air Quality Index), Open-Meteo, Geoapify
 
-### Local Frontend Setup
-1. `cd frontend`
-2. `npm install`
-3. `npm run dev` (Runs on http://localhost:5173)
+## Key Features
 
-## Deployment Preparation
-- **Frontend**: Prepared for deployment on Vercel/Netlify. Ensure `npm run build` succeeds and environment variables are set.
-- **Backend**: Prepared for Render/Railway. Ensure CORS allows the production frontend URL.
-- **Database**: MongoDB Atlas. Ensure network access IP whitelist is configured for the backend deployment provider.
+- **Personalized AI Health Reports**: Generates risk assessments based on local air quality and user medical conditions.
+- **Route Risk Analysis**: Find the safest travel route avoiding highly polluted areas, along with amenities (hospitals, fuel stations).
+- **City Comparison**: Real-time comparison of AQI and PM2.5 across multiple locations.
+- **Real-Time Data**: WebSocket integration for live data updates without refreshing.
+- **Privacy & Security**: Granular privacy controls, data export capabilities, and secure JWT + OAuth authentication.
 
-## Known Limitations
-- The Route Risk Planner uses a simplified straight-line mock coordinate logic due to the absence of a configured Google Maps/Mapbox API key in this demo.
-- Community reports are temporarily tied to a mock User ID until the full JWT authentication flow from Device 1 is integrated.
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18+)
+- MongoDB (Local or Atlas)
+- API Keys: Groq API Key, Geoapify Key (for maps), WAQI token
+
+### 1. Backend Setup
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Fill in your .env variables (MongoDB, JWT, API Keys)
+npm run dev
+```
+
+### 2. Frontend Setup
+
+```bash
+cd frontend
+npm install
+cp .env.example .env
+# Set VITE_API_BASE_URL=http://localhost:5000/api
+npm run dev
+```
+
+The application will be accessible at `http://localhost:5173`.
+
+## Deployment
+
+Both the frontend and backend are production-ready.
+
+1. **Backend Deployment**:
+   - Deploy as a Node.js application (Render, Heroku, AWS).
+   - Set all production environment variables.
+   - Configure `CLIENT_URL` to match your frontend domain to resolve CORS.
+
+2. **Frontend Deployment**:
+   - Run `npm run build` to generate the static files.
+   - Deploy the `dist/` folder to a static host (Vercel, Netlify).
+   - Ensure the `VITE_API_BASE_URL` points to your deployed backend.
+   - Configure SPA routing fallbacks (rewrite rules to `index.html`).
+
+## Troubleshooting
+
+- **CORS Issues**: Ensure the backend `.env` `CLIENT_URL` matches the exact frontend origin.
+- **API Errors**: Ensure your Groq API key and Geoapify key are properly injected into the backend and frontend `.env` respectively.
+- **Missing Data**: Environmental APIs can rate-limit requests. Check backend logs for API call failures.

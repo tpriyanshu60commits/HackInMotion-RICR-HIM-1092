@@ -1,19 +1,16 @@
-import cron from "node-cron";
-import User from "../models/User.js";
-import Location from "../models/Location.js";
-import Alert from "../models/Alert.js";
-import { getAirQualityByCoordinates } from "./airQualityService.js";
+import cron from 'node-cron';
+import User from '../models/User.js';
+import Location from '../models/Location.js';
+import Alert from '../models/Alert.js';
+import { getAirQualityByCoordinates } from './airQualityService.js';
 
 export const checkLocationsAndAlert = async () => {
   try {
-    console.log("Running scheduled air quality check for user locations...");
+    console.log('Running scheduled air quality check for user locations...');
 
     // Get all users who have alerts enabled
     const users = await User.find({
-      $or: [
-        { "alertPreferences.highRisk": true },
-        { "alertPreferences.moderateRisk": true },
-      ],
+      $or: [{ 'alertPreferences.highRisk': true }, { 'alertPreferences.moderateRisk': true }],
     });
 
     for (const user of users) {
@@ -25,7 +22,7 @@ export const checkLocationsAndAlert = async () => {
           const envData = await getAirQualityByCoordinates(
             location.latitude,
             location.longitude,
-            user.healthProfile,
+            user.healthProfile
           );
 
           if (!envData) continue;
@@ -38,10 +35,10 @@ export const checkLocationsAndAlert = async () => {
             await createAlertIfNotExists(
               user,
               location._id,
-              "high-risk",
+              'high-risk',
               `High Risk Alert for ${location.name}`,
               `${location.name} (${location.city}) has reached a ${risk.label} risk level (AQI: ${envData.aqi}). ${risk.explanation}`,
-              envData.aqi,
+              envData.aqi
             );
           }
           // Check for Moderate Risk
@@ -49,35 +46,23 @@ export const checkLocationsAndAlert = async () => {
             await createAlertIfNotExists(
               user,
               location._id,
-              "moderate-risk",
+              'moderate-risk',
               `Moderate Risk Warning for ${location.name}`,
               `${location.name} (${location.city}) is now Unhealthy for Sensitive Groups (AQI: ${envData.aqi}).`,
-              envData.aqi,
+              envData.aqi
             );
           }
         } catch (err) {
-          console.error(
-            `Error checking location ${location.name}:`,
-            err.message,
-          );
+          console.error(`Error checking location ${location.name}:`, err.message);
         }
       }
     }
   } catch (error) {
-    console.error("Error in checkLocationsAndAlert cron job:", error.message);
+    console.error('Error in checkLocationsAndAlert cron job:', error.message);
   }
 };
 
-
-
-const createAlertIfNotExists = async (
-  user,
-  locationId,
-  type,
-  title,
-  message,
-  aqiValue,
-) => {
+const createAlertIfNotExists = async (user, locationId, type, title, message, aqiValue) => {
   // Check if an unread alert of the same type for this location already exists recently (e.g., last 24 hours)
   const oneDayAgo = new Date();
   oneDayAgo.setDate(oneDayAgo.getDate() - 1);
@@ -99,16 +84,14 @@ const createAlertIfNotExists = async (
       aqiValue,
     });
     console.log(`Created alert for user ${user._id} at location ${locationId}`);
-    
-
   }
 };
 
 // Start the cron job
 export const initCronJobs = () => {
   // Run every 2 hours
-  cron.schedule("0 */2 * * *", () => {
+  cron.schedule('0 */2 * * *', () => {
     checkLocationsAndAlert();
   });
-  console.log("Cron jobs initialized.");
+  console.log('Cron jobs initialized.');
 };

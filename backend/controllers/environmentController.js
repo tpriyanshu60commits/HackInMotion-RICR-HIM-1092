@@ -1,4 +1,8 @@
-import { getAirQualityByCoordinates, getAirQualityByCity, getHistoricalData } from '../services/airQualityService.js';
+import {
+  getAirQualityByCoordinates,
+  getAirQualityByCity,
+  getHistoricalData,
+} from '../services/airQualityService.js';
 
 // @desc    Get current environmental data by coordinates
 // @route   GET /api/environment/current
@@ -31,19 +35,30 @@ export const getCurrentEnvironmentByCity = async (req, res, next) => {
   try {
     const { city } = req.query;
 
-    if (!city) {
-      res.status(400);
-      throw new Error('City is required');
+    if (!city || typeof city !== 'string' || !city.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'City parameter is required',
+      });
     }
 
     const healthProfile = req.user?.healthProfile || null;
-    const data = await getAirQualityByCity(city, healthProfile);
+    const data = await getAirQualityByCity(city.trim(), healthProfile);
 
     res.json({
       success: true,
       data,
     });
   } catch (error) {
+    if (
+      error.message &&
+      (error.message.includes('Could not resolve') || error.message.includes('unavailable'))
+    ) {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    }
     next(error);
   }
 };
@@ -92,7 +107,10 @@ export const compareCities = async (req, res, next) => {
       throw new Error('Cities query parameter is required');
     }
 
-    const cityList = cities.split(',').map((c) => c.trim()).filter((c) => c);
+    const cityList = cities
+      .split(',')
+      .map((c) => c.trim())
+      .filter((c) => c);
 
     if (cityList.length < 2) {
       res.status(400);
@@ -106,7 +124,7 @@ export const compareCities = async (req, res, next) => {
       try {
         const data = await getAirQualityByCity(city, healthProfile);
         comparisons.push(data);
-      } catch{
+      } catch {
         comparisons.push({ city, error: 'Data unavailable' });
       }
     }

@@ -16,12 +16,11 @@ import communityRoutes from './routes/communityRoutes.js';
 import aiRoutes from './routes/ai.js';
 import dataRoutes from './routes/data.js';
 import reportRoutes from './routes/reports.js';
-import myLocationRoutes from './routes/locations.js';
 import snapshotRoutes from './routes/snapshotRoutes.js';
-import routeRoutes from './routes/routeRoutes.js';        // ← feature/SS06
-import profileRoutes from './routes/profileRoutes.js';    // ← master
+import routeRoutes from './routes/routeRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import healthRoutes from './routes/healthRoutes.js';
+import aiHealthRoutes from './routes/aiHealthRoutes.js';
 
 const app = express();
 
@@ -30,9 +29,15 @@ app.use(helmet());
 app.use(
   cors({
     origin:
-      process.env.CLIENT_URL ||
-      process.env.FRONTEND_URL ||
-      'http://localhost:5173',
+      process.env.NODE_ENV === 'production'
+        ? [
+            process.env.CLIENT_URL,
+            process.env.FRONTEND_URL,
+            'https://hack-in-motion-ricr-him-1092.vercel.app',
+          ].filter(Boolean)
+        : [process.env.CLIENT_URL, process.env.FRONTEND_URL, 'http://localhost:5173'].filter(
+            Boolean
+          ),
     credentials: true,
   })
 );
@@ -48,6 +53,9 @@ if (process.env.NODE_ENV !== 'production') {
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  skip: (req) => {
+    return req.ip === '127.0.0.1' || req.ip === '::1' || req.ip === '::ffff:127.0.0.1';
+  },
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -62,24 +70,22 @@ app.get('/', (req, res) => {
   res.send('Environmental API is running...');
 });
 
-// ─── Device 1 Routes ──────────────────────────────────────────────────────────
 import { authLimiter } from './middleware/authLimiter.js';
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/location', locationRoutes);
 app.use('/api/environment', environmentRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/community', communityRoutes);
-app.use('/api/v1/profile', profileRoutes);      // ← master
+app.use('/api/v1/profile', profileRoutes);
 
-// ─── Device 3 Routes ──────────────────────────────────────────────────────────
 app.use('/api/ai', aiRoutes);
 app.use('/api/data', dataRoutes);
 app.use('/api/reports', reportRoutes);
-app.use('/api/my-locations', myLocationRoutes);
 app.use('/api/snapshots', snapshotRoutes);
-app.use('/api/route', routeRoutes);             // ← feature/SS06
+app.use('/api/route', routeRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/health', healthRoutes);
+app.use('/api/ai-health', aiHealthRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);

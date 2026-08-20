@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "locations": "स्थान",
+    "history": "इतिहास",
+    "alerts": "अलर्ट",
+    "profile": "प्रोफ़ाइल"
+  },
+  "settings": {
+    "languageAndRegion": "भाषा और क्षेत्र",
+    "interfaceLanguage": "इंटरफ़ेस भाषा",
+    "voiceAlertLanguage": "वॉइस अलर्ट भाषा",
+    "region": "क्षेत्र",
+    "saveChanges": "बदलाव सेव करें",
+    "saving": "सेव हो रहा है...",
+    "saved": "सेव हो गया!"
+  },
+  "app": {
+    "welcome": "वापसी पर स्वागत है",
+    "search": "जगह खोजें..."
+  }
+}

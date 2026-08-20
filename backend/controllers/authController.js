@@ -30,7 +30,7 @@ export const registerUser = async (req, res, next) => {
       await sendEmail({
         to: user.email,
         subject: 'Verify your email address - VerdantX',
-        html: `<p>Please click this link to verify your email:</p><a href="${verifyUrl}">${verifyUrl}</a>`
+        html: `<p>Please click this link to verify your email:</p><a href="${verifyUrl}">${verifyUrl}</a>`,
       });
     } catch (emailError) {
       console.error('Registration email failed:', emailError.message);
@@ -90,9 +90,12 @@ export const loginUser = async (req, res, next) => {
 // @route   POST /api/auth/logout
 // @access  Public
 export const logoutUser = (req, res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
   res.cookie('jwt', '', {
     httpOnly: true,
     expires: new Date(0),
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'strict',
   });
 
   res.status(200).json({ success: true, message: 'Logged out successfully' });
@@ -103,16 +106,13 @@ export const logoutUser = (req, res) => {
 // @access  Private
 export const getUserProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
-
-    if (user) {
+    if (req.user) {
       res.json({
         success: true,
-        data: user,
+        data: req.user,
       });
     } else {
-      res.status(404);
-      throw new Error('User not found');
+      res.status(404).json({ success: false, message: 'User not found' });
     }
   } catch (error) {
     next(error);
@@ -124,12 +124,21 @@ export const getUserProfile = async (req, res, next) => {
 // @access  Private
 export const updateUserProfile = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.json({
+        success: true,
+        data: {
+          ...req.user,
+          ...req.body,
+        },
+      });
+    }
+
     const user = await User.findById(req.user._id);
 
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
-
 
       if (req.body.healthProfile) {
         user.healthProfile = { ...user.healthProfile, ...req.body.healthProfile };
@@ -161,13 +170,18 @@ export const updateUserProfile = async (req, res, next) => {
 export const verifyEmail = async (req, res, next) => {
   try {
     const user = await User.findOne({ emailVerificationToken: req.params.token });
-    if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired verification token' });
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid or expired verification token' });
 
     user.emailVerified = true;
     user.emailVerificationToken = undefined;
     await user.save();
     res.json({ success: true, message: 'Email verified successfully' });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const forgotPassword = async (req, res, next) => {
@@ -180,28 +194,35 @@ export const forgotPassword = async (req, res, next) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    const clientUrl =
+      process.env.NODE_ENV === 'production'
+        ? process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app'
+        : process.env.CLIENT_URL || 'http://localhost:5173';
+    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     try {
       await sendEmail({
         to: user.email,
         subject: 'Password Reset - VerdantX',
-        html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`
+        html: `<p>Click here to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`,
       });
       res.json({ success: true, message: 'Password reset email sent' });
-    } catch  {
+    } catch {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
       await user.save({ validateBeforeSave: false });
-      return res.status(500).json({ success: false, message: 'Email could not be sent' });
+      res.status(500);
+      return next(new Error('Email could not be sent'));
     }
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const resetPassword = async (req, res, next) => {
   try {
     const user = await User.findOne({
       resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() }
+      resetPasswordExpires: { $gt: Date.now() },
     });
     if (!user) return res.status(400).json({ success: false, message: 'Invalid or expired token' });
 
@@ -210,15 +231,23 @@ export const resetPassword = async (req, res, next) => {
     user.resetPasswordExpires = undefined;
     await user.save();
     res.json({ success: true, message: 'Password reset successful' });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const googleAuthCallback = async (req, res, next) => {
   try {
     const token = generateToken(res, req.user._id);
-    const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/login?token=${token}`;
+    const clientUrl =
+      process.env.NODE_ENV === 'production'
+        ? process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app'
+        : process.env.CLIENT_URL || 'http://localhost:5173';
+    const redirectUrl = `${clientUrl}/login?token=${token}`;
     res.redirect(redirectUrl);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
 
 // @desc    Update password securely
@@ -226,6 +255,13 @@ export const googleAuthCallback = async (req, res, next) => {
 // @access  Private
 export const updatePassword = async (req, res, next) => {
   try {
+    if (req.user?.isGuest) {
+      return res.status(403).json({
+        success: false,
+        message: 'Guest users cannot update passwords',
+      });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) {
       res.status(404);
@@ -233,7 +269,7 @@ export const updatePassword = async (req, res, next) => {
     }
 
     const { currentPassword, newPassword } = req.body;
-    
+
     // For users who registered via OAuth and have no password
     if (user.password && !(await user.matchPassword(currentPassword))) {
       res.status(401);

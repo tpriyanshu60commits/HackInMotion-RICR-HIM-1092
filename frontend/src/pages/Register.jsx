@@ -12,7 +12,7 @@ export const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const setUser = useStore((state) => state.setUser);
   const navigate = useNavigate();
 
@@ -43,12 +43,9 @@ export const Register = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4 transition-colors"
-      
-    >
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4 transition-colors">
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/20 blur-[120px] pointer-events-none" />
-      
+
       <GlassCard className="w-full max-w-md p-8 z-10 animate-fade-in-up">
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
@@ -84,7 +81,9 @@ export const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-main mb-1.5">Email Address</label>
+            <label className="block text-sm font-semibold text-text-main mb-1.5">
+              Email Address
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
                 <Mail size={18} />
@@ -118,7 +117,9 @@ export const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-main mb-1.5">Confirm Password</label>
+            <label className="block text-sm font-semibold text-text-main mb-1.5">
+              Confirm Password
+            </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
                 <Lock size={18} />
@@ -139,8 +140,12 @@ export const Register = () => {
             disabled={loading}
             className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed mt-4"
           >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : (
-              <>Create Account <ArrowRight size={18} /></>
+            {loading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              <>
+                Create Account <ArrowRight size={18} />
+              </>
             )}
           </button>
         </form>

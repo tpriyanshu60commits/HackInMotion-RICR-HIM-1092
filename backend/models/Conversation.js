@@ -4,16 +4,16 @@ const messageSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ['user', 'assistant', 'system'],
-    required: true
+    required: true,
   },
   content: {
     type: String,
-    required: true
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 const conversationSchema = new mongoose.Schema({
@@ -21,17 +21,17 @@ const conversationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true // One main conversation thread per user for now
+    unique: true, // One main conversation thread per user for now
   },
   messages: [messageSchema],
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Update the updatedAt timestamp before saving
-conversationSchema.pre('save', function() {
+conversationSchema.pre('save', function () {
   this.updatedAt = Date.now();
 });
 

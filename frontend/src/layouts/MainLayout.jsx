@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { NavLink, Outlet, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink, Outlet, Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Leaf,
   MapPin,
@@ -10,7 +12,7 @@ import {
   Navigation as NavIcon,
   Activity,
   BookOpen,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 import useStore from '../store/useStore';
@@ -22,39 +24,52 @@ import { AlertToastContainer } from '../components/alerts/AlertToastContainer';
 import { BottomNavMobile } from './BottomNavMobile';
 
 const NAV_ITEMS = [
-  { to: '/locations', icon: MapPin, label: 'Locations' },
-  { to: '/history', icon: Activity, label: 'History' },
-  { to: '/compare', icon: Wind, label: 'Compare' },
-  { to: '/route', icon: NavIcon, label: 'Route Risk' },
-  { to: '/education', icon: BookOpen, label: 'Education' },
+  { to: '/locations', icon: MapPin, label: 'Locations', tKey: 'locations' },
+  { to: '/history', icon: Activity, label: 'History', tKey: 'history' },
+  { to: '/compare', icon: Wind, label: 'Compare', tKey: 'compare' },
+  { to: '/route', icon: NavIcon, label: 'Route Risk', tKey: 'routeRisk' },
+  { to: '/education', icon: BookOpen, label: 'Education', tKey: 'education' },
 ];
 
 export const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const user = useStore((state) => state.user);
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
 
+  // Sync i18n language with user preferences
+  useEffect(() => {
+    if (user?.preferences?.language) {
+      i18n.changeLanguage(user.preferences.language);
+    }
+  }, [user?.preferences?.language, i18n]);
 
-  const navItems = user?.role === 'admin'
-    ? [...NAV_ITEMS, { to: '/admin', icon: User, label: 'Admin Panel' }]
-    : NAV_ITEMS;
+  const navItems =
+    user?.role === 'admin'
+      ? [...NAV_ITEMS, { to: '/admin', icon: User, label: 'Admin Panel', tKey: 'adminPanel' }]
+      : NAV_ITEMS;
 
   return (
     <WeatherBackground>
-      <div className="min-h-screen w-full flex flex-col text-text-main overflow-x-hidden">
-
+      <div className="min-h-screen  w-full flex flex-col text-text-main overflow-x-hidden">
         {/* =====================================================
-            TOP NAVBAR
+            TOP NAVBAR (Progressive Blur + Pill Navbar)
         ====================================================== */}
-        <header className="glass border-b border-border fixed top-2 z-100 w-full h-16 hidden md:flex items-center justify-between px-4 md:px-8 rounded-2xl">
+        {/* Progressive Blur Mask for smooth scrolling */}
+        <div className="fixed top-0 left-0 right-0 h-28 z-[85] hidden md:block pointer-events-none  backdrop-blur-[12px] [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"></div>
 
+        <header className="bg-[#0A0F0D]/60 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] fixed top-2 z-[90] w-19/20 h-16 hidden md:flex items-center justify-between ms-10 mt-1 px-4 md:px-8 rounded-full transition-all duration-300">
           {/* Logo Section */}
-          <Link to="/dashboard" className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-3 text-white font-heading font-bold text-xl hover:opacity-80 transition-opacity"
+          >
             <Leaf className="text-green-500 shrink-0" size={28} />
             <span>VerdantX</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             <nav className="hidden xl:flex items-center gap-1">
               {navItems.map((item) => (
                 <NavLink
@@ -62,39 +77,65 @@ export const MainLayout = () => {
                   to={item.to}
                   className={({ isActive }) =>
                     cn(
-                      'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 group border border-transparent',
+                      'flex items-center px-3 py-2 rounded-full font-medium transition-all duration-300 group border border-transparent',
                       isActive
-                        ? 'bg-green-500/10 text-green-400 border-green-500/20'
-                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                        ? 'bg-green-500/10 text-green-400 border-green-500/20 gap-2'
+                        : 'text-gray-400 hover:bg-white/[0.06] hover:text-white gap-0 hover:gap-2'
                     )
                   }
                 >
-                  <item.icon size={18} className="transition-transform group-hover:scale-110 shrink-0" />
-                  <span className="text-xs">{item.label}</span>
+                  {({ isActive }) => (
+                    <>
+                      <item.icon
+                        size={18}
+                        className="transition-transform group-hover:scale-110 shrink-0"
+                      />
+                      <span
+                        className={cn(
+                          'text-xs whitespace-nowrap overflow-hidden transition-all duration-300',
+                          isActive
+                            ? 'max-w-[100px] opacity-100'
+                            : 'max-w-0 opacity-0 group-hover:max-w-[100px] group-hover:opacity-100'
+                        )}
+                      >
+                        {t(`nav.${item.tKey}`, item.label)}
+                      </span>
+                    </>
+                  )}
                 </NavLink>
               ))}
             </nav>
 
             {/* User Profile / Logout (Desktop) */}
             <div className="hidden xl:flex items-center gap-4">
-              <Link
-                to="/report"
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors text-sm shadow-lg shadow-green-500/20 mr-2"
-              >
-                <AlertCircle size={16} />
-                <span>Report Issue</span>
-              </Link>
-              <Link
-                to="/profile"
-                className="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400 font-bold hover:bg-green-500/30 transition-colors overflow-hidden"
-                title="Account Settings"
-              >
-                {user?.profileImage?.url ? (
-                  <img src={user.profileImage.url} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  user?.name ? user.name.charAt(0).toUpperCase() : 'A'
-                )}
-              </Link>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  to="/report"
+                  className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full font-medium transition-colors text-sm shadow-lg shadow-green-500/20 mr-2"
+                >
+                  <AlertCircle size={16} />
+                  <span>{t('nav.reportIssue', 'Report Issue')}</span>
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  to="/profile"
+                  className="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400 font-bold hover:bg-green-500/30 transition-colors overflow-hidden"
+                  title="Account Settings"
+                >
+                  {user?.profileImage?.url ? (
+                    <img
+                      src={user.profileImage.url}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : user?.name ? (
+                    user.name.charAt(0).toUpperCase()
+                  ) : (
+                    'A'
+                  )}
+                </Link>
+              </motion.div>
             </div>
           </div>
 
@@ -119,7 +160,7 @@ export const MainLayout = () => {
             />
             <div className="absolute right-0 top-0 bottom-0 w-72 glass shadow-2xl flex flex-col h-full animate-fade-in">
               <div className="flex justify-between items-center p-4 border-b border-border">
-                <span className="font-bold text-lg text-white">Menu</span>
+                <span className="font-bold text-lg text-white">{t('nav.menu', 'Menu')}</span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 text-text-muted hover:text-text-main rounded-lg transition-colors"
@@ -144,28 +185,32 @@ export const MainLayout = () => {
                     }
                   >
                     <item.icon size={20} />
-                    <span>{item.label}</span>
+                    <span>{t(`nav.${item.tKey}`, item.label)}</span>
                   </NavLink>
                 ))}
               </div>
 
               <div className="p-4 border-t border-border flex flex-col gap-3">
-                <Link
-                  to="/report"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors shadow-lg shadow-green-500/20"
-                >
-                  <AlertCircle size={20} />
-                  Report Issue
-                </Link>
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10"
-                >
-                  <User size={20} />
-                  Account Settings
-                </Link>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    to="/report"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors shadow-lg shadow-green-500/20"
+                  >
+                    <AlertCircle size={20} />
+                    {t('nav.reportIssue', 'Report Issue')}
+                  </Link>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium transition-colors border border-white/10"
+                  >
+                    <User size={20} />
+                    {t('nav.accountSettings', 'Account Settings')}
+                  </Link>
+                </motion.div>
               </div>
             </div>
           </div>
@@ -174,9 +219,80 @@ export const MainLayout = () => {
         {/* =====================================================
             MAIN CONTENT
         ====================================================== */}
-        <main className="flex-1 w-full relative mt-0 md:mt-10 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
-          <Outlet />
+        <main className="flex-1 w-full relative mt-0 md:mt-20 scroll-smooth p-0 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:p-8 overflow-x-hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{
+                opacity: 0,
+                scale: 0.88,
+                rotateY: -18,
+                rotateX: 5,
+                x: 45,
+                filter: 'blur(12px)',
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                rotateY: 0,
+                rotateX: 0,
+                x: 0,
+                filter: 'blur(0px)',
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.92,
+                rotateY: 18,
+                rotateX: -5,
+                x: -45,
+                filter: 'blur(12px)',
+              }}
+              transition={{
+                duration: 0.65,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              style={{
+                perspective: 1400,
+                transformStyle: 'preserve-3d',
+                transformOrigin: 'center center',
+                willChange: 'transform, opacity, filter',
+              }}
+              className="relative w-full h-full"
+            >
+              {/* Butterfly Glow */}
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  scale: 0.5,
+                }}
+                animate={{
+                  opacity: [0, 0.8, 0],
+                  scale: [0.5, 1.2, 1.5],
+                }}
+                transition={{
+                  duration: 0.8,
+                  ease: 'easeOut',
+                }}
+                className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-primary-400/10 blur-3xl"
+              />
+
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
+
+        {/* =====================================================
+            GLOBAL FOOTER
+        ====================================================== */}
+        <footer className="relative z-10  backdrop-blur-full border-t border-white/5 px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-4 mb-16 md:mb-0">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+            <p>© 2026 VerdantX. All rights reserved.</p>
+
+            <p>
+              Made with <span className="text-red-500">❤</span> for a VerdantX Team 🌱
+            </p>
+          </div>
+        </footer>
 
         {/* =====================================================
             LIVE ALERTS TOAST

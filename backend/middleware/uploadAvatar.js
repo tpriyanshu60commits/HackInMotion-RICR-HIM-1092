@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'airsense/avatars',
-    allowed_formats: ['jpg', 'png', 'jpeg'],
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
   },
 });
 

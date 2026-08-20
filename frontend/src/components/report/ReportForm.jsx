@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Camera, MapPin, Upload, X } from 'lucide-react';
 import { GlassCard } from '../common/GlassCard';
+import { environmentService } from '../../services/api';
 
 const CATEGORIES = [
   { id: 'garbage', label: 'Garbage Dump' },
@@ -44,18 +45,27 @@ export const ReportForm = ({ onSubmit, loading }) => {
         async (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          
+
           try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-            const data = await res.json();
-            setFormData(prev => ({
+            const res = await environmentService.getCurrentByCoords(lat, lng);
+            const envData = res.data?.data;
+            const address = envData?.city
+              ? `${envData.city}${envData.country ? ', ' + envData.country : ''}`
+              : `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+            setFormData((prev) => ({
               ...prev,
               lat,
               lng,
-              address: data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`
+              address,
             }));
           } catch {
-            setFormData(prev => ({ ...prev, lat, lng, address: `${lat.toFixed(4)}, ${lng.toFixed(4)}` }));
+            setFormData((prev) => ({
+              ...prev,
+              lat,
+              lng,
+              address: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+            }));
           }
         },
         () => {
@@ -68,45 +78,44 @@ export const ReportForm = ({ onSubmit, loading }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.category) {
-      alert("Please select an issue category.");
+      alert('Please select an issue category.');
       return;
     }
     if (!photo) {
-      alert("Please upload a photo evidence.");
+      alert('Please upload a photo evidence.');
       return;
     }
     if (!formData.title || !formData.address) {
-      alert("Please enter title and location.");
+      alert('Please enter title and location.');
       return;
     }
-    
+
     const submitData = new FormData();
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       let val = formData[key];
       if ((key === 'lat' || key === 'lng') && val === '') val = 0;
       submitData.append(key, val);
     });
     if (photo) submitData.append('photo', photo);
-    
+
     onSubmit(submitData);
   };
 
   return (
     <GlassCard className="p-6 bg-[#0A0F0D]/80 backdrop-blur-2xl border border-white/20">
       <form onSubmit={handleSubmit} className="space-y-6">
-        
         {/* Category Selection */}
         <div className="space-y-3">
           <label className="text-sm font-medium text-text-muted">Issue Category</label>
           <div className="flex flex-wrap gap-3">
-            {CATEGORIES.map(cat => (
+            {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, category: cat.id }))}
+                onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
-                  formData.category === cat.id 
-                    ? 'bg-green-500/20 text-green-400 border-green-500/50' 
+                  formData.category === cat.id
+                    ? 'bg-green-500/20 text-green-400 border-green-500/50'
                     : 'bg-[#0A0F0D]/80 border-white/20 text-text-muted hover:bg-black hover:text-white backdrop-blur-md'
                 }`}
               >
@@ -148,8 +157,8 @@ export const ReportForm = ({ onSubmit, loading }) => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-text-muted">Location</label>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={handleLocationDetect}
               className="text-xs text-green-400 hover:text-green-300 flex items-center gap-1 transition-colors"
             >
@@ -187,7 +196,13 @@ export const ReportForm = ({ onSubmit, loading }) => {
             <label className="w-full h-32 border-2 border-dashed border-white/20 hover:border-green-500/50 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors bg-[#0A0F0D]/80 hover:bg-black backdrop-blur-md">
               <Camera className="text-text-muted" size={28} />
               <span className="text-sm text-text-muted font-medium">Click to upload photo</span>
-              <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" required />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="hidden"
+                required
+              />
             </label>
           )}
         </div>
@@ -201,7 +216,9 @@ export const ReportForm = ({ onSubmit, loading }) => {
           {loading ? (
             <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            <><Upload size={18} /> Submit Report</>
+            <>
+              <Upload size={18} /> Submit Report
+            </>
           )}
         </button>
       </form>

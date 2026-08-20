@@ -1,7 +1,11 @@
 export const sendEscalationEmail = async (report) => {
   try {
-    const acceptLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/report?acceptEscalation=${report._id}`;
-    
+    const clientUrl =
+      process.env.NODE_ENV === 'production'
+        ? process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app'
+        : process.env.CLIENT_URL || 'http://localhost:5173';
+    const acceptLink = `${clientUrl}/report?acceptEscalation=${report._id}`;
+
     // The user requested to send it to this specific email
     const targetEmail = 'sonishivanshu7898163335@gmail.com';
 
@@ -17,16 +21,16 @@ export const sendEscalationEmail = async (report) => {
         location: report.location?.address || 'Unknown',
         date: new Date(report.createdAt).toLocaleString(),
         description: report.description,
-        acceptLink: acceptLink
-      }
+        acceptLink: acceptLink,
+      },
     };
 
     const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {

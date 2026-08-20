@@ -1,4 +1,3 @@
-
 import { cn } from '../../utils/utils';
 
 const getColor = (value, thresholds) => {
@@ -18,11 +17,11 @@ const getBarColor = (value, thresholds) => {
 // WHO annual guideline thresholds [good, moderate, unhealthy]
 const POLLUTANT_THRESHOLDS = {
   'PM2.5': [15, 35, 55],
-  'PM10': [45, 100, 150],
+  PM10: [45, 100, 150],
   'O₃': [60, 100, 140],
   'NO₂': [40, 80, 120],
   'SO₂': [40, 80, 120],
-  'CO': [4400, 9400, 15400],
+  CO: [4400, 9400, 15400],
 };
 
 export const PollutantChip = ({ name, value, unit = 'µg/m³', max }) => {
@@ -35,14 +34,19 @@ export const PollutantChip = ({ name, value, unit = 'µg/m³', max }) => {
   return (
     <div className="glass-inner rounded-xl p-3 flex flex-col gap-2 min-w-[100px]">
       <div className="flex justify-between items-center">
-        <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">{name}</span>
+        <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+          {name}
+        </span>
       </div>
       <div className="flex items-baseline gap-1">
-        <span className={cn("text-lg font-black", color)}>{value ?? '--'}</span>
+        <span className={cn('text-lg font-black', color)}>{value ?? '--'}</span>
         <span className="text-[9px] text-text-muted font-medium">{unit}</span>
       </div>
       <div className="w-full bg-border rounded-full h-1.5 overflow-hidden">
-        <div className={cn("h-1.5 rounded-full transition-all duration-700", barColor)} style={{ width: `${pct}%` }} />
+        <div
+          className={cn('h-1.5 rounded-full transition-all duration-700', barColor)}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

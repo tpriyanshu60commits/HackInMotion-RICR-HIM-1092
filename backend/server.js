@@ -6,8 +6,6 @@ dotenv.config();
 
 connectDB();
 
-
-
 import { initCronJobs } from './services/alertService.js';
 initCronJobs();
 

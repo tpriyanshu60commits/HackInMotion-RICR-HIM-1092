@@ -1,6 +1,6 @@
 /**
  * Downsamples an array of route coordinates to a target maximum number of points.
- * 
+ *
  * @param {Array<Array<number>>} coordinates - Array of [lat, lng] coordinates
  * @param {number} maxPoints - Maximum number of points to return (default 15)
  * @returns {Array<Array<number>>} Downsampled array of coordinates

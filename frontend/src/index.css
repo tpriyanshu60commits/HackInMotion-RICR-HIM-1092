@@ -1,4 +1,40 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Hide scrollbar for all scrollable elements */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
 
 @theme {
   --color-primary-50: var(--primary-50);
@@ -24,7 +60,7 @@
 
 @layer base {
   :root {
-    --background: #0A0F0D;
+    --background: #0a0f0d;
     --surface: rgba(0, 0, 0, 0.4);
     --surface-hover: rgba(0, 0, 0, 0.6);
     --border-color: rgba(255, 255, 255, 0.08);
@@ -50,10 +86,17 @@
     @apply bg-background text-text-main font-sans antialiased;
     background-image: var(--bg-image);
     background-attachment: fixed;
-    transition: background 0.5s ease, color 0.5s ease;
+    transition:
+      background 0.5s ease,
+      color 0.5s ease;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-bold tracking-tight text-white;
   }
 }
@@ -61,7 +104,9 @@
 @layer utilities {
   .glass {
     @apply bg-surface backdrop-blur-xl border border-border shadow-lg;
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition:
+      background 0.3s ease,
+      border-color 0.3s ease;
   }
 
   .glass-hover:hover {
@@ -71,61 +116,116 @@
 
 /* Water Drop Loader Keyframes */
 @keyframes fall {
-  0% { transform: translateY(-50px) scaleY(1.2); opacity: 0; }
-  20% { transform: translateY(-20px) scaleY(1.1); opacity: 1; }
-  100% { transform: translateY(0) scaleY(1); opacity: 1; }
+  0% {
+    transform: translateY(-50px) scaleY(1.2);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(-20px) scaleY(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
 }
 
 @keyframes ripple {
-  0% { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(3); opacity: 0; }
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .animate-fall {
     animation: fall 1s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   }
-  
+
   .animate-ripple {
     animation: ripple 1s ease-out infinite;
     animation-delay: 0.5s;
   }
-  
+
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
-  
+
   .animate-fade-in-up {
     animation: fadeInUp 0.5s ease-out forwards;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fall, .animate-ripple, .animate-fade-in, .animate-fade-in-up {
+  .animate-fall,
+  .animate-ripple,
+  .animate-fade-in,
+  .animate-fade-in-up {
     animation: none;
     opacity: 1;
     transform: none;
   }
 }
 
-@keyframes rain {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(30px); }
+@keyframes rainBg {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 600px;
+  }
+}
+
+.rain-layer-1 {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cg fill='%23fff' opacity='0.7'%3E%3Crect x='10' y='0' width='1.5' height='20'/%3E%3Crect x='40' y='50' width='1' height='15'/%3E%3Crect x='70' y='20' width='2' height='25'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100px 100px;
+  animation: rainBg 1.5s linear infinite;
+}
+
+.rain-layer-2 {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cg fill='%23fff' opacity='0.5'%3E%3Crect x='30' y='10' width='1' height='20'/%3E%3Crect x='90' y='80' width='1.5' height='30'/%3E%3Crect x='130' y='40' width='1' height='15'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 150px 150px;
+  animation: rainBg 2.5s linear infinite;
+}
+
+.rain-layer-3 {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='%23fff' opacity='0.3'%3E%3Crect x='50' y='30' width='1' height='20'/%3E%3Crect x='110' y='120' width='2' height='40'/%3E%3Crect x='170' y='70' width='1' height='25'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: rainBg 3.5s linear infinite;
 }
 
 @keyframes wiggle {
-  0%, 100% { transform: rotate(-3deg); }
-  50% { transform: rotate(3deg); }
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
 }
 
 .animate-wiggle {
@@ -138,4 +238,3 @@
     display: none !important;
   }
 }
-

@@ -1,9 +1,5 @@
 import express from 'express';
-import {
-  getAlerts,
-  markAlertAsRead,
-  deleteAlert,
-} from '../controllers/alertController.js';
+import { getAlerts, markAlertAsRead, deleteAlert } from '../controllers/alertController.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();

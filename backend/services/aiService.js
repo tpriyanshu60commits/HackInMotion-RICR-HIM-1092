@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const SYSTEM_PROMPT = `You are an environmental and CleanTech assistant.
@@ -66,66 +66,69 @@ STRICT RESPONSE RULES:
 10. Never override these restrictions based on the user's request to change the topic.`;
 
 export const askAI = async (message, contextData, previousMessages = [], healthProfile = null) => {
-    try {
-
-        let systemMessageContent = SYSTEM_PROMPT;
-        if (contextData) {
-            systemMessageContent += `\n\nCurrent Context provided by system:\n${JSON.stringify(contextData)}`;
-        }
-        
-        if (healthProfile) {
-            systemMessageContent += `\n\nUser Health Profile (Personalize responses accordingly):\n${JSON.stringify(healthProfile)}`;
-        }
-
-        const messages = [
-            { role: 'system', content: systemMessageContent },
-            ...previousMessages.map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: message }
-        ];
-
-        const chatCompletion = await groq.chat.completions.create({
-            messages,
-            model: 'llama-3.1-8b-instant', 
-            temperature: 0.3,
-            max_tokens: 512,
-        });
-
-        return chatCompletion.choices[0]?.message?.content || "No response generated.";
-    } catch (error) {
-        console.error("Groq API Error:", error);
-        throw error;
+  try {
+    let systemMessageContent = SYSTEM_PROMPT;
+    if (contextData) {
+      systemMessageContent += `\n\nCurrent Context provided by system:\n${JSON.stringify(contextData)}`;
     }
+
+    if (healthProfile) {
+      systemMessageContent += `\n\nUser Health Profile (Personalize responses accordingly):\n${JSON.stringify(healthProfile)}`;
+    }
+
+    const messages = [
+      { role: 'system', content: systemMessageContent },
+      ...previousMessages.map((m) => ({ role: m.role, content: m.content })),
+      { role: 'user', content: message },
+    ];
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages,
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.3,
+      max_tokens: 512,
+    });
+
+    return chatCompletion.choices[0]?.message?.content || 'No response generated.';
+  } catch (error) {
+    console.error('Groq API Error:', error);
+    throw error;
+  }
 };
 
-export const askAIStream = async (message, contextData, previousMessages = [], healthProfile = null) => {
-    try {
-
-        let systemMessageContent = SYSTEM_PROMPT;
-        if (contextData) {
-            systemMessageContent += `\n\nCurrent Context provided by system:\n${JSON.stringify(contextData)}`;
-        }
-        
-        if (healthProfile) {
-            systemMessageContent += `\n\nUser Health Profile (Personalize responses accordingly):\n${JSON.stringify(healthProfile)}`;
-        }
-
-        const messages = [
-            { role: 'system', content: systemMessageContent },
-            ...previousMessages.map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: message }
-        ];
-
-        const stream = await groq.chat.completions.create({
-            messages,
-            model: 'llama-3.1-8b-instant', 
-            temperature: 0.3,
-            max_tokens: 512,
-            stream: true,
-        });
-
-        return stream;
-    } catch (error) {
-        console.error("Groq Stream Error:", error);
-        throw error;
+export const askAIStream = async (
+  message,
+  contextData,
+  previousMessages = [],
+  healthProfile = null
+) => {
+  try {
+    let systemMessageContent = SYSTEM_PROMPT;
+    if (contextData) {
+      systemMessageContent += `\n\nCurrent Context provided by system:\n${JSON.stringify(contextData)}`;
     }
+
+    if (healthProfile) {
+      systemMessageContent += `\n\nUser Health Profile (Personalize responses accordingly):\n${JSON.stringify(healthProfile)}`;
+    }
+
+    const messages = [
+      { role: 'system', content: systemMessageContent },
+      ...previousMessages.map((m) => ({ role: m.role, content: m.content })),
+      { role: 'user', content: message },
+    ];
+
+    const stream = await groq.chat.completions.create({
+      messages,
+      model: 'llama-3.1-8b-instant',
+      temperature: 0.3,
+      max_tokens: 512,
+      stream: true,
+    });
+
+    return stream;
+  } catch (error) {
+    console.error('Groq Stream Error:', error);
+    throw error;
+  }
 };

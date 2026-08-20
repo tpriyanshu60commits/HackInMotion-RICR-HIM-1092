@@ -17,7 +17,8 @@ export function useReports() {
         setError(res.error);
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
+      const msg =
+        err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
       setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setLoading(false);
@@ -35,7 +36,8 @@ export function useReports() {
         setError(res.error);
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
+      const msg =
+        err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
       setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setLoading(false);
@@ -55,7 +57,8 @@ export function useReports() {
         return { success: false, error: res.error };
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
+      const msg =
+        err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
       setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
       return { success: false, error: msg };
     } finally {
@@ -73,7 +76,8 @@ export function useReports() {
         return { success: true };
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
+      const msg =
+        err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
       setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setLoading(false);
@@ -90,7 +94,8 @@ export function useReports() {
         return { success: true };
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
+      const msg =
+        err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
       setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setLoading(false);
@@ -107,7 +112,8 @@ export function useReports() {
         return { success: true };
       }
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
+      const msg =
+        err.response?.data?.message || err.response?.data?.error || err.message || 'Error occurred';
       setError(typeof msg === 'string' ? msg : JSON.stringify(msg));
     } finally {
       setLoading(false);
@@ -124,6 +130,6 @@ export function useReports() {
     createReport,
     updateStatus,
     upvoteReport,
-    escalateToCMHelp
+    escalateToCMHelp,
   };
 }

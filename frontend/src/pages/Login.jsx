@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Leaf, Mail, Lock, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { Leaf, Mail, Lock, AlertCircle, ArrowRight, Loader2, User } from 'lucide-react';
 import { GlassCard } from '../components/common/GlassCard';
 import useStore from '../store/useStore';
 import api from '../services/api';
@@ -35,10 +35,7 @@ export const Login = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4 transition-colors"
-      
-    >
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background p-4 transition-colors">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-400/20 blur-[120px] pointer-events-none" />
 
       <GlassCard className="w-full max-w-md p-8 z-10 animate-fade-in-up">
@@ -97,9 +94,31 @@ export const Login = () => {
             disabled={loading}
             className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
           >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : (
-              <>Sign In <ArrowRight size={18} /></>
+            {loading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              <>
+                Sign In <ArrowRight size={18} />
+              </>
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('auth_token', 'guest_token');
+              setUser({
+                _id: 'guest_id',
+                name: 'Guest User',
+                email: 'guest@verdantx.com',
+                role: 'guest',
+                isGuest: true,
+              });
+              navigate('/dashboard', { replace: true });
+            }}
+            className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-border text-text-main font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-4"
+          >
+            <User size={18} className="text-text-muted" /> Login as Guest
           </button>
         </form>
 
