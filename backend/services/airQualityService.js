@@ -3,7 +3,128 @@ import { calculateBaseRisk, getPersonalizedRisk } from './riskEngine.js';
 import AirQualitySnapshot from '../models/AirQualitySnapshot.js';
 import { geocodeCity, reverseGeocode } from './geocodingService.js';
 
+<<<<<<< Updated upstream
 const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null) => {
+=======
+// Helper to pause execution
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Helper for axios with retry logic for rate limits (429) and server errors (5xx)
+const axiosGetWithRetry = async (url, retries = 3, backoff = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await axios.get(url);
+    } catch (error) {
+      const status = error.response?.status;
+      if ((status === 429 || (status >= 500 && status < 600)) && i < retries - 1) {
+        console.warn(`API Error ${status} for ${url}. Retrying in ${backoff}ms...`);
+        await delay(backoff);
+        backoff *= 2; // Exponential backoff
+      } else {
+        throw error;
+      }
+    }
+  }
+};
+
+// Helper: Calculate US AQI from PM2.5 using EPA standard breakpoints
+const calculatePM25_AQI = (pm25) => {
+  if (pm25 === undefined || pm25 === null) return 0;
+  const c = Math.floor(pm25 * 10) / 10; // truncate to 1 decimal place
+  let IHigh, ILow, CHigh, CLow;
+
+  if (c >= 0 && c <= 12.0) {
+    IHigh = 50;
+    ILow = 0;
+    CHigh = 12.0;
+    CLow = 0.0;
+  } else if (c >= 12.1 && c <= 35.4) {
+    IHigh = 100;
+    ILow = 51;
+    CHigh = 35.4;
+    CLow = 12.1;
+  } else if (c >= 35.5 && c <= 55.4) {
+    IHigh = 150;
+    ILow = 101;
+    CHigh = 55.4;
+    CLow = 35.5;
+  } else if (c >= 55.5 && c <= 150.4) {
+    IHigh = 200;
+    ILow = 151;
+    CHigh = 150.4;
+    CLow = 55.5;
+  } else if (c >= 150.5 && c <= 250.4) {
+    IHigh = 300;
+    ILow = 201;
+    CHigh = 250.4;
+    CLow = 150.5;
+  } else if (c >= 250.5 && c <= 350.4) {
+    IHigh = 400;
+    ILow = 301;
+    CHigh = 350.4;
+    CLow = 250.5;
+  } else if (c >= 350.5 && c <= 500.4) {
+    IHigh = 500;
+    ILow = 401;
+    CHigh = 500.4;
+    CLow = 350.5;
+  } else {
+    return 500;
+  } // Beyond index
+
+  return Math.round(((IHigh - ILow) / (CHigh - CLow)) * (c - CLow) + ILow);
+};
+
+// Helper: Calculate US AQI from PM10 using EPA standard breakpoints
+const calculatePM10_AQI = (pm10) => {
+  if (pm10 === undefined || pm10 === null) return 0;
+  const c = Math.floor(pm10);
+  let IHigh, ILow, CHigh, CLow;
+
+  if (c >= 0 && c <= 54) {
+    IHigh = 50;
+    ILow = 0;
+    CHigh = 54;
+    CLow = 0;
+  } else if (c >= 55 && c <= 154) {
+    IHigh = 100;
+    ILow = 51;
+    CHigh = 154;
+    CLow = 55;
+  } else if (c >= 155 && c <= 254) {
+    IHigh = 150;
+    ILow = 101;
+    CHigh = 254;
+    CLow = 155;
+  } else if (c >= 255 && c <= 354) {
+    IHigh = 200;
+    ILow = 151;
+    CHigh = 354;
+    CLow = 255;
+  } else if (c >= 355 && c <= 424) {
+    IHigh = 300;
+    ILow = 201;
+    CHigh = 424;
+    CLow = 355;
+  } else if (c >= 425 && c <= 504) {
+    IHigh = 400;
+    ILow = 301;
+    CHigh = 504;
+    CLow = 425;
+  } else if (c >= 505 && c <= 604) {
+    IHigh = 500;
+    ILow = 401;
+    CHigh = 604;
+    CLow = 505;
+  } else {
+    return 500;
+  }
+
+  return Math.round(((IHigh - ILow) / (CHigh - CLow)) * (c - CLow) + ILow);
+};
+
+const normalizeOpenMeteoData = (data, locationInfo, healthProfile = null, uvData = null) => {
+>>>>>>> Stashed changes
   const currentAirQuality = data.airQuality.current;
   const currentWeather = data.weather.current;
   const dailyWeather = data.weather.daily;
@@ -49,9 +170,21 @@ export const getAirQualityByCoordinates = async (lat, lng, healthProfile = null)
   try {
     const locationInfo = await reverseGeocode(lat, lng);
 
+<<<<<<< Updated upstream
     const [airQualityResponse, weatherResponse] = await Promise.all([
       axios.get(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`),
       axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,is_day&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`)
+=======
+    const [airQualityResponse, weatherResponse, uvResponse] = await Promise.all([
+      axiosGetWithRetry(
+        `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone&timezone=auto`
+      ),
+      axiosGetWithRetry(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,is_day&daily=weather_code,sunrise,sunset,uv_index_max&timezone=auto`
+      ),
+      axiosGetWithRetry(`https://currentuvindex.com/api/v1/uvi?latitude=${lat}&longitude=${lng}`)
+        .catch(() => ({ data: null })), // Fallback gracefully if UV API fails
+>>>>>>> Stashed changes
     ]);
 
     const data = {
@@ -106,7 +239,7 @@ const saveSnapshot = async (data, locationId = null) => {
 export const getHistoricalData = async (lat, lng, days = 7) => {
   try {
     const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=us_aqi,pm10,pm2_5&past_days=${days}`;
-    const response = await axios.get(url);
+    const response = await axiosGetWithRetry(url);
     const hourly = response.data.hourly;
 
     const dailyData = {};
