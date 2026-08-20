@@ -30,8 +30,14 @@ export const startSampleAirQualityJob = () => {
         });
       });
 
+      // Helper to pause execution
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
       for (const [coordStr, loc] of uniqueLocations) {
         try {
+          // Wait 2 seconds before each location to respect Open-Meteo API rate limits
+          await delay(2000);
+          
           const { latitude, longitude, city } = loc;
           const aqiData = await getAirQualityByCoordinates(latitude, longitude, null);
 
