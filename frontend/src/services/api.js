@@ -5,6 +5,15 @@ export const getApiBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
   const url = envUrl || (isProd ? '/api' : 'http://localhost:5000/api');
 
+  if (isProd && !envUrl) {
+    console.warn(
+      "⚠️ VITE_API_URL or VITE_API_BASE_URL is not set. API calls will default to the relative path '/api'."
+    );
+    console.warn(
+      "If your backend is hosted separately, you MUST set this environment variable in your deployment settings (e.g., Vercel) to point to your backend URL."
+    );
+  }
+
   // If the user set VITE_API_URL to the root domain, ensure it ends with /api
   if (!url.endsWith('/api')) {
     // Trim trailing slash if present before adding /api
