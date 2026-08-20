@@ -112,7 +112,7 @@ export const Login = () => {
                 name: 'Guest User',
                 email: 'guest@verdantx.com',
                 role: 'guest',
-                isGuest: true
+                isGuest: true,
               });
               navigate('/dashboard', { replace: true });
             }}

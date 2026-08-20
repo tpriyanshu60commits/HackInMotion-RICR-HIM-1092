@@ -48,12 +48,7 @@ export const askQuestion = async (req, res, next) => {
         res.setHeader('Connection', 'keep-alive');
 
         try {
-          const chatStream = await askAIStream(
-            message,
-            contextData,
-            [],
-            req.user.healthProfile
-          );
+          const chatStream = await askAIStream(message, contextData, [], req.user.healthProfile);
 
           for await (const chunk of chatStream) {
             const content = chunk.choices[0]?.delta?.content || '';
@@ -73,12 +68,7 @@ export const askQuestion = async (req, res, next) => {
           return;
         }
       } else {
-        const responseText = await askAI(
-          message,
-          contextData,
-          [],
-          req.user.healthProfile
-        );
+        const responseText = await askAI(message, contextData, [], req.user.healthProfile);
 
         return res.status(200).json({
           success: true,

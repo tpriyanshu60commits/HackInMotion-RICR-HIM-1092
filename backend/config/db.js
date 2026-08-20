@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
-    
+
     mongoose.connection.on('disconnected', () => {
       console.warn('MongoDB disconnected! Attempting to reconnect...');
     });
-    
+
     mongoose.connection.on('reconnected', () => {
       console.log('MongoDB reconnected successfully.');
     });

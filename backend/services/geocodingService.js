@@ -133,10 +133,7 @@ export const reverseGeocode = async (lat, lng) => {
 
     if (bdcRes.data) {
       const city =
-        bdcRes.data.city ||
-        bdcRes.data.locality ||
-        bdcRes.data.principalSubdivision ||
-        '';
+        bdcRes.data.city || bdcRes.data.locality || bdcRes.data.principalSubdivision || '';
       const country = bdcRes.data.countryName || '';
 
       if (city) {
@@ -254,4 +251,3 @@ export const searchLocationsService = async (query) => {
 
   return [];
 };
-

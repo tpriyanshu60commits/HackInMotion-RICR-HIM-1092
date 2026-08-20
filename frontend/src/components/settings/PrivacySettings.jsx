@@ -136,7 +136,8 @@ export const PrivacySettings = () => {
         </div>
         <div className="p-6 bg-white/5 border border-white/10 rounded-xl text-center">
           <p className="text-gray-300 text-sm">
-            This feature is unavailable for guest accounts. Please create a registered account to manage privacy settings and personal data.
+            This feature is unavailable for guest accounts. Please create a registered account to
+            manage privacy settings and personal data.
           </p>
         </div>
       </div>

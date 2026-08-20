@@ -94,29 +94,26 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
     try {
       // Setup SSE connection for streaming
       const token = localStorage.getItem('auth_token');
-      const response = await fetch(
-        `${API_BASE_URL}/ai/ask`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            message: text,
-            stream: true,
-            contextData: contextData
-              ? {
-                  city: contextData.city,
-                  aqi: contextData.aqi,
-                  pm25: contextData.pm25,
-                  temperature: contextData.temperature,
-                  humidity: contextData.humidity,
-                }
-              : null,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/ai/ask`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: text,
+          stream: true,
+          contextData: contextData
+            ? {
+                city: contextData.city,
+                aqi: contextData.aqi,
+                pm25: contextData.pm25,
+                temperature: contextData.temperature,
+                humidity: contextData.humidity,
+              }
+            : null,
+        }),
+      });
 
       if (!response.ok) throw new Error('Network response was not ok');
 
@@ -216,159 +213,161 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="w-full h-[100dvh] md:w-[900px] md:h-[85vh] md:max-h-[850px] bg-background/80 backdrop-blur-3xl flex flex-col overflow-hidden md:rounded-[2rem] border-0 md:border md:border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]"
           >
-          {/* Header */}
-          <div className="p-4 border-b border-border flex items-center justify-between bg-surface-inner">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary-500/20 text-primary-500 flex items-center justify-center">
-                <Sparkles size={20} />
+            {/* Header */}
+            <div className="p-4 border-b border-border flex items-center justify-between bg-surface-inner">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary-500/20 text-primary-500 flex items-center justify-center">
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-text-main">VerdantX</h3>
+                  <p className="text-xs text-text-muted font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-bold text-text-main">VerdantX</h3>
-                <p className="text-xs text-text-muted font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleClear}
-                className="p-2 text-text-muted hover:text-red-500 transition-colors"
-                title="Clear Chat"
-              >
-                <Trash2 size={18} />
-              </button>
-              <button
-                onClick={onClose}
-                className="p-2 text-text-muted hover:text-text-main transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-          </div>
-
-          {/* Chat Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {loadingHistory && (
-              <div className="flex justify-center p-4">
-                <RefreshCw className="animate-spin text-text-muted" size={20} />
-              </div>
-            )}
-
-            {!loadingHistory &&
-              messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={cn(
-                    'flex gap-3 max-w-[85%]',
-                    msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''
-                  )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleClear}
+                  className="p-2 text-text-muted hover:text-red-500 transition-colors"
+                  title="Clear Chat"
                 >
+                  <Trash2 size={18} />
+                </button>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-text-muted hover:text-text-main transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Chat Area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {loadingHistory && (
+                <div className="flex justify-center p-4">
+                  <RefreshCw className="animate-spin text-text-muted" size={20} />
+                </div>
+              )}
+
+              {!loadingHistory &&
+                messages.map((msg, idx) => (
                   <div
+                    key={idx}
                     className={cn(
-                      'w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm',
-                      msg.role === 'user'
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-surface-inner border border-border text-primary-500'
+                      'flex gap-3 max-w-[85%]',
+                      msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''
                     )}
                   >
-                    {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
-                  </div>
-
-                  <div className="flex flex-col gap-1">
                     <div
                       className={cn(
-                        'p-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap',
+                        'w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm',
                         msg.role === 'user'
-                          ? 'bg-primary-500 text-white rounded-tr-sm'
-                          : 'bg-surface-inner text-text-main border border-border rounded-tl-sm',
-                        msg.isError && 'border-red-500/50 bg-red-500/10 text-red-500'
+                          ? 'bg-primary-500 text-white'
+                          : 'bg-surface-inner border border-border text-primary-500'
                       )}
                     >
-                      {msg.isError && <AlertCircle className="inline-block w-4 h-4 mr-1 mb-0.5" />}
-                      {msg.content}
+                      {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                     </div>
-                    <span
-                      className={cn(
-                        'text-[10px] text-text-muted px-1',
-                        msg.role === 'user' ? 'text-right' : 'text-left'
-                      )}
-                    >
-                      {msg.createdAt
-                        ? new Date(msg.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : ''}
-                    </span>
+
+                    <div className="flex flex-col gap-1">
+                      <div
+                        className={cn(
+                          'p-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap',
+                          msg.role === 'user'
+                            ? 'bg-primary-500 text-white rounded-tr-sm'
+                            : 'bg-surface-inner text-text-main border border-border rounded-tl-sm',
+                          msg.isError && 'border-red-500/50 bg-red-500/10 text-red-500'
+                        )}
+                      >
+                        {msg.isError && (
+                          <AlertCircle className="inline-block w-4 h-4 mr-1 mb-0.5" />
+                        )}
+                        {msg.content}
+                      </div>
+                      <span
+                        className={cn(
+                          'text-[10px] text-text-muted px-1',
+                          msg.role === 'user' ? 'text-right' : 'text-left'
+                        )}
+                      >
+                        {msg.createdAt
+                          ? new Date(msg.createdAt).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : ''}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+
+              {isTyping && (
+                <div className="flex gap-3 max-w-[85%]">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm bg-surface-inner border border-border text-primary-500">
+                    <Bot size={16} />
+                  </div>
+                  <div className="p-3 rounded-2xl bg-surface-inner border border-border rounded-tl-sm shadow-sm flex items-center gap-1 h-10">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary-500/60 typing-dot"></div>
+                    <div
+                      className="w-1.5 h-1.5 rounded-full bg-primary-500/60 typing-dot"
+                      style={{ animationDelay: '0.15s' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 rounded-full bg-primary-500/60 typing-dot"
+                      style={{ animationDelay: '0.3s' }}
+                    ></div>
                   </div>
                 </div>
-              ))}
+              )}
+              <div ref={messagesEndRef} />
+            </div>
 
-            {isTyping && (
-              <div className="flex gap-3 max-w-[85%]">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm bg-surface-inner border border-border text-primary-500">
-                  <Bot size={16} />
-                </div>
-                <div className="p-3 rounded-2xl bg-surface-inner border border-border rounded-tl-sm shadow-sm flex items-center gap-1 h-10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary-500/60 typing-dot"></div>
-                  <div
-                    className="w-1.5 h-1.5 rounded-full bg-primary-500/60 typing-dot"
-                    style={{ animationDelay: '0.15s' }}
-                  ></div>
-                  <div
-                    className="w-1.5 h-1.5 rounded-full bg-primary-500/60 typing-dot"
-                    style={{ animationDelay: '0.3s' }}
-                  ></div>
+            {/* Quick Actions */}
+            {messages.length <= 2 && !loadingHistory && (
+              <div className="px-4 pb-2 pt-2 bg-gradient-to-t from-surface to-transparent">
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {QUICK_ACTIONS.map((action, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSend(action)}
+                      className="whitespace-nowrap px-3 py-1.5 rounded-full border border-border bg-surface-inner hover:bg-surface-hover text-xs font-semibold transition-colors text-text-main shrink-0"
+                    >
+                      {action}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
-          </div>
 
-          {/* Quick Actions */}
-          {messages.length <= 2 && !loadingHistory && (
-            <div className="px-4 pb-2 pt-2 bg-gradient-to-t from-surface to-transparent">
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {QUICK_ACTIONS.map((action, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSend(action)}
-                    className="whitespace-nowrap px-3 py-1.5 rounded-full border border-border bg-surface-inner hover:bg-surface-hover text-xs font-semibold transition-colors text-text-main shrink-0"
-                  >
-                    {action}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Input Area */}
-          <div className="p-3 bg-surface border-t border-border mt-auto">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSend(input);
-              }}
-              className="relative flex items-end gap-2"
-            >
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={onKeyDown}
-                placeholder="Ask about air quality..."
-                className="w-full bg-surface-inner border border-border rounded-2xl pl-4 pr-12 py-3 max-h-32 outline-none focus:ring-2 focus:ring-primary-500/50 shadow-inner transition-all text-sm resize-none scrollbar-hide text-text-main"
-                rows={1}
-                disabled={isTyping}
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isTyping}
-                className="absolute right-2 bottom-2 p-2 rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 disabled:hover:bg-primary-500 transition-colors"
+            {/* Input Area */}
+            <div className="p-3 bg-surface border-t border-border mt-auto">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSend(input);
+                }}
+                className="relative flex items-end gap-2"
               >
-                <Send size={18} />
-              </button>
-            </form>
-          </div>
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  placeholder="Ask about air quality..."
+                  className="w-full bg-surface-inner border border-border rounded-2xl pl-4 pr-12 py-3 max-h-32 outline-none focus:ring-2 focus:ring-primary-500/50 shadow-inner transition-all text-sm resize-none scrollbar-hide text-text-main"
+                  rows={1}
+                  disabled={isTyping}
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isTyping}
+                  className="absolute right-2 bottom-2 p-2 rounded-xl bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50 disabled:hover:bg-primary-500 transition-colors"
+                >
+                  <Send size={18} />
+                </button>
+              </form>
+            </div>
           </motion.div>
         </motion.div>
       )}

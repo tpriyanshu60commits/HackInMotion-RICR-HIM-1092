@@ -5,7 +5,12 @@ import { calculateBaseRisk } from '../services/riskEngine.js';
 
 export const analyzeRoute = async (req, res, next) => {
   try {
-    const { origin, destination, originCoords: reqOriginCoords, destCoords: reqDestCoords } = req.body;
+    const {
+      origin,
+      destination,
+      originCoords: reqOriginCoords,
+      destCoords: reqDestCoords,
+    } = req.body;
 
     if (!origin || !destination) {
       return res
@@ -14,8 +19,8 @@ export const analyzeRoute = async (req, res, next) => {
     }
 
     // 1. Geocode locations
-    const originCoords = reqOriginCoords || await geocodeLocation(origin);
-    const destCoords = reqDestCoords || await geocodeLocation(destination);
+    const originCoords = reqOriginCoords || (await geocodeLocation(origin));
+    const destCoords = reqDestCoords || (await geocodeLocation(destination));
 
     if (!originCoords || !destCoords) {
       return res

@@ -133,7 +133,10 @@ export const acceptEscalation = async (req, res, next) => {
     await report.save();
 
     // Redirect to the frontend application
-    const clientUrl = process.env.NODE_ENV === 'production' ? (process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app') : (process.env.CLIENT_URL || 'http://localhost:5173');
+    const clientUrl =
+      process.env.NODE_ENV === 'production'
+        ? process.env.CLIENT_URL || 'https://hack-in-motion-ricr-him-1092.vercel.app'
+        : process.env.CLIENT_URL || 'http://localhost:5173';
     res.redirect(`${clientUrl}/report?accepted=true&id=${report._id}`);
   } catch (error) {
     next(error);

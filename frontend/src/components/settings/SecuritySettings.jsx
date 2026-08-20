@@ -55,9 +55,7 @@ export const SecuritySettings = () => {
             <Key size={24} className="text-gray-400" />
             Security & Password
           </h2>
-          <p className="text-sm text-gray-400 leading-relaxed">
-            Password management settings.
-          </p>
+          <p className="text-sm text-gray-400 leading-relaxed">Password management settings.</p>
         </div>
         <div className="p-6 bg-white/5 border border-white/10 rounded-xl text-center">
           <p className="text-gray-300 text-sm">

@@ -8,17 +8,35 @@ import api from './services/api';
 
 // Lazy Loaded Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
-const Login = lazy(() => import('./pages/Login').then(module => ({ default: module.Login })));
-const Register = lazy(() => import('./pages/Register').then(module => ({ default: module.Register })));
-const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })));
-const Locations = lazy(() => import('./pages/Locations').then(module => ({ default: module.Locations })));
-const Alerts = lazy(() => import('./pages/Alerts').then(module => ({ default: module.Alerts })));
-const Profile = lazy(() => import('./pages/Profile').then(module => ({ default: module.Profile })));
-const Compare = lazy(() => import('./pages/Compare').then(module => ({ default: module.Compare })));
-const RouteRisk = lazy(() => import('./pages/RouteRisk').then(module => ({ default: module.RouteRisk })));
-const HistoricalTrends = lazy(() => import('./pages/HistoricalTrends').then(module => ({ default: module.HistoricalTrends })));
-const Education = lazy(() => import('./pages/Education').then(module => ({ default: module.Education })));
-const ReportPage = lazy(() => import('./pages/ReportPage').then(module => ({ default: module.ReportPage })));
+const Login = lazy(() => import('./pages/Login').then((module) => ({ default: module.Login })));
+const Register = lazy(() =>
+  import('./pages/Register').then((module) => ({ default: module.Register }))
+);
+const Dashboard = lazy(() =>
+  import('./pages/Dashboard').then((module) => ({ default: module.Dashboard }))
+);
+const Locations = lazy(() =>
+  import('./pages/Locations').then((module) => ({ default: module.Locations }))
+);
+const Alerts = lazy(() => import('./pages/Alerts').then((module) => ({ default: module.Alerts })));
+const Profile = lazy(() =>
+  import('./pages/Profile').then((module) => ({ default: module.Profile }))
+);
+const Compare = lazy(() =>
+  import('./pages/Compare').then((module) => ({ default: module.Compare }))
+);
+const RouteRisk = lazy(() =>
+  import('./pages/RouteRisk').then((module) => ({ default: module.RouteRisk }))
+);
+const HistoricalTrends = lazy(() =>
+  import('./pages/HistoricalTrends').then((module) => ({ default: module.HistoricalTrends }))
+);
+const Education = lazy(() =>
+  import('./pages/Education').then((module) => ({ default: module.Education }))
+);
+const ReportPage = lazy(() =>
+  import('./pages/ReportPage').then((module) => ({ default: module.ReportPage }))
+);
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Public Route Wrapper (Redirects to dashboard if already logged in)
@@ -77,7 +95,7 @@ function App() {
             name: 'Guest User',
             email: 'guest@verdantx.com',
             role: 'guest',
-            isGuest: true
+            isGuest: true,
           });
           setInitializing(false);
           return;
@@ -103,16 +121,15 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <WaterDropLoader message="Loading App..." />
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center">
+            <WaterDropLoader message="Loading App..." />
+          </div>
+        }
+      >
         <Routes>
-          <Route
-            path="/"
-            element={<LandingPage />}
-          />
+          <Route path="/" element={<LandingPage />} />
           <Route
             path="/login"
             element={

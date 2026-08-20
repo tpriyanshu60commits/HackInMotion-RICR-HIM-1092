@@ -255,10 +255,7 @@ export const HistoricalTrends = () => {
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={chartData}
-                    margin={{ top: 10, right: 5, left: -25, bottom: 0 }}
-                  >
+                  <AreaChart data={chartData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorAqi" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#22C55E" stopOpacity={0.3} />
@@ -351,7 +348,9 @@ export const HistoricalTrends = () => {
                     {stats.trend}%
                   </div>
                   <div className={`flex items-center gap-1.5 text-xs font-bold ${trendColor}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${trendBg} ${trendShadow}`}></span>
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 ${trendBg} ${trendShadow}`}
+                    ></span>
                     {trendText}
                   </div>
                 </>

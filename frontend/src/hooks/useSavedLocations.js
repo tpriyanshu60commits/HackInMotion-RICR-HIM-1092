@@ -1,9 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import {
-  locationService,
-  environmentService,
-  API_BASE_URL
-} from '../services/api';
+import { locationService, environmentService, API_BASE_URL } from '../services/api';
 import useStore from '../store/useStore';
 import { io } from 'socket.io-client';
 
@@ -37,12 +33,9 @@ export function useSavedLocations() {
   useEffect(() => {
     if (!user?._id) return;
 
-    const socket = io(
-      API_BASE_URL.replace('/api', ''),
-      {
-        withCredentials: true,
-      }
-    );
+    const socket = io(API_BASE_URL.replace('/api', ''), {
+      withCredentials: true,
+    });
 
     socket.emit('join', user._id);
 
@@ -95,17 +88,12 @@ export function useSavedLocations() {
               longitude: loc.longitude,
               aqi: envData.aqi || 0,
               status: getAqiStatus(envData.aqi || 0),
-              temperature: Math.round(
-                envData.temperature || 0
-              ),
+              temperature: Math.round(envData.temperature || 0),
               condition: weather.condition,
               icon: weather.icon,
             };
           } catch (err) {
-            console.error(
-              `Failed to fetch live data for ${loc.name}`,
-              err
-            );
+            console.error(`Failed to fetch live data for ${loc.name}`, err);
 
             // Fallback so saved location still renders
             return {
@@ -128,11 +116,7 @@ export function useSavedLocations() {
 
       setLocations(enrichedLocs);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        err.message ||
-        'Failed to fetch saved locations'
-      );
+      setError(err.response?.data?.message || err.message || 'Failed to fetch saved locations');
     } finally {
       setLoading(false);
     }
@@ -159,10 +143,7 @@ export function useSavedLocations() {
         error: 'Failed to save location',
       };
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message ||
-        err.message ||
-        'Failed to save location';
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to save location';
 
       setError(errorMsg);
 
@@ -187,10 +168,7 @@ export function useSavedLocations() {
         success: true,
       };
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.message ||
-        err.message ||
-        'Failed to delete location';
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to delete location';
 
       setError(errorMsg);
 

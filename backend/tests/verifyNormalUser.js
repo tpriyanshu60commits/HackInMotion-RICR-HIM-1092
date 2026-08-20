@@ -68,11 +68,38 @@ async function testNormalUser() {
 
   const tests = [
     { name: 'GET /api/v1/profile', method: 'GET', path: '/api/v1/profile', expected: 200 },
-    { name: 'GET /api/v1/profile/privacy', method: 'GET', path: '/api/v1/profile/privacy', expected: 200 },
-    { name: 'GET /api/v1/profile/health', method: 'GET', path: '/api/v1/profile/health', expected: 200 },
-    { name: 'POST /api/ai-health/profile', method: 'POST', path: '/api/ai-health/profile', body: { ageGroup: 'adult', primaryCity: 'London' }, expected: 200 },
-    { name: 'POST /api/ai-health/report/generate', method: 'POST', path: '/api/ai-health/report/generate', body: { primaryCity: 'London' }, expected: 201 },
-    { name: 'GET /api/ai-health/report/latest', method: 'GET', path: '/api/ai-health/report/latest', expected: 200 },
+    {
+      name: 'GET /api/v1/profile/privacy',
+      method: 'GET',
+      path: '/api/v1/profile/privacy',
+      expected: 200,
+    },
+    {
+      name: 'GET /api/v1/profile/health',
+      method: 'GET',
+      path: '/api/v1/profile/health',
+      expected: 200,
+    },
+    {
+      name: 'POST /api/ai-health/profile',
+      method: 'POST',
+      path: '/api/ai-health/profile',
+      body: { ageGroup: 'adult', primaryCity: 'London' },
+      expected: 200,
+    },
+    {
+      name: 'POST /api/ai-health/report/generate',
+      method: 'POST',
+      path: '/api/ai-health/report/generate',
+      body: { primaryCity: 'London' },
+      expected: 201,
+    },
+    {
+      name: 'GET /api/ai-health/report/latest',
+      method: 'GET',
+      path: '/api/ai-health/report/latest',
+      expected: 200,
+    },
   ];
 
   let passed = 0;
@@ -85,7 +112,10 @@ async function testNormalUser() {
         console.log(`✅ [PASS] Normal User: ${t.name} -> Status ${res.status}`);
         passed++;
       } else {
-        console.error(`❌ [FAIL] Normal User: ${t.name} -> Expected ${t.expected}, got ${res.status}`, res.data);
+        console.error(
+          `❌ [FAIL] Normal User: ${t.name} -> Expected ${t.expected}, got ${res.status}`,
+          res.data
+        );
         failed++;
       }
     } catch (err) {

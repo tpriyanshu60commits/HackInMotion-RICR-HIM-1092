@@ -50,7 +50,10 @@ export const getCurrentEnvironmentByCity = async (req, res, next) => {
       data,
     });
   } catch (error) {
-    if (error.message && (error.message.includes('Could not resolve') || error.message.includes('unavailable'))) {
+    if (
+      error.message &&
+      (error.message.includes('Could not resolve') || error.message.includes('unavailable'))
+    ) {
       return res.status(404).json({
         success: false,
         message: error.message,

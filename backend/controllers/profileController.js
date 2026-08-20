@@ -69,7 +69,7 @@ export const updateBasicProfile = async (req, res, next) => {
         success: true,
         message: 'Basic profile updated successfully',
         data: {
-          name: req.body.name !== undefined ? req.body.name : (req.user.name || 'Guest User'),
+          name: req.body.name !== undefined ? req.body.name : req.user.name || 'Guest User',
           phone: req.body.phone !== undefined ? req.body.phone : '',
           avatar: req.body.avatar !== undefined ? req.body.avatar : '',
           bio: req.body.bio !== undefined ? req.body.bio : '',

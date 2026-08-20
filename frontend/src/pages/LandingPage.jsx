@@ -68,7 +68,7 @@ export default function LandingPage() {
       <nav className="fixed top-6 left-0 right-0 z-50 px-4 flex justify-center">
         <div className="w-full max-w-7xl flex items-center justify-between px-6 py-4 bg-[#0A0F0D]/60 backdrop-blur-2xl border border-white/10 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300">
           <div className="flex items-center gap-2">
-          <img src="/favicon.svg" className='w-7' alt="" />
+            <img src="/favicon.svg" className="w-7" alt="" />
             <div className="flex flex-col">
               <span className="font-bold text-xl leading-none">VerdantX</span>
               <span className="text-[10px] text-gray-400 mt-1">Breathe Better. Live Better.</span>

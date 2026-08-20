@@ -11,14 +11,7 @@ import {
   Activity,
 } from 'lucide-react';
 
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  Polyline,
-  useMap,
-} from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 
 import L from 'leaflet';
 import api from '../services/api';
@@ -105,7 +98,6 @@ export const RouteRisk = () => {
   return (
     <div className="min-h-full relative px-4 lg:px-8 py-8 animate-fade-in flex flex-col">
       <div className="max-w-[1600px] w-full mx-auto flex flex-col h-full gap-8">
-
         {/* Header */}
         <div className="flex flex-col">
           <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight mb-2">
@@ -119,7 +111,6 @@ export const RouteRisk = () => {
 
         {/* Location Inputs */}
         <div className="w-full relative z-30 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-4 lg:p-6 shadow-2xl flex flex-col lg:flex-row items-center gap-4 lg:gap-6">
-
           {/* Origin */}
           <div className="flex-1 w-full relative group z-20">
             <LocationSearch
@@ -136,10 +127,7 @@ export const RouteRisk = () => {
             />
           </div>
 
-          <ArrowRight
-            className="text-gray-500 hidden lg:block shrink-0"
-            size={20}
-          />
+          <ArrowRight className="text-gray-500 hidden lg:block shrink-0" size={20} />
 
           {/* Destination */}
           <div className="flex-1 w-full relative group z-10">
@@ -165,29 +153,20 @@ export const RouteRisk = () => {
           >
             {analyzing ? (
               <span className="flex items-center gap-2">
-                Analyzing{' '}
-                <span className="animate-spin">
-                  ↻
-                </span>
+                Analyzing <span className="animate-spin">↻</span>
               </span>
             ) : (
-              <span className="flex items-center gap-2">
-                Analyze
-              </span>
+              <span className="flex items-center gap-2">Analyze</span>
             )}
           </button>
         </div>
 
         {/* Main Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 flex-1">
-
           {/* Map Container */}
           <div className="col-span-1 lg:col-span-2 bg-white/[0.02] backdrop-blur-sm border border-white/[0.07] rounded-2xl p-2 relative overflow-hidden min-h-[480px] lg:min-h-[600px] shadow-2xl flex flex-col group hover:border-white/[0.12] transition-colors duration-300">
-
             <div className="w-full h-full rounded-xl overflow-hidden flex-1 relative z-0">
-
               <div className="absolute inset-0 z-0 [&_.leaflet-layer]:brightness-[0.4] [&_.leaflet-layer]:contrast-[1.2] [&_.leaflet-layer]:grayscale-[0.8] [&_.leaflet-layer]:invert-[1] [&_.leaflet-layer]:hue-rotate-[180deg] [&_.leaflet-layer]:h-[100%]">
-
                 <MapContainer
                   center={mapCenter}
                   zoom={9}
@@ -212,12 +191,8 @@ export const RouteRisk = () => {
                       />
 
                       <Marker
-                        key={`end-${routePositions[
-                          routePositions.length - 1
-                        ].join(',')}`}
-                        position={
-                          routePositions[routePositions.length - 1]
-                        }
+                        key={`end-${routePositions[routePositions.length - 1].join(',')}`}
+                        position={routePositions[routePositions.length - 1]}
                       />
 
                       <Polyline
@@ -237,40 +212,23 @@ export const RouteRisk = () => {
                   {result?.risk?.worstPoint && (
                     <Marker
                       key={`worst-${result.risk.worstPoint.lat}-${result.risk.worstPoint.lng}`}
-                      position={[
-                        result.risk.worstPoint.lat,
-                        result.risk.worstPoint.lng,
-                      ]}
+                      position={[result.risk.worstPoint.lat, result.risk.worstPoint.lng]}
                     >
-                      <Popup>
-                        Worst AQI: {result.risk.worstPoint.aqi}
-                      </Popup>
+                      <Popup>Worst AQI: {result.risk.worstPoint.aqi}</Popup>
                     </Marker>
                   )}
 
                   {/* Fuel Stations */}
                   {result?.amenities?.fuelStations?.list?.map((p) => (
-                    <Marker
-                      key={`fuel-${p.place_id}`}
-                      position={[p.lat, p.lng]}
-                      icon={fuelIcon}
-                    >
-                      <Popup>
-                        {p.name || 'Fuel Station'}
-                      </Popup>
+                    <Marker key={`fuel-${p.place_id}`} position={[p.lat, p.lng]} icon={fuelIcon}>
+                      <Popup>{p.name || 'Fuel Station'}</Popup>
                     </Marker>
                   ))}
 
                   {/* Hotels */}
                   {result?.amenities?.hotels?.list?.map((p) => (
-                    <Marker
-                      key={`hotel-${p.place_id}`}
-                      position={[p.lat, p.lng]}
-                      icon={hotelIcon}
-                    >
-                      <Popup>
-                        {p.name || 'Hotel'}
-                      </Popup>
+                    <Marker key={`hotel-${p.place_id}`} position={[p.lat, p.lng]} icon={hotelIcon}>
+                      <Popup>{p.name || 'Hotel'}</Popup>
                     </Marker>
                   ))}
 
@@ -281,9 +239,7 @@ export const RouteRisk = () => {
                       position={[p.lat, p.lng]}
                       icon={hospitalIcon}
                     >
-                      <Popup>
-                        {p.name || 'Hospital'}
-                      </Popup>
+                      <Popup>{p.name || 'Hospital'}</Popup>
                     </Marker>
                   ))}
                 </MapContainer>
@@ -291,11 +247,7 @@ export const RouteRisk = () => {
 
               {/* Floating Overlay */}
               <div className="absolute top-6 left-6 z-[400] bg-black/60 backdrop-blur-md px-4 py-2.5 rounded-lg border border-white/10 shadow-lg font-semibold text-sm flex items-center gap-2 text-white">
-                <MapPin
-                  size={16}
-                  className="text-green-400"
-                />
-
+                <MapPin size={16} className="text-green-400" />
                 Live Route Analysis
               </div>
             </div>
@@ -304,7 +256,6 @@ export const RouteRisk = () => {
           {/* Risk Summary */}
           {result ? (
             <div className="col-span-1 bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08] rounded-2xl p-6 lg:p-8 hover:bg-white/[0.04] transition-all duration-300 ease-out flex flex-col shadow-2xl">
-
               <h2 className="text-lg font-semibold text-white mb-8 pb-4 border-b border-white/[0.05]">
                 Route Risk
               </h2>
@@ -332,7 +283,6 @@ export const RouteRisk = () => {
 
               {/* Distance / Duration */}
               <div className="mb-10 grid grid-cols-2 gap-4">
-
                 <div className="p-5 bg-cyan-500/5 border border-cyan-500/20 rounded-xl">
                   <span className="text-sm text-cyan-400/80 uppercase font-semibold tracking-wider block mb-1">
                     Distance
@@ -356,62 +306,44 @@ export const RouteRisk = () => {
 
               {/* Amenities */}
               <div className="space-y-8 flex-1 flex flex-col">
-
                 <div>
                   <h4 className="text-sm font-semibold text-white uppercase tracking-widest flex items-center gap-2 mb-4">
                     Amenities Along Route
                   </h4>
 
                   <div className="grid grid-cols-3 gap-3">
-
                     {/* Fuel */}
                     <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Fuel
-                        className="text-orange-400 mb-2"
-                        size={20}
-                      />
+                      <Fuel className="text-orange-400 mb-2" size={20} />
 
                       <span className="text-xl font-bold text-white">
                         {result.amenities?.fuelStations?.count ?? 0}
                       </span>
 
-                      <span className="text-xs text-gray-400">
-                        Pumps
-                      </span>
+                      <span className="text-xs text-gray-400">Pumps</span>
                     </div>
 
                     {/* Hotels */}
                     <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Bed
-                        className="text-blue-400 mb-2"
-                        size={20}
-                      />
+                      <Bed className="text-blue-400 mb-2" size={20} />
 
                       <span className="text-xl font-bold text-white">
                         {result.amenities?.hotels?.count ?? 0}
                       </span>
 
-                      <span className="text-xs text-gray-400">
-                        Hotels
-                      </span>
+                      <span className="text-xs text-gray-400">Hotels</span>
                     </div>
 
                     {/* Hospitals */}
                     <div className="flex flex-col items-center justify-center p-3 bg-white/[0.03] rounded-xl border border-white/10 text-center">
-                      <Activity
-                        className="text-red-400 mb-2"
-                        size={20}
-                      />
+                      <Activity className="text-red-400 mb-2" size={20} />
 
                       <span className="text-xl font-bold text-white">
                         {result.amenities?.hospitals?.count ?? 0}
                       </span>
 
-                      <span className="text-xs text-gray-400">
-                        Hospitals
-                      </span>
+                      <span className="text-xs text-gray-400">Hospitals</span>
                     </div>
-
                   </div>
                 </div>
               </div>
@@ -419,7 +351,6 @@ export const RouteRisk = () => {
               {/* Worst Stretch */}
               {result.risk?.worstPoint && (
                 <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-
                   <h4 className="text-sm font-semibold text-orange-400 uppercase tracking-widest flex items-center gap-2 mb-2">
                     <ShieldAlert size={16} />
                     Worst Stretch
@@ -427,30 +358,22 @@ export const RouteRisk = () => {
 
                   <p className="text-sm text-gray-300">
                     We detected a high risk zone with an AQI of{' '}
-                    <span className="font-bold text-orange-400">
-                      {result.risk.worstPoint.aqi}
-                    </span>{' '}
-                    along your route. Ensure your windows are rolled up
-                    and air recirculation is active.
+                    <span className="font-bold text-orange-400">{result.risk.worstPoint.aqi}</span>{' '}
+                    along your route. Ensure your windows are rolled up and air recirculation is
+                    active.
                   </p>
                 </div>
               )}
             </div>
           ) : (
             <div className="col-span-1 bg-white/[0.02] backdrop-blur-[24px] border border-white/[0.04] rounded-2xl p-6 lg:p-8 flex flex-col items-center justify-center text-center shadow-2xl">
+              <NavIcon size={48} className="text-gray-600 mb-4" />
 
-              <NavIcon
-                size={48}
-                className="text-gray-600 mb-4"
-              />
-
-              <h3 className="text-lg font-semibold text-white mb-2">
-                No Route Selected
-              </h3>
+              <h3 className="text-lg font-semibold text-white mb-2">No Route Selected</h3>
 
               <p className="text-sm text-gray-500">
-                Enter your start location and destination to analyze
-                environmental risks along your journey.
+                Enter your start location and destination to analyze environmental risks along your
+                journey.
               </p>
             </div>
           )}

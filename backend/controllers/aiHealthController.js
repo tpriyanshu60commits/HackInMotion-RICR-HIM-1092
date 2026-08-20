@@ -23,23 +23,16 @@ export const saveProfile = async (req, res, next) => {
     if (req.user?.isGuest) {
       guestHealthProfile = {
         userId: 'guest_id',
-        ageGroup:
-          req.body.ageGroup ||
-          guestHealthProfile.ageGroup ||
-          'adult',
+        ageGroup: req.body.ageGroup || guestHealthProfile.ageGroup || 'adult',
         conditions: Array.isArray(req.body.conditions)
           ? req.body.conditions
           : req.body.conditions
             ? [req.body.conditions]
             : guestHealthProfile.conditions,
         sensitivityLevel:
-          req.body.sensitivityLevel ||
-          guestHealthProfile.sensitivityLevel ||
-          'medium',
+          req.body.sensitivityLevel || guestHealthProfile.sensitivityLevel || 'medium',
         outdoorActivity:
-          req.body.outdoorActivity ||
-          guestHealthProfile.outdoorActivity ||
-          'mostly indoors',
+          req.body.outdoorActivity || guestHealthProfile.outdoorActivity || 'mostly indoors',
         activityTimeWindow:
           req.body.activityTimeWindow !== undefined
             ? req.body.activityTimeWindow
@@ -48,10 +41,7 @@ export const saveProfile = async (req, res, next) => {
           typeof req.body.medicationReminder === 'boolean'
             ? req.body.medicationReminder
             : !!req.body.medicationReminder,
-        primaryCity:
-          req.body.primaryCity ||
-          guestHealthProfile.primaryCity ||
-          'Delhi',
+        primaryCity: req.body.primaryCity || guestHealthProfile.primaryCity || 'Delhi',
         updatedAt: new Date(),
       };
 
@@ -123,11 +113,7 @@ export const generateReport = async (req, res, next) => {
     // Handle Guest Users
     if (req.user?.isGuest) {
       currentStage = 'guest_generation';
-
-      const primaryCity =
-        req.body.primaryCity ||
-        guestHealthProfile.primaryCity ||
-        'Delhi';
+      const primaryCity = req.body.primaryCity || guestHealthProfile.primaryCity || 'Delhi';
 
       let conditions = guestHealthProfile.conditions || [];
 
@@ -143,23 +129,14 @@ export const generateReport = async (req, res, next) => {
 
       const profile = {
         primaryCity,
-        ageGroup:
-          req.body.ageGroup ||
-          guestHealthProfile.ageGroup ||
-          'adult',
+        ageGroup: req.body.ageGroup || guestHealthProfile.ageGroup || 'adult',
         conditions,
         sensitivityLevel:
-          req.body.sensitivityLevel ||
-          guestHealthProfile.sensitivityLevel ||
-          'medium',
+          req.body.sensitivityLevel || guestHealthProfile.sensitivityLevel || 'medium',
         outdoorActivity:
-          req.body.outdoorActivity ||
-          guestHealthProfile.outdoorActivity ||
-          'mostly indoors',
+          req.body.outdoorActivity || guestHealthProfile.outdoorActivity || 'mostly indoors',
         activityTimeWindow:
-          req.body.activityTimeWindow ||
-          guestHealthProfile.activityTimeWindow ||
-          '',
+          req.body.activityTimeWindow || guestHealthProfile.activityTimeWindow || '',
         medicationReminder:
           req.body.medicationReminder === 'true' ||
           req.body.medicationReminder === true ||
@@ -182,48 +159,31 @@ export const generateReport = async (req, res, next) => {
       try {
         environmentData = await getAirQualityByCity(primaryCity);
       } catch (err) {
-        console.error(
-          `[generateReport] Guest env fetch failed: ${err.message}`
-        );
+        console.error(`[generateReport] Guest env fetch failed: ${err.message}`);
 
         res.status(500);
 
-        return next(
-          new Error(
-            'Could not fetch environmental data for the specified city.'
-          )
-        );
+        return next(new Error('Could not fetch environmental data for the specified city.'));
       }
 
       // Generate real AI report via Groq healthReportService
       currentStage = 'generate_ai_report';
 
-      const aiReportJson = await generateAIReport(
-        profile,
-        environmentData
-      );
+      const aiReportJson = await generateAIReport(profile, environmentData);
 
       const report = {
         _id: 'guest_report_' + Date.now(),
         userId: 'guest_id',
         environmentSnapshot: environmentData,
-        riskLevel:
-          aiReportJson.riskLevel || 'Moderate',
-        summary:
-          aiReportJson.summary || 'Summary unavailable.',
-        keyConcern:
-          aiReportJson.keyConcern || 'None',
-        dosAndDonts:
-          aiReportJson.dosAndDonts || [],
-        symptomWatch:
-          aiReportJson.symptomWatch || [],
-        bestTimeWindow:
-          aiReportJson.bestTimeWindow || '',
-        cityComparisonNote:
-          aiReportJson.cityComparisonNote || null,
+        riskLevel: aiReportJson.riskLevel || 'Moderate',
+        summary: aiReportJson.summary || 'Summary unavailable.',
+        keyConcern: aiReportJson.keyConcern || 'None',
+        dosAndDonts: aiReportJson.dosAndDonts || [],
+        symptomWatch: aiReportJson.symptomWatch || [],
+        bestTimeWindow: aiReportJson.bestTimeWindow || '',
+        cityComparisonNote: aiReportJson.cityComparisonNote || null,
         reportImageUrls: [],
-        rawModelResponse:
-          JSON.stringify(aiReportJson),
+        rawModelResponse: JSON.stringify(aiReportJson),
         createdAt: new Date().toISOString(),
       };
 
@@ -237,8 +197,7 @@ export const generateReport = async (req, res, next) => {
 
     const userId = req.user._id;
 
-    // 1. Fetch user's AI health profile
-    //    or sync from req.body
+    // 1. Fetch user's AI health profile or sync from req.body
     currentStage = 'fetch_profile';
 
     let profile = await AIHealthProfile.findOne({
@@ -246,9 +205,7 @@ export const generateReport = async (req, res, next) => {
     });
 
     const primaryCity =
-      req.body.primaryCity ||
-      profile?.primaryCity ||
-      req.user.preferences?.region;
+      req.body.primaryCity || profile?.primaryCity || req.user.preferences?.region;
 
     if (!primaryCity) {
       console.error(
@@ -257,8 +214,7 @@ export const generateReport = async (req, res, next) => {
 
       return res.status(400).json({
         success: false,
-        error:
-          'Primary city is required to generate a health report.',
+        error: 'Primary city is required to generate a health report.',
         stage: currentStage,
       });
     }
@@ -270,27 +226,16 @@ export const generateReport = async (req, res, next) => {
         ? req.body['conditions[]']
         : [req.body['conditions[]']];
     } else if (req.body.conditions) {
-      conditions = Array.isArray(req.body.conditions)
-        ? req.body.conditions
-        : [req.body.conditions];
+      conditions = Array.isArray(req.body.conditions) ? req.body.conditions : [req.body.conditions];
     }
 
     const profileData = {
       userId,
       primaryCity,
-      ageGroup:
-        req.body.ageGroup ||
-        profile?.ageGroup ||
-        'adult',
+      ageGroup: req.body.ageGroup || profile?.ageGroup || 'adult',
       conditions,
-      sensitivityLevel:
-        req.body.sensitivityLevel ||
-        profile?.sensitivityLevel ||
-        'medium',
-      outdoorActivity:
-        req.body.outdoorActivity ||
-        profile?.outdoorActivity ||
-        'mostly indoors',
+      sensitivityLevel: req.body.sensitivityLevel || profile?.sensitivityLevel || 'medium',
+      outdoorActivity: req.body.outdoorActivity || profile?.outdoorActivity || 'mostly indoors',
       activityTimeWindow:
         req.body.activityTimeWindow !== undefined
           ? req.body.activityTimeWindow
@@ -307,20 +252,15 @@ export const generateReport = async (req, res, next) => {
       { new: true, upsert: true }
     );
 
-    // 2. Fetch current environmental data
-    //    for the user's primaryCity
+    // 2. Fetch current environmental data for the user's primaryCity
     currentStage = 'fetch_environment_data';
 
     let environmentData;
 
     try {
-      environmentData = await getAirQualityByCity(
-        profile.primaryCity
-      );
+      environmentData = await getAirQualityByCity(profile.primaryCity);
     } catch (err) {
-      console.error(
-        `[generateReport] Failed at stage: ${currentStage}. Error: ${err.message}`
-      );
+      console.error(`[generateReport] Failed at stage: ${currentStage}. Error: ${err.message}`);
 
       return res.status(404).json({
         success: false,
@@ -332,10 +272,7 @@ export const generateReport = async (req, res, next) => {
     // 3. Generate AI report using healthReportService
     currentStage = 'generate_ai_report';
 
-    const aiReportJson = await generateAIReport(
-      profile,
-      environmentData
-    );
+    const aiReportJson = await generateAIReport(profile, environmentData);
 
     // 4. Persist the returned report in MongoDB
     currentStage = 'save_report_mongo';
@@ -343,27 +280,15 @@ export const generateReport = async (req, res, next) => {
     const report = new AIHealthReport({
       userId,
       environmentSnapshot: environmentData,
-      riskLevel:
-        aiReportJson.riskLevel || 'Moderate',
-      summary:
-        aiReportJson.summary || 'Summary unavailable.',
-      keyConcern:
-        aiReportJson.keyConcern || 'None',
-      dosAndDonts:
-        Array.isArray(aiReportJson.dosAndDonts)
-          ? aiReportJson.dosAndDonts
-          : [],
-      symptomWatch:
-        Array.isArray(aiReportJson.symptomWatch)
-          ? aiReportJson.symptomWatch
-          : [],
-      bestTimeWindow:
-        aiReportJson.bestTimeWindow || '',
-      cityComparisonNote:
-        aiReportJson.cityComparisonNote || null,
+      riskLevel: aiReportJson.riskLevel || 'Moderate',
+      summary: aiReportJson.summary || 'Summary unavailable.',
+      keyConcern: aiReportJson.keyConcern || 'None',
+      dosAndDonts: Array.isArray(aiReportJson.dosAndDonts) ? aiReportJson.dosAndDonts : [],
+      symptomWatch: Array.isArray(aiReportJson.symptomWatch) ? aiReportJson.symptomWatch : [],
+      bestTimeWindow: aiReportJson.bestTimeWindow || '',
+      cityComparisonNote: aiReportJson.cityComparisonNote || null,
       reportImageUrls: [],
-      rawModelResponse:
-        JSON.stringify(aiReportJson),
+      rawModelResponse: JSON.stringify(aiReportJson),
     });
 
     await report.save();
@@ -375,26 +300,18 @@ export const generateReport = async (req, res, next) => {
   } catch (error) {
     console.error(
       `[generateReport] Caught an exception at stage: ${currentStage}. Full error:`,
-      error?.response?.data ||
-        error?.message ||
-        error
+      error?.response?.data || error?.message || error
     );
 
-    // Explicitly return 400 if it was an API/Parsing issue from Groq,
-    // else 500
+    // Explicitly return 400 if it was an API/Parsing issue from Groq, else 500
     const errorMessage = error?.message || '';
 
     const statusCode =
-      errorMessage.includes('Groq') ||
-      errorMessage.includes('validation')
-        ? 400
-        : 500;
+      errorMessage.includes('Groq') || errorMessage.includes('validation') ? 400 : 500;
 
     return res.status(statusCode).json({
       success: false,
-      error:
-        error.message ||
-        'Failed to generate report',
+      error: error.message || 'Failed to generate report',
       stage: currentStage,
     });
   }
@@ -403,11 +320,7 @@ export const generateReport = async (req, res, next) => {
 // @desc    Get the most recent AI health report
 // @route   GET /api/ai-health/report/latest
 // @access  Private
-export const getLatestReport = async (
-  req,
-  res,
-  next
-) => {
+export const getLatestReport = async (req, res, next) => {
   try {
     if (req.user?.isGuest) {
       if (guestLatestReport) {
