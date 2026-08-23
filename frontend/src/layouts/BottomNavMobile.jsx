@@ -9,23 +9,23 @@ export const BottomNavMobile = ({ setMobileMenuOpen }) => {
   const location = useLocation();
   const shouldReduceMotion = useReducedMotion();
   const { t } = useTranslation();
-  
+
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // If scrolling down and scrolled past 50px, hide
       if (currentScrollY > lastScrollY && currentScrollY > 50) {
         setIsVisible(false);
-      } 
+      }
       // If scrolling up, show
       else if (currentScrollY < lastScrollY) {
         setIsVisible(true);
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
@@ -40,10 +40,10 @@ export const BottomNavMobile = ({ setMobileMenuOpen }) => {
   ];
 
   return (
-    <div 
+    <div
       className={cn(
-        "bottom-nav-mobile md:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-[env(safe-area-inset-bottom)] pt-2 mb-2 transition-transform duration-300 ease-in-out",
-        isVisible ? "translate-y-0" : "translate-y-[150%]"
+        'bottom-nav-mobile md:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-[env(safe-area-inset-bottom)] pt-2 mb-2 transition-transform duration-300 ease-in-out',
+        isVisible ? 'translate-y-0' : 'translate-y-[150%]'
       )}
     >
       <div className="glass border border-border/50 rounded-full flex items-center justify-around h-16 px-2 shadow-2xl backdrop-blur-md bg-background/60">

@@ -199,4 +199,3 @@ export const ReportPage = () => {
   );
 };
 
-export default ReportPage;
