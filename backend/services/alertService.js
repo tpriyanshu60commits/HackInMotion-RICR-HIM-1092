@@ -4,7 +4,7 @@ import Location from '../models/Location.js';
 import Alert from '../models/Alert.js';
 import { getAirQualityByCoordinates } from './airQualityService.js';
 
-export const checkLocationsAndAlert = async () => {
+const checkLocationsAndAlert = async () => {
   try {
     console.log('Running scheduled air quality check for user locations...');
 
