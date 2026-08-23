@@ -31,7 +31,7 @@ const NAV_ITEMS = [
   { to: '/education', icon: BookOpen, label: 'Education', tKey: 'education' },
 ];
 
-export const MainLayout = () => {
+const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const user = useStore((state) => state.user);
   const { t, i18n } = useTranslation();
@@ -312,3 +312,5 @@ export const MainLayout = () => {
     </WeatherBackground>
   );
 };
+
+export default MainLayout;

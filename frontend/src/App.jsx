@@ -1,7 +1,7 @@
 import { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import { MainLayout } from './layouts/MainLayout';
+import MainLayout from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
