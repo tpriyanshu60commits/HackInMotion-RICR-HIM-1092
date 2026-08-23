@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const getApiBaseUrl = () => {
+const getApiBaseUrl = () => {
   const isProd = import.meta.env.PROD;
   const envUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
   const url = envUrl || (isProd ? '/api' : 'http://localhost:5000/api');
