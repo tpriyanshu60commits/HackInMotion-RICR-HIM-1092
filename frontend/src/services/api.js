@@ -149,6 +149,7 @@ export const usersAPI = {
     api.post('/users/profile-image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
+  removeProfileImage: () => api.delete('/users/profile-image'),
   deleteAccount: () => api.delete('/users/me'),
 };
 
