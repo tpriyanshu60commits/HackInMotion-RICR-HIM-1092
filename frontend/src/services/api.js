@@ -145,10 +145,7 @@ export const alertService = {
 // Master - Extended User Profile
 export const usersAPI = {
   updateExtendedProfile: (data) => api.patch('/users/profile', data),
-  uploadProfileImage: (formData) =>
-    api.post('/users/profile-image', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+  uploadProfileImage: (formData) => api.post('/users/profile-image', formData),
   removeProfileImage: () => api.delete('/users/profile-image'),
   deleteAccount: () => api.delete('/users/me'),
 };
