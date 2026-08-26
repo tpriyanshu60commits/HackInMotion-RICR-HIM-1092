@@ -3,6 +3,7 @@ import { User, CheckCircle2, Upload, Camera, Image, Trash2 } from 'lucide-react'
 import useStore from '../../store/useStore';
 import { profileAPI, usersAPI } from '../../services/api';
 import { cn } from '../../utils/utils';
+import { CameraModal } from './CameraModal';
 
 export const BasicProfile = () => {
   const user = useStore((state) => state.user);
@@ -19,6 +20,7 @@ export const BasicProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
 
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -56,9 +58,9 @@ export const BasicProfile = () => {
     };
   }, [showPhotoMenu]);
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = async (eOrFile) => {
+    const file = eOrFile?.target?.files?.[0] || eOrFile;
+    if (!file || !file.type) return;
 
     setShowPhotoMenu(false);
     setUploadingImage(true);
@@ -194,7 +196,7 @@ export const BasicProfile = () => {
                   className="flex items-center gap-3 w-full px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors text-left"
                   onClick={() => {
                     setShowPhotoMenu(false);
-                    if (cameraInputRef.current) cameraInputRef.current.click();
+                    setIsCameraModalOpen(true);
                   }}
                 >
                   <Camera size={16} className="text-green-400 shrink-0" />
@@ -229,14 +231,6 @@ export const BasicProfile = () => {
             )}
 
             {/* Hidden file inputs */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handleImageUpload}
-            />
             <input
               ref={galleryInputRef}
               type="file"
@@ -384,6 +378,12 @@ export const BasicProfile = () => {
           </div>
         </form>
       </div>
+      
+      <CameraModal
+        isOpen={isCameraModalOpen}
+        onClose={() => setIsCameraModalOpen(false)}
+        onCapture={handleImageUpload}
+      />
     </div>
   );
 };
