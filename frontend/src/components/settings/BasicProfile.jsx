@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, CheckCircle2, Upload, Camera, Image, Trash2 } from 'lucide-react';
+import { User, CheckCircle2, Camera, Image, Trash2 } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { profileAPI, usersAPI } from '../../services/api';
 import { cn } from '../../utils/utils';
@@ -128,7 +128,7 @@ export const BasicProfile = () => {
     }
   };
 
-  const hasProfileImage = !!(user?.profileImage?.url);
+  const hasProfileImage = !!user?.profileImage?.url;
 
   return (
     <div className="w-full bg-black/40 backdrop-blur-xl border border-white/[0.10] rounded-2xl p-6 md:p-8 shadow-2xl animate-fade-in-up">
@@ -378,7 +378,7 @@ export const BasicProfile = () => {
           </div>
         </form>
       </div>
-      
+
       <CameraModal
         isOpen={isCameraModalOpen}
         onClose={() => setIsCameraModalOpen(false)}

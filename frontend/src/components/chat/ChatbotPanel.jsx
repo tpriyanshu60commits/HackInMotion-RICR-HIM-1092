@@ -126,23 +126,30 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
         { role: 'assistant', content: '', createdAt: new Date().toISOString() },
       ]);
 
-      while (true) {
+      let buffer = '';
+      let isStreamComplete = false;
+
+      while (!isStreamComplete) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        // Pass stream: true to prevent splitting UTF-8 characters
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.slice(6);
-            if (dataStr === '[DONE]') break;
-
+        buffer += decoder.decode(value, { stream: true });
+        
+        let boundary = buffer.indexOf('\n\n');
+        while (boundary !== -1) {
+          const chunk = buffer.slice(0, boundary);
+          buffer = buffer.slice(boundary + 2);
+          
+          if (chunk.startsWith('data: ')) {
+            const dataStr = chunk.slice(6);
+            if (dataStr === '[DONE]') {
+              isStreamComplete = true;
+              break;
+            }
+            
             try {
               const data = JSON.parse(dataStr);
               if (data.content) {
-                // Use pure state updates to prevent duplication bug in React 18 StrictMode
                 setMessages((prev) => {
                   const newMsgs = [...prev];
                   const lastMsg = { ...newMsgs[newMsgs.length - 1] };
@@ -155,6 +162,7 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
               console.error('Error parsing SSE JSON', e, dataStr);
             }
           }
+          boundary = buffer.indexOf('\n\n');
         }
       }
     } catch (error) {
@@ -244,7 +252,7 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 custom-scrollbar">
               {loadingHistory && (
                 <div className="flex justify-center p-4">
                   <RefreshCw className="animate-spin text-text-muted" size={20} />

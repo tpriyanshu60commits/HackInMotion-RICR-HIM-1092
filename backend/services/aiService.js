@@ -84,7 +84,7 @@ export const askAI = async (message, contextData, previousMessages = [], healthP
 
     const chatCompletion = await groq.chat.completions.create({
       messages,
-      model: 'llama-3.1-8b-instant',
+      model: process.env.AI_MODEL || 'openai/gpt-oss-120b',
       temperature: 0.3,
       max_tokens: 512,
     });
@@ -120,7 +120,7 @@ export const askAIStream = async (
 
     const stream = await groq.chat.completions.create({
       messages,
-      model: 'llama-3.1-8b-instant',
+      model: process.env.AI_MODEL || 'openai/gpt-oss-120b',
       temperature: 0.3,
       max_tokens: 512,
       stream: true,
