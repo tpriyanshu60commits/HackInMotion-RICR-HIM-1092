@@ -145,7 +145,13 @@ export const alertService = {
 // Master - Extended User Profile
 export const usersAPI = {
   updateExtendedProfile: (data) => api.patch('/users/profile', data),
-  uploadProfileImage: (formData) => api.post('/users/profile-image', formData),
+  uploadProfileImage: (formData) => {
+    return axios.post(`${API_BASE_URL}/users/profile-image`, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+      },
+    });
+  },
   removeProfileImage: () => api.delete('/users/profile-image'),
   deleteAccount: () => api.delete('/users/me'),
 };

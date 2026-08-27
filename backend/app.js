@@ -22,9 +22,12 @@ import profileRoutes from './routes/profileRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import aiHealthRoutes from './routes/aiHealthRoutes.js';
 
+import compression from 'compression';
+
 const app = express();
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
+app.use(compression());
 app.use(helmet());
 app.use(
   cors({

@@ -65,8 +65,8 @@ export const uploadProfileImage = async (req, res, next) => {
         message: 'Profile image uploaded successfully',
         data: {
           profileImage: {
-            url: req.file.path,
-            publicId: req.file.filename || '',
+            url: req.file.secure_url || req.file.url || req.file.path,
+            publicId: req.file.filename || req.file.public_id || '',
           },
         },
       });
@@ -79,9 +79,10 @@ export const uploadProfileImage = async (req, res, next) => {
     }
 
     // req.file contains the Cloudinary info from Multer Storage
+    console.log('Multer file uploaded:', req.file);
     user.profileImage = {
-      url: req.file.path,
-      publicId: req.file.filename,
+      url: req.file.secure_url || req.file.url || req.file.path,
+      publicId: req.file.filename || req.file.public_id,
     };
 
     const updatedUser = await user.save();
@@ -121,7 +122,7 @@ export const deleteProfileImage = async (req, res, next) => {
     if (user.profileImage && user.profileImage.publicId) {
       try {
         const cloudinary = (await import('../config/cloudinary.js')).default;
-        await cloudinary.uploader.destroy(user.profileImage.publicId);
+        await cloudinary.v2.uploader.destroy(user.profileImage.publicId);
       } catch (cloudErr) {
         console.error('Cloudinary deletion failed:', cloudErr);
         // Continue even if Cloudinary deletion fails

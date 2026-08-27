@@ -2,8 +2,8 @@ import multer from 'multer';
 import CloudinaryStorage from 'multer-storage-cloudinary';
 import cloudinary from '../config/cloudinary.js';
 
-const storage = CloudinaryStorage({
-  cloudinary: { v2: cloudinary },
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
   params: {
     folder: 'airsense/avatars',
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],

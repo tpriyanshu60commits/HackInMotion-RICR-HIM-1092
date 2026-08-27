@@ -5,6 +5,8 @@ import MainLayout from './layouts/MainLayout';
 import { WaterDropLoader } from './components/common/WaterDropLoader';
 import useStore from './store/useStore';
 import api from './services/api';
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 
 // Lazy Loaded Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -78,6 +80,25 @@ function App() {
   const { setUser, setInitializing } = useStore();
 
   useEffect(() => {
+    // Initialize Lenis smooth scroll
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      smoothTouch: false,
+      touchMultiplier: 2,
+      infinite: false,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
     // ... inside App ...
 
     const verifyAuth = async () => {
@@ -117,6 +138,10 @@ function App() {
     };
 
     verifyAuth();
+
+    return () => {
+      lenis.destroy();
+    };
   }, [setUser, setInitializing]);
 
   return (

@@ -19,7 +19,6 @@ export async function getMyReports(userId) {
   return res.data;
 }
 
-
 export async function updateStatus(id, status) {
   const res = await api.patch(`/reports/${id}/status`, { status });
   return res.data;
