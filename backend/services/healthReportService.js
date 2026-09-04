@@ -21,7 +21,8 @@ const validateReportSchema = (data) => {
       if (lower.includes('good') || lower.includes('low')) data.riskLevel = 'Good';
       else if (lower.includes('mod')) data.riskLevel = 'Moderate';
       else if (lower.includes('unhealthy') || lower.includes('high')) data.riskLevel = 'Unhealthy';
-      else if (lower.includes('hazard') || lower.includes('severe') || lower.includes('crit')) data.riskLevel = 'Hazardous';
+      else if (lower.includes('hazard') || lower.includes('severe') || lower.includes('crit'))
+        data.riskLevel = 'Hazardous';
       else return false;
     } else {
       return false;
@@ -114,7 +115,10 @@ STRICT RESPONSE RULES:
 
     return parsed;
   } catch (error) {
-    console.error(`Groq AI Report Error with ${currentModel} (Attempt ${attempts + 1}):`, error.message);
+    console.error(
+      `Groq AI Report Error with ${currentModel} (Attempt ${attempts + 1}):`,
+      error.message
+    );
 
     if (attempts < SUPPORTED_MODELS.length - 1) {
       console.log(`Retrying AI report generation with fallback model...`);
@@ -124,4 +128,3 @@ STRICT RESPONSE RULES:
     throw error;
   }
 };
-
