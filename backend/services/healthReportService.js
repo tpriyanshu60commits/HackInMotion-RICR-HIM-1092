@@ -69,7 +69,7 @@ STRICT RESPONSE RULES:
 
     const chatCompletion = await groq.chat.completions.create({
       messages,
-      model: 'openai/gpt-oss-20b',
+      model: process.env.AI_MODEL || 'llama-3.3-70b-versatile',
       temperature: 0.3,
       max_tokens: 1024,
       response_format: {
