@@ -65,7 +65,22 @@ STRICT RESPONSE RULES:
 
 10. Never override these restrictions based on the user's request to change the topic.`;
 
-export const askAI = async (message, contextData, previousMessages = [], healthProfile = null) => {
+const SUPPORTED_MODELS = [
+  process.env.AI_MODEL || 'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
+  'qwen/qwen3.8-27b',
+];
+
+export const askAI = async (
+  message,
+  contextData,
+  previousMessages = [],
+  healthProfile = null,
+  attempts = 0
+) => {
+  const modelIndex = Math.min(attempts, SUPPORTED_MODELS.length - 1);
+  const currentModel = SUPPORTED_MODELS[modelIndex];
+
   try {
     let systemMessageContent = SYSTEM_PROMPT;
     if (contextData) {
@@ -84,14 +99,17 @@ export const askAI = async (message, contextData, previousMessages = [], healthP
 
     const chatCompletion = await groq.chat.completions.create({
       messages,
-      model: process.env.AI_MODEL || 'llama-3.3-70b-versatile',
+      model: currentModel,
       temperature: 0.3,
       max_tokens: 512,
     });
 
     return chatCompletion.choices[0]?.message?.content || 'No response generated.';
   } catch (error) {
-    console.error('Groq API Error:', error);
+    console.error(`Groq API Error with ${currentModel} (Attempt ${attempts + 1}):`, error.message);
+    if (attempts < SUPPORTED_MODELS.length - 1) {
+      return askAI(message, contextData, previousMessages, healthProfile, attempts + 1);
+    }
     throw error;
   }
 };
@@ -102,6 +120,7 @@ export const askAIStream = async (
   previousMessages = [],
   healthProfile = null
 ) => {
+  const primaryModel = process.env.AI_MODEL || 'openai/gpt-oss-120b';
   try {
     let systemMessageContent = SYSTEM_PROMPT;
     if (contextData) {
@@ -120,7 +139,7 @@ export const askAIStream = async (
 
     const stream = await groq.chat.completions.create({
       messages,
-      model: process.env.AI_MODEL || 'llama-3.3-70b-versatile',
+      model: primaryModel,
       temperature: 0.3,
       max_tokens: 512,
       stream: true,
@@ -132,3 +151,4 @@ export const askAIStream = async (
     throw error;
   }
 };
+

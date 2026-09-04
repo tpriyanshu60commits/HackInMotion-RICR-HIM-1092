@@ -7,9 +7,25 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+const SUPPORTED_MODELS = [
+  process.env.AI_MODEL || 'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
+  'qwen/qwen3.8-27b',
+];
+
 const validateReportSchema = (data) => {
   if (!data.riskLevel || !['Good', 'Moderate', 'Unhealthy', 'Hazardous'].includes(data.riskLevel)) {
-    return false;
+    // Normalize or fallback if close
+    if (data.riskLevel && typeof data.riskLevel === 'string') {
+      const lower = data.riskLevel.toLowerCase();
+      if (lower.includes('good') || lower.includes('low')) data.riskLevel = 'Good';
+      else if (lower.includes('mod')) data.riskLevel = 'Moderate';
+      else if (lower.includes('unhealthy') || lower.includes('high')) data.riskLevel = 'Unhealthy';
+      else if (lower.includes('hazard') || lower.includes('severe') || lower.includes('crit')) data.riskLevel = 'Hazardous';
+      else return false;
+    } else {
+      return false;
+    }
   }
 
   if (!data.summary || typeof data.summary !== 'string') {
@@ -30,6 +46,9 @@ const validateReportSchema = (data) => {
 // Vision API and medical image analysis removed
 
 export const generateAIReport = async (profile, environmentData, attempts = 0) => {
+  const modelIndex = Math.min(attempts, SUPPORTED_MODELS.length - 1);
+  const currentModel = SUPPORTED_MODELS[modelIndex];
+
   try {
     const SYSTEM_PROMPT = `You are a health-risk AI assistant.
 Your task is to analyze the user's health profile and the current environmental data, and generate a personalized health report.
@@ -69,7 +88,7 @@ STRICT RESPONSE RULES:
 
     const chatCompletion = await groq.chat.completions.create({
       messages,
-      model: process.env.AI_MODEL || 'llama-3.3-70b-versatile',
+      model: currentModel,
       temperature: 0.3,
       max_tokens: 1024,
       response_format: {
@@ -77,9 +96,17 @@ STRICT RESPONSE RULES:
       },
     });
 
-    const responseText = chatCompletion.choices[0]?.message?.content || '{}';
+    let responseText = chatCompletion.choices[0]?.message?.content || '{}';
 
-    const parsed = JSON.parse(responseText);
+    // Strip any markdown code fences if present
+    if (responseText.includes('```')) {
+      const match = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (match) {
+        responseText = match[1];
+      }
+    }
+
+    const parsed = JSON.parse(responseText.trim());
 
     if (!validateReportSchema(parsed)) {
       throw new Error('Schema validation failed');
@@ -87,15 +114,14 @@ STRICT RESPONSE RULES:
 
     return parsed;
   } catch (error) {
-    console.error(`Groq AI Report Error (Attempt ${attempts + 1}):`, error.message);
+    console.error(`Groq AI Report Error with ${currentModel} (Attempt ${attempts + 1}):`, error.message);
 
-    if (attempts < 1) {
-      // Retry once (max 2 total attempts)
-      console.log('Retrying AI report generation due to schema or parsing error...');
-
+    if (attempts < SUPPORTED_MODELS.length - 1) {
+      console.log(`Retrying AI report generation with fallback model...`);
       return generateAIReport(profile, environmentData, attempts + 1);
     }
 
     throw error;
   }
 };
+

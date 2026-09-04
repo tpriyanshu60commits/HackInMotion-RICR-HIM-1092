@@ -205,7 +205,7 @@ export const generateReport = async (req, res, next) => {
     });
 
     const primaryCity =
-      req.body.primaryCity || profile?.primaryCity || req.user.preferences?.region;
+      req.body.primaryCity || profile?.primaryCity || req.user?.preferences?.region || 'Delhi';
 
     if (!primaryCity) {
       console.error(
