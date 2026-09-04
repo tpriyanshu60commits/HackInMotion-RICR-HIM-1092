@@ -92,8 +92,11 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
     setIsTyping(true);
 
     try {
-      // Setup SSE connection for streaming
+      // Setup SSE connection for streaming with timeout
       const token = localStorage.getItem('auth_token');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
       const response = await fetch(`${API_BASE_URL}/ai/ask`, {
         method: 'POST',
         headers: {
@@ -113,7 +116,10 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
               }
             : null,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) throw new Error('Network response was not ok');
 
@@ -134,19 +140,19 @@ export const ChatbotPanel = ({ isOpen, onClose }) => {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        
+
         let boundary = buffer.indexOf('\n\n');
         while (boundary !== -1) {
           const chunk = buffer.slice(0, boundary);
           buffer = buffer.slice(boundary + 2);
-          
+
           if (chunk.startsWith('data: ')) {
             const dataStr = chunk.slice(6);
             if (dataStr === '[DONE]') {
               isStreamComplete = true;
               break;
             }
-            
+
             try {
               const data = JSON.parse(dataStr);
               if (data.content) {

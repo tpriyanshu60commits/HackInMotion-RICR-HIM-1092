@@ -118,9 +118,12 @@ export const askAIStream = async (
   message,
   contextData,
   previousMessages = [],
-  healthProfile = null
+  healthProfile = null,
+  attempts = 0
 ) => {
-  const primaryModel = process.env.AI_MODEL || 'openai/gpt-oss-120b';
+  const modelIndex = Math.min(attempts, SUPPORTED_MODELS.length - 1);
+  const currentModel = SUPPORTED_MODELS[modelIndex];
+
   try {
     let systemMessageContent = SYSTEM_PROMPT;
     if (contextData) {
@@ -139,7 +142,7 @@ export const askAIStream = async (
 
     const stream = await groq.chat.completions.create({
       messages,
-      model: primaryModel,
+      model: currentModel,
       temperature: 0.3,
       max_tokens: 512,
       stream: true,
@@ -147,8 +150,13 @@ export const askAIStream = async (
 
     return stream;
   } catch (error) {
-    console.error('Groq Stream Error:', error);
+    console.error(
+      `Groq Stream Error with ${currentModel} (Attempt ${attempts + 1}):`,
+      error.message
+    );
+    if (attempts < SUPPORTED_MODELS.length - 1) {
+      return askAIStream(message, contextData, previousMessages, healthProfile, attempts + 1);
+    }
     throw error;
   }
 };
-
